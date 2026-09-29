@@ -23,6 +23,7 @@ export class QuestionController {
         page: req.query.page ? Number(req.query.page) : undefined,
         limit: req.query.limit ? Number(req.query.limit) : undefined,
         search: req.query.search ? String(req.query.search) : undefined,
+        companyId: req.query.companyId ? String(req.query.companyId) : undefined,
         category: req.query.category as QuestionQueryFilters['category'],
         topic: req.query.topic ? String(req.query.topic) : undefined,
         difficulty: req.query.difficulty as QuestionQueryFilters['difficulty'],

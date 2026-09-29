@@ -51,7 +51,7 @@ export const HealthStatusPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <MetricCard
             title="REST API STATUS"
-            value={health.isLoading ? 'Checking...' : health.isError ? 'Disconnected' : 'Operational'}
+            value={health.isLoading ? 'Checking...' : health.isError ? 'Disconnected' : 'Connected'}
             subtitle={health.data?.message || 'GET /api/health'}
             icon={<HttpIcon fontSize="small" />}
             color={health.isError ? '#ef4444' : health.isLoading ? '#f59e0b' : '#10b981'}

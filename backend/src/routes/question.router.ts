@@ -10,9 +10,9 @@ import {
 
 export const questionRouter = Router();
 
-// All question bank management routes are strictly restricted to SUPER_ADMIN & PLACEMENT_ADMIN
+// Question bank management routes are strictly restricted to operational PLACEMENT_ADMIN
 questionRouter.use(authenticateToken);
-questionRouter.use(requireRole(Role.SUPER_ADMIN, Role.PLACEMENT_ADMIN));
+questionRouter.use(requireRole(Role.PLACEMENT_ADMIN));
 
 // Category-Topics master dictionary lookup
 questionRouter.get('/categories', questionController.getCategories);

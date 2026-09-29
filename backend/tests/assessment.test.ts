@@ -8,6 +8,7 @@ import { assessmentRepository } from '../src/repositories/assessment.repository.
 let server: http.Server;
 let baseUrl: string;
 let superAdminToken: string;
+let placementAdminToken: string;
 let studentToken: string;
 
 before(async () => {
@@ -31,7 +32,16 @@ before(async () => {
   const adminJson = await adminRes.json();
   superAdminToken = adminJson.data.accessToken;
 
-  // 2. Student Token
+  // 2. Placement Admin Token (Assessment Authoring)
+  const placementRes = await fetch(`${baseUrl}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'placementadmin@placement.edu', password: 'PlacementAdmin@123' }),
+  });
+  const placementJson = await placementRes.json();
+  placementAdminToken = placementJson.data.accessToken;
+
+  // 3. Student Token
   const studentRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -93,7 +103,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Invalid Test',
@@ -114,7 +124,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Invalid Component Assessment',
@@ -139,7 +149,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Campus Placement Drive 2026',
@@ -187,7 +197,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
 
   it('4. GET /api/assessments returns paginated assessments list', async () => {
     const res = await fetch(`${baseUrl}/assessments`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 200);
     const body = await res.json();
@@ -202,7 +212,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'To Be Updated Assessment',
@@ -223,7 +233,7 @@ describe('Phase 5 — Assessment Configuration & Server-Side Validation', () => 
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Updated Assessment Name',
@@ -246,7 +256,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Shortage Assessment Test',
@@ -266,7 +276,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
 
     const genRes = await fetch(`${baseUrl}/assessments/${created.id}/generate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(genRes.status, 400);
     const body = await genRes.json();
@@ -281,7 +291,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
 
     // Verify NO papers were created (atomic safety)
     const papersRes = await fetch(`${baseUrl}/assessments/${created.id}/papers`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     const papers = (await papersRes.json()).data;
     assert.strictEqual(papers.length, 0);
@@ -292,7 +302,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Multi-Paper Generator Test',
@@ -314,7 +324,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
 
     const genRes = await fetch(`${baseUrl}/assessments/${created.id}/generate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(genRes.status, 201);
     const genBody = await genRes.json();
@@ -324,7 +334,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
 
     // Inspect papers and verify zero duplicate questions across sets
     const papersRes = await fetch(`${baseUrl}/assessments/${created.id}/papers`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     const papers = (await papersRes.json()).data;
     assert.strictEqual(papers.length, 2);
@@ -355,18 +365,18 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
   it('8. Deterministic reproducibility: paper reload returns identical question and option order', async () => {
     // Fetch the papers generated in test 7 again
     const allAssessmentsRes = await fetch(`${baseUrl}/assessments`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     const assessments = (await allAssessmentsRes.json()).data.data;
     const multiPaperAsmt = assessments.find((a: { name: string }) => a.name === 'Multi-Paper Generator Test');
 
     const fetch1 = await fetch(`${baseUrl}/assessments/${multiPaperAsmt.id}/papers`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     const papers1 = (await fetch1.json()).data;
 
     const fetch2 = await fetch(`${baseUrl}/assessments/${multiPaperAsmt.id}/papers`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     const papers2 = (await fetch2.json()).data;
 
@@ -386,7 +396,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Monthly Exclusion Test Assessment',
@@ -406,7 +416,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
 
     const genRes = await fetch(`${baseUrl}/assessments/${created.id}/generate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(genRes.status, 400);
     const body = await genRes.json();
@@ -423,7 +433,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Concurrency Lock Test Assessment',
@@ -447,7 +457,7 @@ describe('Phase 5 — Question Selection Engine & Shortage Failure', () => {
     // Call generate while lock is active
     const genRes = await fetch(`${baseUrl}/assessments/${created.id}/generate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(genRes.status, 409);
     const body = await genRes.json();
@@ -467,7 +477,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         name: 'Lifecycle & Assignment Assessment',
@@ -490,7 +500,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
   it('11. Cannot publish an assessment before examination papers are generated', async () => {
     const res = await fetch(`${baseUrl}/assessments/${assessmentId}/publish`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 400);
     const body = await res.json();
@@ -502,14 +512,14 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
     // Generate paper first
     const genRes = await fetch(`${baseUrl}/assessments/${assessmentId}/generate`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(genRes.status, 201);
 
     // Now publish
     const pubRes = await fetch(`${baseUrl}/assessments/${assessmentId}/publish`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(pubRes.status, 200);
     const pubBody = await pubRes.json();
@@ -518,7 +528,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
     // Unpublish to revert to DRAFT
     const unpubRes = await fetch(`${baseUrl}/assessments/${assessmentId}/unpublish`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(unpubRes.status, 200);
     const unpubBody = await unpubRes.json();
@@ -533,7 +543,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({ startDate, endDate }),
     });
@@ -549,7 +559,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         studentIds: ['std-test-001', 'std-test-002', 'std-test-003'],
@@ -563,7 +573,7 @@ describe('Phase 5 — Lifecycle, Scheduling & Student Assignments', () => {
 
     // Verify retrieval of assignments
     const listRes = await fetch(`${baseUrl}/assessments/${assessmentId}/assignments`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(listRes.status, 200);
     const listBody = await listRes.json();
@@ -577,6 +587,16 @@ describe('Phase 5 — Security, RBAC & Phases 1–4 Regression', () => {
       headers: { Authorization: `Bearer ${studentToken}` },
     });
     assert.strictEqual(res.status, 403);
+  });
+
+  it('15b. SUPER_ADMIN token is denied access to assessment management APIs (HTTP 403 Forbidden)', async () => {
+    const res = await fetch(`${baseUrl}/assessments`, {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.strictEqual(res.status, 403);
+    const body = await res.json();
+    assert.strictEqual(body.success, false);
+    assert.ok(body.message.includes('Forbidden'));
   });
 
   it('16. Unauthenticated requests are denied access (HTTP 401 Unauthorized)', async () => {
@@ -613,8 +633,15 @@ describe('Phase 5 — Security, RBAC & Phases 1–4 Regression', () => {
   });
 
   it('20. Phase 4 Question Bank regression: /api/questions/categories and question CRUD work', async () => {
-    const res = await fetch(`${baseUrl}/questions/categories`, {
+    // SUPER_ADMIN is 403 on question bank
+    const saRes = await fetch(`${baseUrl}/questions/categories`, {
       headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.strictEqual(saRes.status, 403);
+
+    // PLACEMENT_ADMIN has 200 on question bank
+    const res = await fetch(`${baseUrl}/questions/categories`, {
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 200);
     const body = await res.json();

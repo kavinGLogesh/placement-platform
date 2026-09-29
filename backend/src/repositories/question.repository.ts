@@ -8,9 +8,11 @@ import {
   CreateQuestionUsageDto,
   QuestionStatus,
   QuestionOptionDto,
+  QuestionCategory,
 } from '../types/question.types.js';
 import { PaginatedResult } from '../types/management.types.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { generateExactQuestionHash } from '../utils/duplicate-detector.util.js';
 
 class InMemoryQuestionStore {
   public questions: Map<string, QuestionDto> = new Map();
@@ -258,10 +260,22 @@ export class QuestionRepository {
       updatedAt: now,
     }));
 
+    const exactHash =
+      payload.exactHash ||
+      generateExactQuestionHash({
+        category: payload.category,
+        topic: payload.topic,
+        questionText: payload.questionText,
+        options: payload.options,
+        correctAnswer: payload.correctAnswer,
+      });
+
     if (process.env.NODE_ENV === 'test') {
       await this.memStore.initialize();
       const memoryRecord: QuestionDto = {
         id,
+        companyId: payload.companyId || null,
+        exactHash,
         category: payload.category,
         topic: payload.topic.trim(),
         difficulty: payload.difficulty || 'MEDIUM',
@@ -276,6 +290,18 @@ export class QuestionRepository {
         createdAt: now,
         updatedAt: now,
         options: optionsData,
+        companyQuestions: payload.companyId
+          ? [
+              {
+                id: `cq-${id}-${payload.companyId}`,
+                companyId: payload.companyId,
+                source: null,
+                year: null,
+                occurrenceCount: 1,
+                label: 'Company Tagged',
+              },
+            ]
+          : [],
         _count: { usages: 0 },
       };
       this.memStore.questions.set(memoryRecord.id, memoryRecord);
@@ -284,6 +310,8 @@ export class QuestionRepository {
 
     const created = await prisma.question.create({
       data: {
+        companyId: payload.companyId || undefined,
+        exactHash,
         category: payload.category,
         topic: payload.topic.trim(),
         difficulty: payload.difficulty || 'MEDIUM',
@@ -302,9 +330,20 @@ export class QuestionRepository {
             isCorrect: o.isCorrect,
           })),
         },
+        companyQuestions: payload.companyId
+          ? {
+              create: {
+                companyId: payload.companyId,
+                label: 'Company Tagged',
+                occurrenceCount: 1,
+              },
+            }
+          : undefined,
       },
       include: {
         options: true,
+        company: { select: { id: true, name: true, code: true } },
+        companyQuestions: true,
         createdBy: { select: { id: true, email: true } },
         _count: { select: { usages: true } },
       },
@@ -325,6 +364,13 @@ export class QuestionRepository {
       await this.memStore.initialize();
       let list = Array.from(this.memStore.questions.values());
 
+      if (filters.companyId) {
+        list = list.filter(
+          (q) =>
+            q.companyId === filters.companyId ||
+            (q.companyQuestions && q.companyQuestions.some((cq) => cq.companyId === filters.companyId))
+        );
+      }
       if (filters.category) {
         list = list.filter((q) => q.category === filters.category);
       }
@@ -392,6 +438,12 @@ export class QuestionRepository {
 
     const whereClause: Record<string, unknown> = {};
 
+    if (filters.companyId) {
+      whereClause.OR = [
+        { companyId: filters.companyId },
+        { companyQuestions: { some: { companyId: filters.companyId } } },
+      ];
+    }
     if (filters.category) whereClause.category = filters.category;
     if (filters.topic) whereClause.topic = { contains: filters.topic };
     if (filters.difficulty) whereClause.difficulty = filters.difficulty;
@@ -399,10 +451,19 @@ export class QuestionRepository {
     if (filters.status) whereClause.status = filters.status;
 
     if (filters.search) {
-      whereClause.OR = [
+      const searchConditions = [
         { questionText: { contains: filters.search } },
         { topic: { contains: filters.search } },
       ];
+      if (whereClause.OR) {
+        whereClause.AND = [
+          { OR: whereClause.OR },
+          { OR: searchConditions },
+        ];
+        delete whereClause.OR;
+      } else {
+        whereClause.OR = searchConditions;
+      }
     }
 
     const orderBy: Record<string, 'asc' | 'desc'> = {};
@@ -418,6 +479,8 @@ export class QuestionRepository {
         orderBy,
         include: {
           options: { orderBy: { optionOrder: 'asc' } },
+          company: { select: { id: true, name: true, code: true } },
+          companyQuestions: true,
           createdBy: { select: { id: true, email: true } },
           _count: { select: { usages: true } },
         },
@@ -439,6 +502,55 @@ export class QuestionRepository {
     };
   }
 
+  async findQuestionByExactHash(exactHash: string): Promise<QuestionDto | null> {
+    if (process.env.NODE_ENV === 'test') {
+      await this.memStore.initialize();
+      for (const q of this.memStore.questions.values()) {
+        if (q.exactHash === exactHash) return q;
+      }
+      return null;
+    }
+
+    const question = await prisma.question.findFirst({
+      where: { exactHash },
+      include: {
+        options: { orderBy: { optionOrder: 'asc' } },
+        company: { select: { id: true, name: true, code: true } },
+        companyQuestions: true,
+        createdBy: { select: { id: true, email: true } },
+        _count: { select: { usages: true } },
+      },
+    });
+
+    return (question as unknown as QuestionDto) || null;
+  }
+
+  async findQuestionsByTopic(category: QuestionCategory, topic: string): Promise<QuestionDto[]> {
+    if (process.env.NODE_ENV === 'test') {
+      await this.memStore.initialize();
+      const normTopic = topic.trim().toLowerCase();
+      return Array.from(this.memStore.questions.values()).filter(
+        (q) => q.category === category && q.topic.toLowerCase() === normTopic && q.status === 'ACTIVE'
+      );
+    }
+
+    const questions = await prisma.question.findMany({
+      where: {
+        category,
+        topic: topic.trim(),
+        status: 'ACTIVE',
+      },
+      include: {
+        options: { orderBy: { optionOrder: 'asc' } },
+        companyQuestions: true,
+      },
+      take: 100,
+    });
+
+    return questions as unknown as QuestionDto[];
+  }
+
+
   // ===========================================================================
   // 3. FIND QUESTION BY ID
   // ===========================================================================
@@ -452,6 +564,7 @@ export class QuestionRepository {
       where: { id },
       include: {
         options: { orderBy: { optionOrder: 'asc' } },
+        company: { select: { id: true, name: true, code: true } },
         createdBy: { select: { id: true, email: true } },
         _count: { select: { usages: true } },
       },
@@ -485,6 +598,7 @@ export class QuestionRepository {
 
     const updatedMemory: QuestionDto = {
       ...existing,
+      companyId: payload.companyId !== undefined ? payload.companyId : existing.companyId,
       category: payload.category ?? existing.category,
       topic: payload.topic ? payload.topic.trim() : existing.topic,
       difficulty: payload.difficulty ?? existing.difficulty,
@@ -522,6 +636,7 @@ export class QuestionRepository {
       await tx.question.update({
         where: { id },
         data: {
+          companyId: payload.companyId !== undefined ? payload.companyId : undefined,
           category: payload.category,
           topic: payload.topic ? payload.topic.trim() : undefined,
           difficulty: payload.difficulty,

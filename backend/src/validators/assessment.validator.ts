@@ -129,6 +129,27 @@ export function validateCreateAssessment(data: unknown): CreateAssessmentDto {
     errors.endDate = 'End date must be strictly after start date';
   }
 
+  // Department Targeting
+  let departmentTargeting: 'ALL' | 'SPECIFIC' = 'ALL';
+  let departmentIds: string[] = [];
+  if (payload.departmentTargeting !== undefined && payload.departmentTargeting !== null) {
+    if (payload.departmentTargeting !== 'ALL' && payload.departmentTargeting !== 'SPECIFIC') {
+      errors.departmentTargeting = "Department targeting must be either 'ALL' or 'SPECIFIC'";
+    } else {
+      departmentTargeting = payload.departmentTargeting as 'ALL' | 'SPECIFIC';
+    }
+  }
+  if (departmentTargeting === 'SPECIFIC') {
+    if (!Array.isArray(payload.departmentIds) || payload.departmentIds.length === 0) {
+      errors.departmentIds = 'At least one department must be selected when targeting specific departments';
+    } else {
+      departmentIds = (payload.departmentIds as unknown[]).filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+      if (departmentIds.length === 0) {
+        errors.departmentIds = 'Valid department IDs must be provided when targeting specific departments';
+      }
+    }
+  }
+
   // Sections
   if (!Array.isArray(payload.sections) || payload.sections.length === 0) {
     errors.sections = 'Assessment must contain at least one section';
@@ -235,6 +256,10 @@ export function validateCreateAssessment(data: unknown): CreateAssessmentDto {
     startDate,
     endDate,
     numberOfPapers,
+    companyId: typeof payload.companyId === 'string' && payload.companyId.trim() ? payload.companyId.trim() : null,
+    isCompanyAssessment: payload.isCompanyAssessment !== undefined ? Boolean(payload.isCompanyAssessment) : (Boolean(payload.companyId)),
+    departmentTargeting,
+    departmentIds,
     sections: validatedSections,
   };
 }
@@ -411,6 +436,12 @@ export function validateUpdateAssessment(data: unknown): UpdateAssessmentDto {
   if (startDate !== undefined) result.startDate = startDate;
   if (endDate !== undefined) result.endDate = endDate;
   if (payload.numberOfPapers !== undefined) result.numberOfPapers = payload.numberOfPapers as number;
+  if (payload.companyId !== undefined) {
+    result.companyId = typeof payload.companyId === 'string' && payload.companyId.trim() ? payload.companyId.trim() : null;
+  }
+  if (payload.isCompanyAssessment !== undefined) {
+    result.isCompanyAssessment = Boolean(payload.isCompanyAssessment);
+  }
   if (validatedSections !== undefined) result.sections = validatedSections;
 
   return result;

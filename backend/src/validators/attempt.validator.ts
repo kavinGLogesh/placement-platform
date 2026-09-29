@@ -1,5 +1,10 @@
 import { AppError } from '../middleware/errorHandler.js';
-import { SaveAnswerDto, BatchSyncAnswersDto } from '../types/attempt.types.js';
+import {
+  SaveAnswerDto,
+  BatchSyncAnswersDto,
+  RecordViolationDto,
+  AttemptViolationType,
+} from '../types/attempt.types.js';
 
 export const validateStartAttempt = (assessmentId: unknown): string => {
   if (!assessmentId || typeof assessmentId !== 'string' || assessmentId.trim().length === 0) {
@@ -78,3 +83,31 @@ export const validateBatchSyncAnswers = (body: unknown): BatchSyncAnswersDto => 
     currentQuestion: typeof currentQuestion === 'number' && currentQuestion >= 1 ? currentQuestion : undefined,
   };
 };
+
+const VALID_VIOLATION_TYPES = ['TAB_SWITCH', 'WINDOW_BLUR', 'FULLSCREEN_EXIT', 'SCREENSHOT_ATTEMPT'] as const;
+
+export const validateRecordViolation = (body: unknown): RecordViolationDto => {
+  if (!body || typeof body !== 'object') {
+    throw new AppError('Invalid violation payload', 400);
+  }
+
+  const { violationType, details, clientTimestamp } = body as Record<string, unknown>;
+
+  if (!violationType || typeof violationType !== 'string' || !VALID_VIOLATION_TYPES.includes(violationType as any)) {
+    throw new AppError(
+      `violationType must be one of: ${VALID_VIOLATION_TYPES.join(', ')}`,
+      400
+    );
+  }
+
+  if (details !== undefined && details !== null && typeof details !== 'string') {
+    throw new AppError('details must be a string if provided', 400);
+  }
+
+  return {
+    violationType: violationType as AttemptViolationType,
+    details: details ? (details as string).trim() : undefined,
+    clientTimestamp: typeof clientTimestamp === 'string' ? clientTimestamp : undefined,
+  };
+};
+

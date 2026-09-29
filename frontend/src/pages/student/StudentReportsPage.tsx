@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Typography,
   Box,
@@ -19,18 +19,12 @@ import {
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import DownloadIcon from '@mui/icons-material/Download';
-import PrintIcon from '@mui/icons-material/Print';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import TableChartIcon from '@mui/icons-material/TableChart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { reportService } from '../../services/report.service.js';
-import { ExportFormat } from '../../types/report.types.js';
 
 export const StudentReportsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [exportLoading, setExportLoading] = useState<string | null>(null);
 
   const {
     data: report,
@@ -44,18 +38,6 @@ export const StudentReportsPage: React.FC = () => {
     staleTime: 30000,
   });
 
-  const handleExport = async (format: ExportFormat) => {
-    try {
-      setExportLoading(format);
-      await reportService.downloadStudentOwnReport(format);
-    } catch (err) {
-      console.error('Student export failed:', err);
-      alert('Failed to generate export file. Please try again.');
-    } finally {
-      setExportLoading(null);
-    }
-  };
-
   return (
     <Box>
       {/* Header & Back Button */}
@@ -64,78 +46,47 @@ export const StudentReportsPage: React.FC = () => {
           mb: 3,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           flexWrap: 'wrap',
           gap: 2,
         }}
       >
         <div>
           <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/student/dashboard')}
-            sx={{ mb: 1, color: 'text.secondary' }}
+            variant="outlined"
             size="small"
+            startIcon={<ArrowBackIcon fontSize="small" />}
+            onClick={() => navigate('/student/dashboard')}
+            sx={{
+              mb: 1.5,
+              color: '#0f3674',
+              borderColor: '#cbd5e1',
+              borderRadius: '6px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.8125rem',
+              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+            }}
           >
             Back to Dashboard
           </Button>
-          <Typography variant="overline" color="success.light" fontWeight={700} letterSpacing={1.2}>
-            Student Workspace • Phase 9 Reports
+          <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+            INSTITUTIONAL TRANSCRIPT & EVALUATION
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-            My Performance Transcript & Official Report
+          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#0f172a' }}>
+            Placement Performance Transcript
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
+            Official record of proctored assessment attempts, cumulative scores, and topic-level competency ratings.
           </Typography>
         </div>
-
-        {/* Export Buttons */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={exportLoading === 'xlsx' ? <CircularProgress size={16} /> : <TableChartIcon />}
-            disabled={Boolean(exportLoading)}
-            onClick={() => handleExport('xlsx')}
-            sx={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}
-          >
-            Excel (.xlsx)
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={exportLoading === 'csv' ? <CircularProgress size={16} /> : <DownloadIcon />}
-            disabled={Boolean(exportLoading)}
-            onClick={() => handleExport('csv')}
-            sx={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)' }}
-          >
-            CSV
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={exportLoading === 'pdf' ? <CircularProgress size={16} /> : <PictureAsPdfIcon />}
-            disabled={Boolean(exportLoading)}
-            onClick={() => handleExport('pdf')}
-            sx={{ color: '#f43f5e', borderColor: 'rgba(244, 63, 94, 0.4)' }}
-          >
-            PDF Transcript
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            startIcon={exportLoading === 'html' ? <CircularProgress size={16} /> : <PrintIcon />}
-            disabled={Boolean(exportLoading)}
-            onClick={() => handleExport('html')}
-          >
-            Print Layout
-          </Button>
-        </Box>
       </Box>
 
       {/* Error Alert */}
       {isError && (
         <Alert
           severity="error"
-          sx={{ mb: 3 }}
+          sx={{ mb: 3, borderRadius: '8px' }}
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
               Retry
@@ -149,58 +100,62 @@ export const StudentReportsPage: React.FC = () => {
       {/* Loading State */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+          <CircularProgress size={32} sx={{ color: '#0f3674' }} />
         </Box>
       ) : (
         report && (
           <>
             {/* Student Profile Info Card */}
             <Card
+              elevation={0}
               sx={{
                 mb: 3,
-                bgcolor: 'rgba(16, 185, 129, 0.04)',
-                border: '1px solid rgba(16, 185, 129, 0.2)',
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
               }}
             >
-              <CardContent sx={{ py: 2 }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                       Candidate Name
                     </Typography>
-                    <Typography variant="subtitle1" fontWeight={700}>
+                    <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a' }}>
                       {report.student.name}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={3} md={2}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                       Register Number
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                    <Typography variant="subtitle2" sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#0f172a' }}>
                       {report.student.registerNumber}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={3} md={2}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                       Department
                     </Typography>
-                    <Typography variant="subtitle2">
+                    <Typography variant="subtitle2" sx={{ color: '#0f172a' }}>
                       {report.student.departmentName} ({report.student.departmentCode})
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={3} md={2}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                       Course & Year
                     </Typography>
-                    <Typography variant="subtitle2">
+                    <Typography variant="subtitle2" sx={{ color: '#0f172a' }}>
                       {report.student.courseCode} • Year {report.student.year}
                     </Typography>
                   </Grid>
                   <Grid item xs={6} sm={3} md={3}>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
                       Institutional Email
                     </Typography>
-                    <Typography variant="subtitle2">{report.student.collegeEmail}</Typography>
+                    <Typography variant="subtitle2" sx={{ color: '#0f172a' }}>
+                      {report.student.collegeEmail}
+                    </Typography>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -209,12 +164,12 @@ export const StudentReportsPage: React.FC = () => {
             {/* Performance KPIs */}
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid item xs={6} sm={4} md={2.4}>
-                <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Card elevation={0} sx={{ bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Tests Completed
                     </Typography>
-                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5 }}>
+                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0f172a' }}>
                       {report.summary.totalAssessmentsCompleted} / {report.summary.totalAssessmentsAssigned}
                     </Typography>
                   </CardContent>
@@ -222,12 +177,12 @@ export const StudentReportsPage: React.FC = () => {
               </Grid>
 
               <Grid item xs={6} sm={4} md={2.4}>
-                <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Card elevation={0} sx={{ bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Average Score
                     </Typography>
-                    <Typography variant="h5" fontWeight={800} color="primary.light" sx={{ mt: 0.5 }}>
+                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0f3674' }}>
                       {report.summary.averageScore}
                     </Typography>
                   </CardContent>
@@ -235,12 +190,12 @@ export const StudentReportsPage: React.FC = () => {
               </Grid>
 
               <Grid item xs={6} sm={4} md={2.4}>
-                <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Card elevation={0} sx={{ bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Average Percentage
                     </Typography>
-                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5 }}>
+                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0f172a' }}>
                       {report.summary.averagePercentage}%
                     </Typography>
                   </CardContent>
@@ -248,12 +203,12 @@ export const StudentReportsPage: React.FC = () => {
               </Grid>
 
               <Grid item xs={6} sm={4} md={2.4}>
-                <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Card elevation={0} sx={{ bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Overall Accuracy
                     </Typography>
-                    <Typography variant="h5" fontWeight={800} color="#06b6d4" sx={{ mt: 0.5 }}>
+                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0369a1' }}>
                       {report.summary.overallAccuracy}%
                     </Typography>
                   </CardContent>
@@ -261,16 +216,18 @@ export const StudentReportsPage: React.FC = () => {
               </Grid>
 
               <Grid item xs={6} sm={4} md={2.4}>
-                <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <Card elevation={0} sx={{ bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                   <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
+                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Pass Rate
                     </Typography>
                     <Typography
                       variant="h5"
                       fontWeight={800}
-                      color={report.summary.passRate >= 60 ? 'success.main' : 'error.main'}
-                      sx={{ mt: 0.5 }}
+                      sx={{
+                        mt: 0.5,
+                        color: report.summary.passRate >= 60 ? '#047857' : '#b91c1c',
+                      }}
                     >
                       {report.summary.passRate}%
                     </Typography>
@@ -280,56 +237,64 @@ export const StudentReportsPage: React.FC = () => {
             </Grid>
 
             {/* Assessment History Table */}
-            <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1.5, color: '#0f172a' }}>
               Assessment Results History
             </Typography>
             <TableContainer
               component={Paper}
+              elevation={0}
               sx={{
-                bgcolor: 'background.paper',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: 2,
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
                 mb: 4,
               }}
             >
               <Table size="small">
-                <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.04)' }}>
+                <TableHead sx={{ bgcolor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Assessment Title</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Total Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Obtained Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Percentage</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Result</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Submitted At</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assessment Title</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Obtained Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Percentage</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Result</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Submitted At</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {report.assessments.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: '#64748b' }}>
                           No assessment results on record.
                         </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
                     report.assessments.map((a) => (
-                      <TableRow key={a.assessmentId} hover>
-                        <TableCell sx={{ fontWeight: 600 }}>{a.assessmentTitle}</TableCell>
-                        <TableCell align="right">{a.totalMarks}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 600 }}>{a.obtainedMarks}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 700 }}>{a.percentage}%</TableCell>
-                        <TableCell align="right">{a.accuracy}%</TableCell>
+                      <TableRow key={a.assessmentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{a.assessmentTitle}</TableCell>
+                        <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{a.totalMarks}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{a.obtainedMarks}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>{a.percentage}%</TableCell>
+                        <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{a.accuracy}%</TableCell>
                         <TableCell align="center">
                           <Chip
                             size="small"
                             label={a.isPassed ? 'PASSED' : 'FAILED'}
-                            color={a.isPassed ? 'success' : 'error'}
-                            sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              borderRadius: '4px',
+                              bgcolor: a.isPassed ? '#ecfdf5' : '#fef2f2',
+                              color: a.isPassed ? '#047857' : '#b91c1c',
+                              border: '1px solid',
+                              borderColor: a.isPassed ? '#a7f3d0' : '#fecaca',
+                            }}
                           />
                         </TableCell>
-                        <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                        <TableCell sx={{ fontSize: '0.75rem', color: '#64748b' }}>
                           {a.submittedAt ? new Date(a.submittedAt).toLocaleString() : '-'}
                         </TableCell>
                       </TableRow>
@@ -340,54 +305,71 @@ export const StudentReportsPage: React.FC = () => {
             </TableContainer>
 
             {/* Topic & Skill Proficiency Breakdown */}
-            <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1.5, color: '#0f172a' }}>
               Topic & Skill Competency Profile
             </Typography>
             <TableContainer
               component={Paper}
+              elevation={0}
               sx={{
-                bgcolor: 'background.paper',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: 2,
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
                 mb: 4,
               }}
             >
               <Table size="small">
-                <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.04)' }}>
+                <TableHead sx={{ bgcolor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Topic Name</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy Rate</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Proficiency Assessment</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Category</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Topic Name</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy Rate</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Proficiency Assessment</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {report.topicProficiency.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: '#64748b' }}>
                           No topic competency data available yet. Complete an assessment to generate your skill profile.
                         </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
                     report.topicProficiency.map((t, idx) => (
-                      <TableRow key={idx} hover>
-                        <TableCell sx={{ fontWeight: 600 }}>{t.category.replace(/_/g, ' ')}</TableCell>
-                        <TableCell>{t.topic}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 700 }}>{t.accuracyPercentage}%</TableCell>
+                      <TableRow key={idx} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{t.category.replace(/_/g, ' ')}</TableCell>
+                        <TableCell sx={{ fontSize: '0.82rem', color: '#0f172a' }}>{t.topic}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>{t.accuracyPercentage}%</TableCell>
                         <TableCell align="center">
                           <Chip
                             size="small"
                             label={t.proficiencyRating}
-                            color={
-                              t.proficiencyRating === 'Strong'
-                                ? 'success'
-                                : t.proficiencyRating === 'Moderate'
-                                ? 'warning'
-                                : 'error'
-                            }
-                            sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              borderRadius: '4px',
+                              bgcolor:
+                                t.proficiencyRating === 'Strong'
+                                  ? '#ecfdf5'
+                                  : t.proficiencyRating === 'Moderate'
+                                  ? '#fef3c7'
+                                  : '#fef2f2',
+                              color:
+                                t.proficiencyRating === 'Strong'
+                                  ? '#047857'
+                                  : t.proficiencyRating === 'Moderate'
+                                  ? '#b45309'
+                                  : '#b91c1c',
+                              border: '1px solid',
+                              borderColor:
+                                t.proficiencyRating === 'Strong'
+                                  ? '#a7f3d0'
+                                  : t.proficiencyRating === 'Moderate'
+                                  ? '#fde68a'
+                                  : '#fecaca',
+                            }}
                           />
                         </TableCell>
                       </TableRow>

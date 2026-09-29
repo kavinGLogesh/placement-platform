@@ -29,7 +29,7 @@ export interface Column<T> {
 
 interface DataTableProps<T> {
   columns: Column<T>[];
-  data: T[];
+  data?: T[];
   loading?: boolean;
   totalCount?: number;
   page?: number;
@@ -48,13 +48,13 @@ interface DataTableProps<T> {
 
 export function DataTable<T extends { id: string | number }>({
   columns,
-  data,
+  data = [],
   loading = false,
   totalCount,
   page = 0,
   rowsPerPage = 10,
   searchValue,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder = 'Filter records...',
   onSearchChange,
   onPageChange,
   onRowsPerPageChange,
@@ -62,30 +62,34 @@ export function DataTable<T extends { id: string | number }>({
   sortOrder = 'asc',
   onSortChange,
   actions,
-  emptyMessage = 'No records found',
+  emptyMessage = 'No records found in this view',
 }: DataTableProps<T>): React.ReactElement {
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <Paper
       elevation={0}
       sx={{
-        backgroundColor: 'rgba(17, 24, 39, 0.75)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: 2.5,
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
+        borderRadius: 2,
         overflow: 'hidden',
+        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
       }}
     >
       {/* Header Toolbar */}
       {(onSearchChange || actions) && (
         <Box
           sx={{
-            p: 2.5,
+            p: 1.75,
+            px: 2,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: 2,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+            gap: 1.5,
+            borderBottom: '1px solid #f1f5f9',
+            backgroundColor: '#ffffff',
           }}
         >
           {onSearchChange ? (
@@ -97,15 +101,17 @@ export function DataTable<T extends { id: string | number }>({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    <SearchIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
                 width: { xs: '100%', sm: 280 },
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'rgba(11, 15, 25, 0.6)',
-                  borderRadius: 2,
+                  backgroundColor: '#f8fafc',
+                  borderRadius: 1.25,
+                  fontSize: '0.84rem',
+                  height: 36,
                 },
               }}
             />
@@ -113,13 +119,17 @@ export function DataTable<T extends { id: string | number }>({
             <Box />
           )}
 
-          {actions && <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>{actions}</Box>}
+          {actions && (
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+              {actions}
+            </Box>
+          )}
         </Box>
       )}
 
       {/* Table Container */}
-      <TableContainer sx={{ maxHeight: 600 }}>
-        <Table stickyHeader size="medium">
+      <TableContainer sx={{ maxHeight: 680, overflowX: 'auto' }}>
+        <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
               {columns.map((col) => (
@@ -128,13 +138,15 @@ export function DataTable<T extends { id: string | number }>({
                   align={col.align || 'left'}
                   sx={{
                     minWidth: col.minWidth,
-                    backgroundColor: '#111827',
-                    color: 'text.secondary',
-                    fontWeight: 700,
-                    fontSize: '0.78rem',
+                    backgroundColor: '#f8fafc',
+                    color: '#475569',
+                    fontWeight: 600,
+                    fontSize: '0.74rem',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    letterSpacing: '0.04em',
+                    borderBottom: '1px solid #e2e8f0',
+                    py: 1.25,
+                    px: 2,
                   }}
                 >
                   {col.sortable && onSortChange ? (
@@ -143,8 +155,8 @@ export function DataTable<T extends { id: string | number }>({
                       direction={sortBy === col.id ? sortOrder : 'asc'}
                       onClick={() => onSortChange(col.id)}
                       sx={{
-                        '&.Mui-active': { color: 'primary.light' },
-                        '& .MuiTableSortLabel-icon': { color: 'primary.light !important' },
+                        '&.Mui-active': { color: '#0f3674' },
+                        '& .MuiTableSortLabel-icon': { color: '#0f3674 !important' },
                       }}
                     >
                       {col.label}
@@ -160,36 +172,39 @@ export function DataTable<T extends { id: string | number }>({
           <TableBody>
             {loading ? (
               // Loading Skeleton
-              Array.from({ length: 5 }).map((_, rIdx) => (
+              Array.from({ length: 6 }).map((_, rIdx) => (
                 <TableRow key={`skeleton-${rIdx}`}>
                   {columns.map((_, cIdx) => (
-                    <TableCell key={`cell-sk-${cIdx}`}>
-                      <Skeleton variant="text" sx={{ bgcolor: 'rgba(255, 255, 255, 0.05)' }} height={28} />
+                    <TableCell key={`cell-sk-${cIdx}`} sx={{ py: 1.5, px: 2 }}>
+                      <Skeleton variant="text" sx={{ bgcolor: '#f1f5f9' }} height={20} />
                     </TableCell>
                   ))}
                 </TableRow>
               ))
-            ) : data.length === 0 ? (
+            ) : safeData.length === 0 ? (
               // Empty State
               <TableRow>
-                <TableCell colSpan={columns.length} align="center" sx={{ py: 8 }}>
-                  <InboxOutlinedIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1, opacity: 0.6 }} />
-                  <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                <TableCell colSpan={columns.length} align="center" sx={{ py: 7, px: 2 }}>
+                  <InboxOutlinedIcon sx={{ fontSize: 40, color: '#94a3b8', mb: 1, opacity: 0.7 }} />
+                  <Typography variant="body2" color="text.primary" fontWeight={600} sx={{ mb: 0.5 }}>
                     {emptyMessage}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    No records match the current filter criteria.
                   </Typography>
                 </TableCell>
               </TableRow>
             ) : (
               // Data Rows
-              data.map((row) => (
+              safeData.map((row) => (
                 <TableRow
                   key={String(row.id)}
                   hover
                   sx={{
                     '&:hover': {
-                      backgroundColor: 'rgba(99, 102, 241, 0.04) !important',
+                      backgroundColor: '#f8fafc !important',
                     },
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                    borderBottom: '1px solid #f1f5f9',
                   }}
                 >
                   {columns.map((col) => (
@@ -197,12 +212,16 @@ export function DataTable<T extends { id: string | number }>({
                       key={col.id}
                       align={col.align || 'left'}
                       sx={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                        color: 'text.primary',
-                        fontSize: '0.875rem',
+                        borderBottom: '1px solid #f1f5f9',
+                        color: '#1e293b',
+                        fontSize: '0.84rem',
+                        py: 1.25,
+                        px: 2,
                       }}
                     >
-                      {col.render ? col.render(row) : ((row as Record<string, unknown>)[col.id] as React.ReactNode) ?? '—'}
+                      {col.render
+                        ? col.render(row)
+                        : ((row as Record<string, unknown>)[col.id] as React.ReactNode) ?? '—'}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -223,8 +242,11 @@ export function DataTable<T extends { id: string | number }>({
           onPageChange={(_e, newPage) => onPageChange(newPage)}
           onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
           sx={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-            color: 'text.secondary',
+            borderTop: '1px solid #e2e8f0',
+            color: '#64748b',
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '0.8rem',
+            },
           }}
         />
       )}

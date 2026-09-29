@@ -83,7 +83,8 @@ export class QuestionSelectionEngine {
       // Query database for eligible questions matching category, topics, difficulty, type
       const eligibleQuestions = await this.queryEligibleQuestions(
         section,
-        Array.from(globallyUsedQuestionIds)
+        Array.from(globallyUsedQuestionIds),
+        assessment
       );
 
       const availableCount = eligibleQuestions.length;
@@ -269,7 +270,8 @@ export class QuestionSelectionEngine {
    */
   private async queryEligibleQuestions(
     section: AssessmentSectionDto,
-    excludedQuestionIds: string[]
+    excludedQuestionIds: string[],
+    assessment?: AssessmentDto
   ): Promise<QuestionDto[]> {
     const category = COMPONENT_CATEGORY_MAP[section.component];
 
@@ -293,6 +295,22 @@ export class QuestionSelectionEngine {
 
       if (excludedQuestionIds.length > 0) {
         list = list.filter((q) => !excludedQuestionIds.includes(q.id));
+      }
+
+      if (assessment?.companyId) {
+        list.sort((a, b) => {
+          const aMatch =
+            a.companyId === assessment.companyId ||
+            (a.companyQuestions && a.companyQuestions.some((cq) => cq.companyId === assessment.companyId))
+              ? 1
+              : 0;
+          const bMatch =
+            b.companyId === assessment.companyId ||
+            (b.companyQuestions && b.companyQuestions.some((cq) => cq.companyId === assessment.companyId))
+              ? 1
+              : 0;
+          return bMatch - aMatch;
+        });
       }
 
       return list;
@@ -324,10 +342,28 @@ export class QuestionSelectionEngine {
       orderBy: { createdAt: 'asc' },
       include: {
         options: { orderBy: { optionOrder: 'asc' } },
+        companyQuestions: true,
       },
     });
 
-    return questions as unknown as QuestionDto[];
+    const questionList = questions as unknown as QuestionDto[];
+    if (assessment?.companyId) {
+      questionList.sort((a, b) => {
+        const aMatch =
+          a.companyId === assessment.companyId ||
+          (a.companyQuestions && a.companyQuestions.some((cq) => cq.companyId === assessment.companyId))
+            ? 1
+            : 0;
+        const bMatch =
+          b.companyId === assessment.companyId ||
+          (b.companyQuestions && b.companyQuestions.some((cq) => cq.companyId === assessment.companyId))
+            ? 1
+            : 0;
+        return bMatch - aMatch;
+      });
+    }
+
+    return questionList;
   }
 }
 

@@ -67,12 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     restoreSession();
   }, []);
 
-  const login = async (credentials: LoginCredentials): Promise<void> => {
+  const login = async (credentials: LoginCredentials): Promise<User> => {
     const data = await authService.login(credentials);
     localStorage.setItem(TOKEN_KEY, data.accessToken);
     localStorage.setItem(REFRESH_KEY, data.refreshToken);
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
     setAccessToken(data.accessToken);
     setUser(data.user);
+    return data.user;
   };
 
   const logout = async (): Promise<void> => {
@@ -86,8 +88,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_KEY);
+    delete apiClient.defaults.headers.common['Authorization'];
     setUser(null);
     setAccessToken(null);
+  };
+
+  const updatePasswordCompleted = (): void => {
+    setUser((prev) => (prev ? { ...prev, mustChangePassword: false } : null));
   };
 
   return (
@@ -99,12 +106,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
+        updatePasswordCompleted,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export { AuthContext };
 

@@ -21,13 +21,20 @@ import {
   StudentDto,
   CreateStudentDto,
   UpdateStudentDto,
+  StudentWithAccountDto,
   StudentQueryFilters,
   PaginatedResult,
   ExcelImportResult,
   ExcelImportRowError,
+  ExcelImportCredential,
 } from '../types/management.types.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { parseStudentExcel } from '../utils/excel.util.js';
+import crypto from 'crypto';
+import { userRepository } from '../repositories/user.repository.js';
+import { hashPassword } from '../utils/password.util.js';
+import { Role } from '../types/auth.types.js';
+import { StudentStatus } from '@prisma/client';
 
 export class ManagementService {
   constructor(private readonly repo: ManagementRepository = managementRepository) {}
@@ -78,10 +85,16 @@ export class ManagementService {
     const college = await this.repo.findCollegeById(dto.collegeId);
     if (!college) throw new AppError('Specified College not found', 404);
 
-    const existing = await this.repo.findDepartmentByCode(dto.collegeId, dto.code);
-    if (existing) {
+    const existingCode = await this.repo.findDepartmentByCode(dto.collegeId, dto.code);
+    if (existingCode) {
       throw new AppError(`Department code "${dto.code.toUpperCase()}" already exists in this college`, 409);
     }
+
+    const existingName = await this.repo.findDepartmentByName(dto.collegeId, dto.name);
+    if (existingName) {
+      throw new AppError(`Department name "${dto.name}" already exists in this college`, 409);
+    }
+
     return this.repo.createDepartment(dto);
   }
 
@@ -103,13 +116,25 @@ export class ManagementService {
         throw new AppError(`Department code "${dto.code.toUpperCase()}" already exists in this college`, 409);
       }
     }
+    if (dto.name) {
+      const existingName = await this.repo.findDepartmentByName(dept.collegeId, dto.name);
+      if (existingName && existingName.id !== id) {
+        throw new AppError(`Department name "${dto.name}" already exists in this college`, 409);
+      }
+    }
     const updated = await this.repo.updateDepartment(id, dto);
     if (!updated) throw new AppError('Failed to update department', 500);
     return updated;
   }
 
   async deleteDepartment(id: string): Promise<void> {
-    await this.getDepartmentById(id);
+    const dept = await this.getDepartmentById(id);
+    if ((dept._count?.courses ?? 0) > 0 || (dept._count?.students ?? 0) > 0) {
+      throw new AppError(
+        `Cannot delete department "${dept.name}" because it contains active courses or students. Please remove or reassign dependent records first.`,
+        400
+      );
+    }
     await this.repo.deleteDepartment(id);
   }
 
@@ -120,10 +145,16 @@ export class ManagementService {
     const dept = await this.repo.findDepartmentById(dto.departmentId);
     if (!dept) throw new AppError('Specified Department not found', 404);
 
-    const existing = await this.repo.findCourseByCode(dto.departmentId, dto.code);
-    if (existing) {
+    const existingCode = await this.repo.findCourseByCode(dto.departmentId, dto.code);
+    if (existingCode) {
       throw new AppError(`Course code "${dto.code.toUpperCase()}" already exists in this department`, 409);
     }
+
+    const existingName = await this.repo.findCourseByName(dto.departmentId, dto.name);
+    if (existingName) {
+      throw new AppError(`Course name "${dto.name}" already exists in this department`, 409);
+    }
+
     return this.repo.createCourse(dto);
   }
 
@@ -145,13 +176,25 @@ export class ManagementService {
         throw new AppError(`Course code "${dto.code.toUpperCase()}" already exists in this department`, 409);
       }
     }
+    if (dto.name) {
+      const existingName = await this.repo.findCourseByName(crs.departmentId, dto.name);
+      if (existingName && existingName.id !== id) {
+        throw new AppError(`Course name "${dto.name}" already exists in this department`, 409);
+      }
+    }
     const updated = await this.repo.updateCourse(id, dto);
     if (!updated) throw new AppError('Failed to update course', 500);
     return updated;
   }
 
   async deleteCourse(id: string): Promise<void> {
-    await this.getCourseById(id);
+    const crs = await this.getCourseById(id);
+    if ((crs._count?.classes ?? 0) > 0 || (crs._count?.students ?? 0) > 0) {
+      throw new AppError(
+        `Cannot delete course "${crs.name}" because it contains active classes or students. Please remove or reassign dependent records first.`,
+        400
+      );
+    }
     await this.repo.deleteCourse(id);
   }
 
@@ -248,7 +291,7 @@ export class ManagementService {
   // ===========================================================================
   // 6. STUDENT CRUD
   // ===========================================================================
-  async createStudent(dto: CreateStudentDto): Promise<StudentDto> {
+  async createStudent(dto: CreateStudentDto): Promise<StudentWithAccountDto> {
     // 1. Duplicate check (registerNumber & collegeEmail)
     const existingReg = await this.repo.findStudentByRegisterNumber(dto.registerNumber);
     if (existingReg) {
@@ -258,6 +301,11 @@ export class ManagementService {
     const existingEmail = await this.repo.findStudentByEmail(dto.collegeEmail);
     if (existingEmail) {
       throw new AppError(`Student with email "${dto.collegeEmail.toLowerCase()}" already exists`, 409);
+    }
+
+    const existingUser = await userRepository.findByEmail(dto.collegeEmail);
+    if (existingUser) {
+      throw new AppError(`User account with email "${dto.collegeEmail.toLowerCase()}" already exists`, 409);
     }
 
     // 2. Hierarchy validation
@@ -282,7 +330,73 @@ export class ManagementService {
       throw new AppError('Hierarchy mismatch: Section does not belong to specified Class', 400);
     }
 
-    return this.repo.createStudent(dto);
+    // 3. Generate temporary password & create linked User account
+    const tempPassword = 'Init#' + crypto.randomBytes(3).toString('hex') + '9A!';
+    const passwordHash = await hashPassword(tempPassword);
+    const user = await userRepository.createUser({
+      email: dto.collegeEmail.trim().toLowerCase(),
+      passwordHash,
+      role: Role.STUDENT,
+      isActive: true,
+      mustChangePassword: true,
+    });
+
+    try {
+      const student = await this.repo.createStudent({
+        ...dto,
+        userId: user.id,
+        status: dto.status || StudentStatus.INACTIVE,
+      });
+
+      if (user.student) {
+        user.student.id = student.id;
+        user.student.status = student.status;
+      }
+
+      return {
+        ...student,
+        temporaryPassword: tempPassword,
+      };
+    } catch (err) {
+      await userRepository.deleteUser(user.id);
+      throw err;
+    }
+  }
+
+  async resetStudentPassword(studentId: string): Promise<{ temporaryPassword: string; email: string }> {
+    const student = await this.getStudentById(studentId);
+    let user = student.userId
+      ? await userRepository.findById(student.userId)
+      : await userRepository.findByEmail(student.collegeEmail);
+
+    const tempPassword = 'Reset#' + crypto.randomBytes(3).toString('hex') + '8B!';
+    const passwordHash = await hashPassword(tempPassword);
+
+    if (!user) {
+      user = await userRepository.createUser({
+        email: student.collegeEmail,
+        passwordHash,
+        role: Role.STUDENT,
+        isActive: true,
+        mustChangePassword: true,
+        student: {
+          id: student.id,
+          userId: '',
+          registerNumber: student.registerNumber,
+          department: student.department?.name || '',
+          batchYear: student.class?.batchYear || 2026,
+          cgpa: student.cgpa || null,
+          status: StudentStatus.INACTIVE,
+        },
+      });
+      await this.repo.updateStudent(student.id, { userId: user.id, status: StudentStatus.INACTIVE });
+    } else {
+      await userRepository.updatePassword(user.id, passwordHash);
+      await userRepository.setMustChangePassword(user.id, true);
+      await this.repo.updateStudent(student.id, { status: StudentStatus.INACTIVE });
+    }
+
+    return { temporaryPassword: tempPassword, email: student.collegeEmail };
   }
 
   async getStudents(filters: StudentQueryFilters): Promise<PaginatedResult<StudentDto>> {
@@ -333,6 +447,7 @@ export class ManagementService {
     const allSections = await this.repo.findSections();
 
     const validStudentsToInsert: CreateStudentDto[] = [];
+    const createdCredentials: ExcelImportCredential[] = [];
     let duplicateCount = 0;
 
     for (const row of rows) {
@@ -385,6 +500,18 @@ export class ManagementService {
           registerNumber: regUpper,
           field: 'College Email',
           message: `Email "${emailLower}" already exists in database`,
+        });
+        continue;
+      }
+
+      const existingUser = await userRepository.findByEmail(emailLower);
+      if (existingUser) {
+        duplicateCount++;
+        errors.push({
+          row: row.rowNumber,
+          registerNumber: regUpper,
+          field: 'College Email',
+          message: `User account with email "${emailLower}" already exists`,
         });
         continue;
       }
@@ -450,7 +577,19 @@ export class ManagementService {
         continue;
       }
 
+      // Create linked user account for imported student
+      const tempPassword = 'Init#' + crypto.randomBytes(3).toString('hex') + '9C!';
+      const passwordHash = await hashPassword(tempPassword);
+      const user = await userRepository.createUser({
+        email: emailLower,
+        passwordHash,
+        role: Role.STUDENT,
+        isActive: true,
+        mustChangePassword: true,
+      });
+
       validStudentsToInsert.push({
+        userId: user.id,
         registerNumber: regUpper,
         name: row.name,
         collegeEmail: emailLower,
@@ -461,6 +600,14 @@ export class ManagementService {
         sectionId: sec.id,
         year: row.year,
         cgpa: row.cgpa,
+        status: StudentStatus.INACTIVE,
+      });
+
+      createdCredentials.push({
+        registerNumber: regUpper,
+        name: row.name,
+        email: emailLower,
+        temporaryPassword: tempPassword,
       });
     }
 
@@ -475,6 +622,7 @@ export class ManagementService {
       failedCount: errors.length,
       duplicateCount,
       errors,
+      credentials: createdCredentials,
     };
   }
 }

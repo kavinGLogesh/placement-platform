@@ -31,13 +31,19 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DownloadIcon from '@mui/icons-material/Download';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
+import LockResetIcon from '@mui/icons-material/LockReset';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import KeyIcon from '@mui/icons-material/Key';
+import CheckIcon from '@mui/icons-material/Check';
+import InputAdornment from '@mui/material/InputAdornment';
 import { DataTable, Column } from '../../components/management/DataTable.js';
 import { ConfirmDialog } from '../../components/management/ConfirmDialog.js';
 import { managementService } from '../../services/management.service.js';
@@ -110,6 +116,23 @@ export const StudentsPage: React.FC = () => {
   const [importResult, setImportResult] = useState<ExcelImportResult | null>(null);
   const [downloadingReport, setDownloadingReport] = useState(false);
 
+  // Password Reset / Account Activation State
+  const [resetPasswordTarget, setResetPasswordTarget] = useState<Student | null>(null);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
+
+  // One-Time Credentials Modal State
+  const [credentialModalData, setCredentialModalData] = useState<{
+    name: string;
+    email: string;
+    registerNumber: string;
+    temporaryPassword?: string;
+    title: string;
+    subtitle: string;
+  } | null>(null);
+  const [showModalPassword, setShowModalPassword] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   // Fetch Hierarchy Lookups
   const fetchLookups = async () => {
     try {
@@ -165,9 +188,9 @@ export const StudentsPage: React.FC = () => {
   }, [fetchStudents]);
 
   // Form dependent cascading options
-  const formCourses = courses.filter((c) => !studentForm.departmentId || c.departmentId === studentForm.departmentId);
-  const formClasses = classes.filter((cl) => !studentForm.courseId || cl.courseId === studentForm.courseId);
-  const formSections = sections.filter((s) => !studentForm.classId || s.classId === studentForm.classId);
+  const formCourses = studentForm.departmentId ? courses.filter((c) => c.departmentId === studentForm.departmentId) : [];
+  const formClasses = studentForm.courseId ? classes.filter((cl) => cl.courseId === studentForm.courseId) : [];
+  const formSections = studentForm.classId ? sections.filter((s) => s.classId === studentForm.classId) : [];
 
   const handleOpenStudentDialog = (st?: Student) => {
     if (st) {
@@ -187,9 +210,9 @@ export const StudentsPage: React.FC = () => {
       });
     } else {
       const defaultDept = departments[0];
-      const defaultCourse = courses.find((c) => c.departmentId === defaultDept?.id) || courses[0];
-      const defaultClass = classes.find((cl) => cl.courseId === defaultCourse?.id) || classes[0];
-      const defaultSection = sections.find((s) => s.classId === defaultClass?.id) || sections[0];
+      const defaultCourse = courses.find((c) => c.departmentId === defaultDept?.id);
+      const defaultClass = classes.find((cl) => cl.courseId === defaultCourse?.id);
+      const defaultSection = sections.find((s) => s.classId === defaultClass?.id);
 
       setEditingStudent(null);
       setStudentForm({
@@ -228,11 +251,21 @@ export const StudentsPage: React.FC = () => {
         };
         await managementService.updateStudent(editingStudent.id, updatePayload);
       } else {
-        await managementService.createStudent({
+        const created = await managementService.createStudent({
           ...studentForm,
           year: Number(studentForm.year),
           cgpa: studentForm.cgpa ? Number(studentForm.cgpa) : undefined,
         });
+        if (created.temporaryPassword) {
+          setCredentialModalData({
+            name: created.name,
+            email: created.collegeEmail,
+            registerNumber: created.registerNumber,
+            temporaryPassword: created.temporaryPassword,
+            title: 'Student Account Registered Successfully',
+            subtitle: 'Linked login account created with temporary credentials. Please communicate these to the student.',
+          });
+        }
       }
       setDialogOpen(false);
       setEditingStudent(null);
@@ -243,6 +276,43 @@ export const StudentsPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handlePromptResetPassword = (s: Student) => {
+    setResetPasswordTarget(s);
+    setResetPasswordDialogOpen(true);
+  };
+
+  const handleConfirmResetPassword = async () => {
+    if (!resetPasswordTarget) return;
+    setResettingPassword(true);
+    try {
+      const res = await managementService.resetStudentPassword(resetPasswordTarget.id);
+      setResetPasswordDialogOpen(false);
+      setCredentialModalData({
+        name: resetPasswordTarget.name,
+        email: resetPasswordTarget.collegeEmail,
+        registerNumber: resetPasswordTarget.registerNumber,
+        temporaryPassword: res.temporaryPassword,
+        title: 'Temporary Credentials Generated',
+        subtitle: 'Student password reset. The student will be required to set a permanent password on next login.',
+      });
+      fetchStudents();
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to reset password';
+      setError(msg);
+    } finally {
+      setResettingPassword(false);
+      setResetPasswordTarget(null);
+    }
+  };
+
+  const handleCopyCredentials = () => {
+    if (!credentialModalData) return;
+    const text = `Placement Platform Login Credentials:\nEmail: ${credentialModalData.email}\nTemporary Password: ${credentialModalData.temporaryPassword}\nLogin URL: ${window.location.origin}/login\nNote: You will be required to change your password upon first login.`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
   const handleDeleteStudent = async () => {
@@ -402,27 +472,42 @@ export const StudentsPage: React.FC = () => {
     },
     {
       id: 'status',
-      label: 'Status',
-      minWidth: 110,
+      label: 'Account Status',
+      minWidth: 150,
       render: (s) => {
-        const color =
-          s.status === 'ACTIVE'
-            ? 'success'
-            : s.status === 'PLACED'
-            ? 'secondary'
-            : s.status === 'BLOCKED'
-            ? 'error'
-            : 'default';
-        return <Chip label={s.status} size="small" color={color} sx={{ fontWeight: 700 }} />;
+        if (s.status === 'ACTIVE') {
+          return <Chip label="Active" size="small" color="success" sx={{ fontWeight: 700 }} />;
+        }
+        if (s.status === 'INACTIVE') {
+          return (
+            <Chip
+              label="Pending Activation"
+              size="small"
+              sx={{ bgcolor: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', fontWeight: 700 }}
+            />
+          );
+        }
+        if (s.status === 'BLOCKED') {
+          return <Chip label="Disabled" size="small" color="error" sx={{ fontWeight: 700 }} />;
+        }
+        if (s.status === 'PLACED') {
+          return <Chip label="Placed" size="small" color="secondary" sx={{ fontWeight: 700 }} />;
+        }
+        return <Chip label={s.status} size="small" sx={{ fontWeight: 700 }} />;
       },
     },
     {
       id: 'actions',
       label: 'Actions',
-      minWidth: 140,
+      minWidth: 170,
       align: 'right',
       render: (s) => (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+          <Tooltip title={s.status === 'INACTIVE' ? 'Activate Account & Issue Credentials' : 'Reset Password'}>
+            <IconButton size="small" onClick={() => handlePromptResetPassword(s)} sx={{ color: 'warning.main' }}>
+              <LockResetIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="View Profile">
             <IconButton size="small" onClick={() => navigate(`/admin/students/${s.id}`)} sx={{ color: 'secondary.light' }}>
               <VisibilityIcon fontSize="small" />
@@ -445,38 +530,57 @@ export const StudentsPage: React.FC = () => {
 
   return (
     <Box>
-      <AdminNavTabs />
-
       {/* Page Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Institutional Hierarchy — Tier 6
+          <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+            CANDIDATE DIRECTORY & ENROLLMENT
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
+          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
             Student Placement Registry
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
+            Manage eligible candidate profiles, department affiliations, academic standing (CGPA), and credential provisioning.
           </Typography>
         </div>
 
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
-            color="secondary"
-            startIcon={<UploadFileIcon />}
+            size="small"
+            startIcon={<UploadFileIcon fontSize="small" />}
             onClick={() => {
               setImportResult(null);
               setImportFile(null);
               setImportDialogOpen(true);
+            }}
+            sx={{
+              color: '#0f3674',
+              borderColor: '#cbd5e1',
+              borderRadius: '6px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.8125rem',
+              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
             }}
           >
             Bulk Excel Import
           </Button>
           <Button
             variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
+            size="small"
+            startIcon={<AddIcon fontSize="small" />}
             onClick={() => handleOpenStudentDialog()}
             disabled={departments.length === 0 || sections.length === 0}
+            sx={{
+              bgcolor: '#0f3674',
+              color: '#ffffff',
+              borderRadius: '6px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.8125rem',
+              '&:hover': { bgcolor: '#0c2b5e' },
+            }}
           >
             Register Student
           </Button>
@@ -495,15 +599,15 @@ export const StudentsPage: React.FC = () => {
         sx={{
           p: 2.5,
           mb: 3,
-          backgroundColor: 'rgba(17, 24, 39, 0.65)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: 2.5,
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <FilterListIcon sx={{ color: 'primary.light', fontSize: 20 }} />
-          <Typography variant="subtitle2" fontWeight={700} color="text.secondary">
+          <FilterListIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="text.primary">
             Server-Side Multi-Parameter Filtering
           </Typography>
         </Box>
@@ -654,14 +758,15 @@ export const StudentsPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: 2.5,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSaveStudent}>
-          <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700 }}>
+          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
             {editingStudent ? 'Edit Student Details' : 'Register New Student'}
           </DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
@@ -744,6 +849,7 @@ export const StudentsPage: React.FC = () => {
                   label="Degree Course"
                   required
                   fullWidth
+                  disabled={!studentForm.departmentId || formCourses.length === 0}
                   value={studentForm.courseId}
                   onChange={(e) => {
                     const cId = e.target.value;
@@ -755,6 +861,13 @@ export const StudentsPage: React.FC = () => {
                       sectionId: '',
                     });
                   }}
+                  helperText={
+                    !studentForm.departmentId
+                      ? 'Select department first'
+                      : formCourses.length === 0
+                      ? 'No courses created for this department yet. Please add a course first under Courses.'
+                      : ''
+                  }
                 >
                   {formCourses.map((c) => (
                     <MenuItem key={c.id} value={c.id}>
@@ -867,13 +980,14 @@ export const StudentsPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: 2.5,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
-        <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', pb: 2 }}>
           <span>Bulk Student Excel Import</span>
           <Button
             size="small"
@@ -885,7 +999,7 @@ export const StudentsPage: React.FC = () => {
             Download Official Template (.xlsx)
           </Button>
         </DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2.5 }}>
           <Typography variant="body2" color="text.secondary">
             Upload student records using <code>.xlsx</code>, <code>.xls</code>, or <code>.csv</code>. The importer automatically performs relational validation, checks email & register number uniqueness, and executes atomic batched insertion.
           </Typography>
@@ -896,12 +1010,12 @@ export const StudentsPage: React.FC = () => {
               p: 4,
               border: '2px dashed rgba(99, 102, 241, 0.4)',
               borderRadius: 2.5,
-              backgroundColor: 'rgba(99, 102, 241, 0.03)',
+              backgroundColor: '#f8fafc',
               textAlign: 'center',
               cursor: 'pointer',
               '&:hover': {
                 borderColor: 'primary.main',
-                backgroundColor: 'rgba(99, 102, 241, 0.06)',
+                backgroundColor: '#f1f5f9',
               },
             }}
             onClick={() => document.getElementById('excel-file-input')?.click()}
@@ -1001,23 +1115,23 @@ export const StudentsPage: React.FC = () => {
                     </Button>
                   </Box>
 
-                  <TableContainer component={Paper} sx={{ maxHeight: 240, bgcolor: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <TableContainer component={Paper} sx={{ maxHeight: 240, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 2 }}>
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell sx={{ bgcolor: '#111827', color: 'text.secondary', fontWeight: 700 }}>Row</TableCell>
-                          <TableCell sx={{ bgcolor: '#111827', color: 'text.secondary', fontWeight: 700 }}>Register No</TableCell>
-                          <TableCell sx={{ bgcolor: '#111827', color: 'text.secondary', fontWeight: 700 }}>Field</TableCell>
-                          <TableCell sx={{ bgcolor: '#111827', color: 'text.secondary', fontWeight: 700 }}>Error Reason</TableCell>
+                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Row</TableCell>
+                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Register No</TableCell>
+                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Field</TableCell>
+                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Error Reason</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
                         {importResult.errors.map((err, idx) => (
                           <TableRow key={idx}>
-                            <TableCell sx={{ fontFamily: 'monospace', color: 'warning.light' }}>{err.row}</TableCell>
-                            <TableCell sx={{ fontFamily: 'monospace' }}>{err.registerNumber || '—'}</TableCell>
+                            <TableCell sx={{ fontFamily: 'monospace', color: '#b45309', fontWeight: 600 }}>{err.row}</TableCell>
+                            <TableCell sx={{ fontFamily: 'monospace', color: 'text.primary' }}>{err.registerNumber || '—'}</TableCell>
                             <TableCell sx={{ color: 'text.secondary' }}>{err.field || 'General'}</TableCell>
-                            <TableCell sx={{ color: 'error.light' }}>{err.message}</TableCell>
+                            <TableCell sx={{ color: 'error.main', fontWeight: 500 }}>{err.message}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -1044,6 +1158,112 @@ export const StudentsPage: React.FC = () => {
         onConfirm={handleDeleteStudent}
         onClose={() => setDeleteTarget(null)}
       />
+
+      {/* Reset Password / Activate Account Confirmation Dialog */}
+      <ConfirmDialog
+        open={resetPasswordDialogOpen}
+        title={resetPasswordTarget?.status === 'INACTIVE' ? 'Activate Student Account' : 'Reset Student Password'}
+        message={`Generate a new temporary password for "${resetPasswordTarget?.name}" (${resetPasswordTarget?.registerNumber})? The account will be marked as Pending Activation and the student will be required to set a permanent password upon next login.`}
+        confirmText="Generate Credentials"
+        confirmColor="warning"
+        loading={resettingPassword}
+        onConfirm={handleConfirmResetPassword}
+        onClose={() => {
+          setResetPasswordDialogOpen(false);
+          setResetPasswordTarget(null);
+        }}
+      />
+
+      {/* One-Time Credentials Modal */}
+      <Dialog
+        open={!!credentialModalData}
+        maxWidth="sm"
+        fullWidth
+        onClose={() => setCredentialModalData(null)}
+        PaperProps={{ sx: { borderRadius: 3, border: '1px solid #e2e8f0', p: 1 } }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
+          <Box sx={{ bgcolor: 'primary.lighter', p: 1, borderRadius: 2, display: 'flex', color: 'primary.main' }}>
+            <KeyIcon />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight={700}>
+              {credentialModalData?.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {credentialModalData?.subtitle}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 2 }}>
+            These temporary credentials are provided <strong>once</strong> for administrative distribution. They are not stored in plaintext and will not be displayed again.
+          </Alert>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Student Name"
+                value={credentialModalData?.name || ''}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Register Number"
+                value={credentialModalData?.registerNumber || ''}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Institutional Login Email"
+                value={credentialModalData?.email || ''}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Temporary Password"
+                type={showModalPassword ? 'text' : 'password'}
+                value={credentialModalData?.temporaryPassword || ''}
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowModalPassword(!showModalPassword)} size="small" edge="end">
+                        {showModalPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, display: 'flex', justifyContent: 'space-between' }}>
+          <Button
+            variant="outlined"
+            startIcon={copied ? <CheckIcon color="success" /> : <ContentCopyIcon />}
+            onClick={handleCopyCredentials}
+            color={copied ? 'success' : 'primary'}
+            sx={{ fontWeight: 600 }}
+          >
+            {copied ? 'Credentials Copied!' : 'Copy Credentials'}
+          </Button>
+          <Button variant="contained" onClick={() => setCredentialModalData(null)} sx={{ fontWeight: 600 }}>
+            Done
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

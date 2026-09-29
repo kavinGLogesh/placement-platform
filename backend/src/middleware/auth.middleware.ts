@@ -40,7 +40,7 @@ export const authenticateToken = (
 /**
  * Middleware: Enforces Role-Based Access Control (RBAC)
  * Responds with HTTP 403 if user lacks required role
- * SUPER_ADMIN has full administrative rights
+ * Permissions are strictly granted if user's role is in allowedRoles
  */
 export const requireRole = (...allowedRoles: Role[]) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
@@ -50,11 +50,7 @@ export const requireRole = (...allowedRoles: Role[]) => {
 
     const userRole = req.user.role;
 
-    // SUPER_ADMIN has full administrative access to all admin routes
-    const isSuperAdmin = userRole === Role.SUPER_ADMIN;
-    const hasExplicitRole = allowedRoles.includes(userRole);
-
-    if (hasExplicitRole || (isSuperAdmin && !allowedRoles.includes(Role.STUDENT))) {
+    if (allowedRoles.includes(userRole)) {
       return next();
     }
 

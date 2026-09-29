@@ -100,6 +100,8 @@ export interface CreateQuestionOptionDto {
 
 export interface QuestionDto {
   id: string;
+  companyId?: string | null;
+  exactHash?: string | null;
   category: QuestionCategory;
   topic: string;
   difficulty: QuestionDifficulty;
@@ -114,6 +116,15 @@ export interface QuestionDto {
   createdAt: Date;
   updatedAt: Date;
   options: QuestionOptionDto[];
+  company?: { id: string; name: string; code: string } | null;
+  companyQuestions?: Array<{
+    id: string;
+    companyId: string;
+    source?: string | null;
+    year?: number | null;
+    occurrenceCount: number;
+    label: string;
+  }>;
   createdBy?: { id: string; email: string } | null;
   _count?: {
     usages: number;
@@ -122,6 +133,8 @@ export interface QuestionDto {
 
 export interface CreateQuestionDto {
   id?: string;
+  companyId?: string | null;
+  exactHash?: string | null;
   category: QuestionCategory;
   topic: string;
   difficulty?: QuestionDifficulty;
@@ -136,6 +149,8 @@ export interface CreateQuestionDto {
 }
 
 export interface UpdateQuestionDto {
+  companyId?: string | null;
+  exactHash?: string | null;
   category?: QuestionCategory;
   topic?: string;
   difficulty?: QuestionDifficulty;
@@ -153,6 +168,7 @@ export interface QuestionQueryFilters {
   page?: number;
   limit?: number;
   search?: string;
+  companyId?: string;
   category?: QuestionCategory;
   topic?: string;
   difficulty?: QuestionDifficulty;

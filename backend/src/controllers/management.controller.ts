@@ -1,9 +1,15 @@
+import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import { ManagementService, managementService } from '../services/management.service.js';
 import { sendSuccess } from '../utils/response.util.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { generateErrorReportCsv, generateTemplateExcelBuffer } from '../utils/excel.util.js';
 import { ExcelImportRowError, StudentQueryFilters } from '../types/management.types.js';
+import {
+  getStudentResumeDetails,
+  getResumeFilePath,
+  getResumeMetaFilePath,
+} from '../utils/resume.util.js';
 
 export class ManagementController {
   constructor(private readonly service: ManagementService = managementService) {}
@@ -312,6 +318,57 @@ export class ManagementController {
     }
   };
 
+  getStudentResume = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = String(req.params.id);
+      const student = await this.service.getStudentById(id);
+      const resume = getStudentResumeDetails(student.id, student.registerNumber, student.updatedAt);
+      sendSuccess(res, 'Student resume details retrieved', resume);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  downloadStudentResume = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = String(req.params.id);
+      const student = await this.service.getStudentById(id);
+      const resumeFile = getResumeFilePath(student.id);
+
+      if (!fs.existsSync(resumeFile)) {
+        throw new AppError('No verified placement resume uploaded.', 404);
+      }
+
+      const metaFile = getResumeMetaFilePath(student.id);
+      let downloadName = `${student.registerNumber}_Resume.pdf`;
+      if (fs.existsSync(metaFile)) {
+        try {
+          const meta = JSON.parse(fs.readFileSync(metaFile, 'utf-8'));
+          if (meta.studentId && meta.studentId !== student.id) {
+            throw new AppError('Unauthorized: Resume ownership mismatch', 403);
+          }
+          if (meta.fileName) downloadName = meta.fileName;
+        } catch (e) {
+          if (e instanceof AppError) throw e;
+        }
+      }
+
+      const stat = fs.statSync(resumeFile);
+      const inline = req.query.inline === 'true';
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Length', stat.size);
+      res.setHeader(
+        'Content-Disposition',
+        `${inline ? 'inline' : 'attachment'}; filename="${encodeURIComponent(downloadName)}"`
+      );
+
+      const stream = fs.createReadStream(resumeFile);
+      stream.pipe(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   updateStudent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const id = String(req.params.id);
@@ -327,6 +384,16 @@ export class ManagementController {
       const id = String(req.params.id);
       await this.service.deleteStudent(id);
       sendSuccess(res, 'Student deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  resetStudentPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = String(req.params.id);
+      const data = await this.service.resetStudentPassword(id);
+      sendSuccess(res, 'Student password reset successfully', data, 200);
     } catch (error) {
       next(error);
     }

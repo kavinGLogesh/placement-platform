@@ -39,19 +39,20 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       onClose={loading ? undefined : onClose}
       PaperProps={{
         sx: {
-          backgroundColor: '#111827',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: 2.5,
-          minWidth: 360,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: 3,
+          minWidth: 380,
+          boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1)',
         },
       }}
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: '#f9fafb' }}>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: '#0f172a', fontWeight: 700 }}>
         <WarningAmberIcon sx={{ color: confirmColor === 'error' ? 'error.main' : 'warning.main' }} />
         {title}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ color: 'text.secondary' }}>
+        <DialogContentText sx={{ color: '#475569', fontSize: '0.9rem', lineHeight: 1.6 }}>
           {message}
         </DialogContentText>
       </DialogContent>

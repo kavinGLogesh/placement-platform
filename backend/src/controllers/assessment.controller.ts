@@ -32,6 +32,8 @@ export class AssessmentController {
         limit: req.query.limit ? Number(req.query.limit) : undefined,
         search: req.query.search ? String(req.query.search) : undefined,
         status: req.query.status as AssessmentStatus | undefined,
+        companyId: req.query.companyId ? String(req.query.companyId) : undefined,
+        isCompanyAssessment: req.query.isCompanyAssessment !== undefined ? req.query.isCompanyAssessment === 'true' : undefined,
         sortBy: req.query.sortBy as AssessmentQueryFilters['sortBy'],
         sortOrder: req.query.sortOrder as AssessmentQueryFilters['sortOrder'],
       };

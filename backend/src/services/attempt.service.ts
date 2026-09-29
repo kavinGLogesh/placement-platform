@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma.config.js';
 import { AttemptRepository, attemptRepository } from '../repositories/attempt.repository.js';
 import { AssessmentRepository, assessmentRepository } from '../repositories/assessment.repository.js';
 import { ScoringService, scoringService } from './scoring.service.js';
+import { CodingRepository, codingRepository } from '../repositories/coding.repository.js';
 import {
   AssessmentAttemptDto,
   AttemptAnswerDto,
@@ -12,6 +13,8 @@ import {
   BatchSyncAnswersDto,
   SanitizedPaperQuestionDto,
   SanitizedOptionDto,
+  RecordViolationDto,
+  AttemptViolationDto,
 } from '../types/attempt.types.js';
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -19,7 +22,8 @@ export class AttemptService {
   constructor(
     private readonly attemptRepo: AttemptRepository = attemptRepository,
     private readonly assessmentRepo: AssessmentRepository = assessmentRepository,
-    private readonly scorer: ScoringService = scoringService
+    private readonly scorer: ScoringService = scoringService,
+    private readonly codingRepo: CodingRepository = codingRepository
   ) {}
 
   // ===========================================================================
@@ -85,6 +89,8 @@ export class AttemptService {
 
       const item: StudentAssessmentItemDto = {
         id: assessment.id,
+        companyId: assessment.companyId || null,
+        isCompanyAssessment: Boolean(assessment.isCompanyAssessment),
         name: assessment.name,
         description: assessment.description,
         duration: assessment.duration,
@@ -99,6 +105,7 @@ export class AttemptService {
         attemptsCount: completedAttempts.length + (activeAttempt ? 1 : 0),
         activeAttemptId: activeAttempt ? activeAttempt.id : null,
         lastResultId,
+        company: assessment.company || null,
       };
 
       if (!filter || item.status === filter) {
@@ -250,6 +257,7 @@ export class AttemptService {
     }
 
     const answers = await this.attemptRepo.getAttemptAnswers(attemptId);
+    const violations = await this.attemptRepo.getViolationsByAttempt(attemptId);
 
     return {
       ...attempt,
@@ -265,6 +273,8 @@ export class AttemptService {
       },
       questions: sanitizedQuestions,
       answers,
+      violationCount: violations.length,
+      violations,
     };
   }
 
@@ -346,7 +356,27 @@ export class AttemptService {
       if (!paper) throw new AppError('Assigned examination paper not found', 500);
 
       const answers = await this.attemptRepo.getAttemptAnswers(attemptId);
-      const score = this.scorer.calculateScore(assessment, paper, answers);
+      const codingSubsMap = await this.codingRepo.getLatestSubmissionsForAttempt(attemptId);
+      const score = this.scorer.calculateScore(assessment, paper, answers, codingSubsMap);
+
+      // Persist coding answer records if not already present
+      if (score.questionGrades && paper.questions) {
+        for (const [qId] of score.questionGrades.entries()) {
+          const qObj = paper.questions.find((pq) => pq.questionId === qId);
+          if (qObj && qObj.category === 'CODING') {
+            const existingAns = answers.find((a) => a.questionId === qId);
+            if (!existingAns) {
+              await this.attemptRepo.batchSaveAnswers(attemptId, [
+                {
+                  questionId: qId,
+                  textAnswer: 'CODING_SUBMITTED',
+                  isMarkedForReview: false,
+                },
+              ]);
+            }
+          }
+        }
+      }
 
       const result = await this.attemptRepo.saveResultTransaction(
         attemptId,
@@ -386,7 +416,8 @@ export class AttemptService {
     if (!paper) return;
 
     const answers = await this.attemptRepo.getAttemptAnswers(attemptId);
-    const score = this.scorer.calculateScore(assessment, paper, answers);
+    const codingSubsMap = await this.codingRepo.getLatestSubmissionsForAttempt(attemptId);
+    const score = this.scorer.calculateScore(assessment, paper, answers, codingSubsMap);
 
     await this.attemptRepo.saveResultTransaction(
       attemptId,
@@ -448,6 +479,55 @@ export class AttemptService {
     }
 
     return res;
+  }
+
+  // ===========================================================================
+  // 6. ANTI-CHEATING INTEGRITY VIOLATIONS
+  // ===========================================================================
+  async recordViolation(
+    studentId: string,
+    attemptId: string,
+    dto: RecordViolationDto
+  ): Promise<{ violation: AttemptViolationDto; violationCount: number }> {
+    const attempt = await this.attemptRepo.getAttemptById(attemptId);
+    if (!attempt) {
+      throw new AppError('Attempt not found', 404);
+    }
+    if (attempt.studentId !== studentId) {
+      throw new AppError('Unauthorized: You do not own this attempt', 403);
+    }
+    const now = new Date();
+    if (attempt.status === 'IN_PROGRESS' && now >= new Date(attempt.expectedEndTime)) {
+      await this.autoFinalizeAttempt(attemptId, 'EXPIRED');
+      throw new AppError('Assessment duration has expired. Attempt is finalized.', 400);
+    }
+    if (attempt.status !== 'IN_PROGRESS') {
+      throw new AppError('Attempt is no longer active and cannot accept violation logs', 400);
+    }
+
+    const violation = await this.attemptRepo.recordViolation(
+      attemptId,
+      studentId,
+      dto.violationType,
+      dto.details
+    );
+    const violations = await this.attemptRepo.getViolationsByAttempt(attemptId);
+
+    return {
+      violation,
+      violationCount: violations.length,
+    };
+  }
+
+  async getViolations(studentId: string, attemptId: string): Promise<AttemptViolationDto[]> {
+    const attempt = await this.attemptRepo.getAttemptById(attemptId);
+    if (!attempt) {
+      throw new AppError('Attempt not found', 404);
+    }
+    if (attempt.studentId !== studentId) {
+      throw new AppError('Unauthorized: You do not own this attempt', 403);
+    }
+    return this.attemptRepo.getViolationsByAttempt(attemptId);
   }
 }
 

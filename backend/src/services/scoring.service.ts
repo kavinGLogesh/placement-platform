@@ -1,6 +1,18 @@
 import { AssessmentDto, AssessmentPaperDto } from '../types/assessment.types.js';
 import { AttemptAnswerDto } from '../types/attempt.types.js';
 
+export interface QuestionGradingDetail {
+  questionId: string;
+  marksAwarded: number;
+  isCorrect: boolean;
+}
+
+export interface CodingSubmissionGradingDto {
+  passedTestCount: number;
+  totalTestCount: number;
+  status: string;
+}
+
 export interface CalculatedScore {
   totalMarks: number;
   obtainedMarks: number;
@@ -10,6 +22,7 @@ export interface CalculatedScore {
   unansweredCount: number;
   accuracy: number;
   isPassed: boolean;
+  questionGrades?: Map<string, QuestionGradingDetail>;
 }
 
 export class ScoringService {
@@ -19,13 +32,15 @@ export class ScoringService {
   calculateScore(
     assessment: AssessmentDto,
     paper: AssessmentPaperDto,
-    answers: AttemptAnswerDto[]
+    answers: AttemptAnswerDto[],
+    codingSubmissions?: Map<string, CodingSubmissionGradingDto>
   ): CalculatedScore {
     let totalMarks = 0;
     let rawScore = 0;
     let correctCount = 0;
     let incorrectCount = 0;
     let unansweredCount = 0;
+    const questionGrades = new Map<string, QuestionGradingDetail>();
 
     const answerMap = new Map<string, AttemptAnswerDto>();
     for (const ans of answers) {
@@ -39,6 +54,37 @@ export class ScoringService {
       const qNegative = assessment.negativeMarking ? (q.negativeMarks ?? 0.0) : 0.0;
       totalMarks += qMarks;
 
+      // 0. Coding Questions (Evaluated via Judge0 hidden test execution outcomes)
+      if (q.category === 'CODING') {
+        const sub = codingSubmissions?.get(q.questionId);
+        if (!sub || sub.totalTestCount === 0) {
+          unansweredCount++;
+          questionGrades.set(q.questionId, {
+            questionId: q.questionId,
+            marksAwarded: 0,
+            isCorrect: false,
+          });
+          continue;
+        }
+
+        const passRatio = sub.passedTestCount / sub.totalTestCount;
+        const earned = Math.round((qMarks * passRatio) * 100) / 100;
+        rawScore += earned;
+
+        if (passRatio === 1) {
+          correctCount++;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: earned, isCorrect: true });
+        } else if (passRatio > 0) {
+          correctCount++;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: earned, isCorrect: true });
+        } else {
+          incorrectCount++;
+          rawScore -= qNegative;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
+        }
+        continue;
+      }
+
       const ans = answerMap.get(q.questionId);
 
       const hasSelectedOptions = Array.isArray(ans?.selectedOptionIds) && ans.selectedOptionIds.length > 0;
@@ -46,6 +92,7 @@ export class ScoringService {
 
       if (!ans || (!hasSelectedOptions && !hasTextAnswer)) {
         unansweredCount++;
+        questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
         continue;
       }
 
@@ -57,9 +104,11 @@ export class ScoringService {
         if (correctOpt && studentSelected === correctOpt.id) {
           correctCount++;
           rawScore += qMarks;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: qMarks, isCorrect: true });
         } else {
           incorrectCount++;
           rawScore -= qNegative;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
         }
       }
       // 2. Multiple Choice
@@ -76,9 +125,11 @@ export class ScoringService {
         if (isExactMatch) {
           correctCount++;
           rawScore += qMarks;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: qMarks, isCorrect: true });
         } else {
           incorrectCount++;
           rawScore -= qNegative;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
         }
       }
       // 3. Fill in Blank
@@ -89,9 +140,11 @@ export class ScoringService {
         if (correctText && studentText === correctText.trim().toLowerCase()) {
           correctCount++;
           rawScore += qMarks;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: qMarks, isCorrect: true });
         } else {
           incorrectCount++;
           rawScore -= qNegative;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
         }
       }
       // 4. Other types (Default objective check)
@@ -100,9 +153,11 @@ export class ScoringService {
         if (correctOpt && ans.selectedOptionIds && ans.selectedOptionIds.includes(correctOpt.id)) {
           correctCount++;
           rawScore += qMarks;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: qMarks, isCorrect: true });
         } else {
           incorrectCount++;
           rawScore -= qNegative;
+          questionGrades.set(q.questionId, { questionId: q.questionId, marksAwarded: 0, isCorrect: false });
         }
       }
     }
@@ -129,6 +184,7 @@ export class ScoringService {
       unansweredCount,
       accuracy,
       isPassed,
+      questionGrades,
     };
   }
 }

@@ -6,11 +6,29 @@ import {
   StudentTestStatus,
   SaveAnswerDto,
   AttemptAnswerDto,
+  AttemptViolationDto,
+  RecordViolationDto,
 } from '../types/attempt.types.js';
 
 const OFFLINE_KEY_PREFIX = 'attempt_offline_answers_';
 
 export class AttemptService {
+  /**
+   * Record an anti-cheating violation during active assessment attempt
+   */
+  async recordViolation(attemptId: string, data: RecordViolationDto): Promise<{ violation: AttemptViolationDto; violationCount: number }> {
+    const res = await apiClient.post(`/student/attempts/${attemptId}/violations`, data);
+    return res.data.data;
+  }
+
+  /**
+   * Retrieve active attempt violations
+   */
+  async getViolations(attemptId: string): Promise<{ violations: AttemptViolationDto[]; count: number }> {
+    const res = await apiClient.get(`/student/attempts/${attemptId}/violations`);
+    return res.data.data;
+  }
+
   /**
    * Fetch all tests assigned to the authenticated student
    */

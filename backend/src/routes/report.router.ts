@@ -68,6 +68,18 @@ reportRouter.get(
   reportController.getFunnelReport
 );
 
+reportRouter.get(
+  '/gd',
+  requireRole(Role.SUPER_ADMIN, Role.PLACEMENT_ADMIN),
+  reportController.getGdReport
+);
+
+reportRouter.get(
+  '/interviews',
+  requireRole(Role.SUPER_ADMIN, Role.PLACEMENT_ADMIN),
+  reportController.getInterviewReport
+);
+
 // Export endpoint for admin reports (must be defined after static routes)
 reportRouter.get(
   '/:type/export',

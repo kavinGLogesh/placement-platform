@@ -6,6 +6,7 @@ import {
   validateStartAttempt,
   validateSaveAnswer,
   validateBatchSyncAnswers,
+  validateRecordViolation,
 } from '../validators/attempt.validator.js';
 import { sendSuccess } from '../utils/response.util.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -14,6 +15,9 @@ import { StudentTestStatus } from '../types/attempt.types.js';
 export const resolveStudentId = async (req: Request): Promise<string> => {
   if (!req.user) {
     throw new AppError('User not authenticated', 401);
+  }
+  if ((req.user as any).studentId) {
+    return (req.user as any).studentId;
   }
   const email = req.user.email;
   if (email) {
@@ -116,6 +120,31 @@ export class AttemptController {
       const resultId = String(req.params.id);
       const result = await this.service.getResultDetail(studentId, resultId);
       sendSuccess(res, 'Result details retrieved successfully', result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // POST /api/attempts/:attemptId/violations or /api/student/attempts/:attemptId/violations
+  recordViolation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const studentId = await resolveStudentId(req);
+      const attemptId = String(req.params.attemptId);
+      const dto = validateRecordViolation(req.body);
+      const result = await this.service.recordViolation(studentId, attemptId, dto);
+      sendSuccess(res, 'Integrity violation recorded successfully', result, 201);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // GET /api/attempts/:attemptId/violations or /api/student/attempts/:attemptId/violations
+  getViolations = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const studentId = await resolveStudentId(req);
+      const attemptId = String(req.params.attemptId);
+      const violations = await this.service.getViolations(studentId, attemptId);
+      sendSuccess(res, 'Attempt violations retrieved successfully', violations);
     } catch (err) {
       next(err);
     }

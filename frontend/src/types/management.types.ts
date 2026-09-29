@@ -51,6 +51,7 @@ export interface Course {
   code: string;
   name: string;
   durationYears: number;
+  level?: 'UG' | 'PG' | string;
   createdAt: string;
   updatedAt: string;
   department?: { id: string; code: string; name: string };
@@ -65,6 +66,14 @@ export interface CreateCourseInput {
   code: string;
   name: string;
   durationYears?: number;
+  level?: 'UG' | 'PG' | string;
+}
+
+export interface UpdateCourseInput {
+  code?: string;
+  name?: string;
+  durationYears?: number;
+  level?: 'UG' | 'PG' | string;
 }
 
 export interface ClassEntity {
@@ -123,12 +132,18 @@ export interface Student {
   year: number;
   cgpa?: number | null;
   status: StudentStatus;
+  temporaryPassword?: string;
   createdAt: string;
   updatedAt: string;
   department?: { id: string; code: string; name: string };
   course?: { id: string; code: string; name: string };
   class?: { id: string; name: string; batchYear: number; currentYear: number };
   section?: { id: string; name: string };
+}
+
+export interface ResetPasswordResponse {
+  temporaryPassword: string;
+  email: string;
 }
 
 export interface CreateStudentInput {
@@ -192,9 +207,54 @@ export interface ExcelImportRowError {
   message: string;
 }
 
+export interface ExcelImportCredential {
+  registerNumber: string;
+  name: string;
+  email: string;
+  temporaryPassword?: string;
+}
+
 export interface ExcelImportResult {
   importedCount: number;
   failedCount: number;
   duplicateCount: number;
   errors: ExcelImportRowError[];
+  credentials?: ExcelImportCredential[];
+}
+
+export interface StudentSkill {
+  name: string;
+  category: 'TECHNICAL' | 'APTITUDE' | 'COMMUNICATION' | 'DOMAIN';
+  level: 'BEGINNER' | 'INTERMEDIATE' | 'PROFICIENT' | 'ADVANCED';
+  verified: boolean;
+}
+
+export interface StudentCertification {
+  title: string;
+  issuer: string;
+  issueDate: string;
+  credentialId: string;
+  verified: boolean;
+}
+
+export interface StudentResume {
+  fileName: string;
+  fileUrl: string;
+  lastUpdated: string;
+  status: 'VERIFIED' | 'PENDING' | 'REJECTED';
+  fileSize: string;
+}
+
+export interface PlacementRecommendation {
+  type: 'PRACTICE' | 'ASSESSMENT' | 'READINESS';
+  priority: 'HIGH' | 'MEDIUM' | 'INFO';
+  title: string;
+  description: string;
+}
+
+export interface StudentFullProfile extends Student {
+  skills?: StudentSkill[];
+  certifications?: StudentCertification[];
+  resume?: StudentResume;
+  recommendations?: PlacementRecommendation[];
 }

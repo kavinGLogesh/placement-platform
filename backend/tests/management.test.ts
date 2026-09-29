@@ -123,6 +123,21 @@ describe('Phase 3 — Institutional Hierarchy CRUD & Relationships', () => {
       }),
     });
     assert.equal(dupRes.status, 409);
+
+    // Duplicate department name in same college rejected (different code)
+    const dupNameRes = await fetch(`${baseUrl}/departments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${superAdminToken}`,
+      },
+      body: JSON.stringify({
+        collegeId: createdCollegeId,
+        code: 'MECH2',
+        name: 'Mechanical Engineering',
+      }),
+    });
+    assert.equal(dupNameRes.status, 409);
   });
 
   it('3. Course CRUD: Create Course under Department', async () => {
@@ -145,6 +160,38 @@ describe('Phase 3 — Institutional Hierarchy CRUD & Relationships', () => {
     assert.equal(body.success, true);
     assert.equal(body.data.code, 'BE-MECH');
     createdCourseId = body.data.id;
+
+    // Duplicate course code in same department rejected
+    const dupCourseCodeRes = await fetch(`${baseUrl}/courses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${superAdminToken}`,
+      },
+      body: JSON.stringify({
+        departmentId: createdDeptId,
+        code: 'BE-MECH',
+        name: 'Different Name',
+        durationYears: 4,
+      }),
+    });
+    assert.equal(dupCourseCodeRes.status, 409);
+
+    // Duplicate course name in same department rejected
+    const dupCourseNameRes = await fetch(`${baseUrl}/courses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${superAdminToken}`,
+      },
+      body: JSON.stringify({
+        departmentId: createdDeptId,
+        code: 'MECH-NEW',
+        name: 'B.E. Mechanical Engineering',
+        durationYears: 4,
+      }),
+    });
+    assert.equal(dupCourseNameRes.status, 409);
   });
 
   it('4. Class CRUD: Create Class under Course with batch & current year', async () => {
@@ -208,6 +255,26 @@ describe('Phase 3 — Institutional Hierarchy CRUD & Relationships', () => {
     assert.equal(res.status, 400);
     const body = await res.json();
     assert.match(body.message, /Relational mismatch/i);
+  });
+
+  it('6b. Dependency Protection: Reject deletion of Department or Course with active dependents', async () => {
+    // Attempt deleting department with active courses
+    const delDeptRes = await fetch(`${baseUrl}/departments/${createdDeptId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.equal(delDeptRes.status, 400);
+    const deptBody = await delDeptRes.json();
+    assert.match(deptBody.message, /Cannot delete department/i);
+
+    // Attempt deleting course with active classes
+    const delCourseRes = await fetch(`${baseUrl}/courses/${createdCourseId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.equal(delCourseRes.status, 400);
+    const courseBody = await delCourseRes.json();
+    assert.match(courseBody.message, /Cannot delete course/i);
   });
 });
 

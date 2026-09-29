@@ -71,6 +71,7 @@ export interface CourseDto {
   code: string;
   name: string;
   durationYears: number;
+  level?: 'UG' | 'PG' | string;
   createdAt: Date;
   updatedAt: Date;
   department?: { id: string; code: string; name: string };
@@ -85,12 +86,14 @@ export interface CreateCourseDto {
   code: string;
   name: string;
   durationYears?: number;
+  level?: 'UG' | 'PG' | string;
 }
 
 export interface UpdateCourseDto {
   code?: string;
   name?: string;
   durationYears?: number;
+  level?: 'UG' | 'PG' | string;
 }
 
 export interface ClassDto {
@@ -173,6 +176,7 @@ export interface StudentDto {
 }
 
 export interface CreateStudentDto {
+  userId?: string | null;
   registerNumber: string;
   name: string;
   collegeEmail: string;
@@ -186,7 +190,12 @@ export interface CreateStudentDto {
   status?: StudentStatus;
 }
 
+export interface StudentWithAccountDto extends StudentDto {
+  temporaryPassword?: string;
+}
+
 export interface UpdateStudentDto {
+  userId?: string | null;
   name?: string;
   phone?: string;
   departmentId?: string;
@@ -241,9 +250,17 @@ export interface ExcelImportRowError {
   message: string;
 }
 
+export interface ExcelImportCredential {
+  registerNumber: string;
+  name: string;
+  email: string;
+  temporaryPassword?: string;
+}
+
 export interface ExcelImportResult {
   importedCount: number;
   failedCount: number;
   duplicateCount: number;
   errors: ExcelImportRowError[];
+  credentials?: ExcelImportCredential[];
 }

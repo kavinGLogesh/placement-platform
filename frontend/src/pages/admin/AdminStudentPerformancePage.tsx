@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Typography,
   Box,
@@ -25,6 +25,15 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import CategoryIcon from '@mui/icons-material/Category';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DownloadIcon from '@mui/icons-material/Download';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   ResponsiveContainer,
   BarChart,
@@ -37,10 +46,16 @@ import {
 } from 'recharts';
 import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
 import { analyticsService } from '../../services/analytics.service.js';
+import { managementService } from '../../services/management.service.js';
 
 export const AdminStudentPerformancePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  // Resume Action State
+  const [downloadingResume, setDownloadingResume] = useState(false);
+  const [viewingResume, setViewingResume] = useState(false);
+  const [resumeActionError, setResumeActionError] = useState<string | null>(null);
 
   const {
     data: drilldown,
@@ -53,6 +68,52 @@ export const AdminStudentPerformancePage: React.FC = () => {
     queryFn: () => analyticsService.getStudentDrilldown(id || ''),
     enabled: !!id,
   });
+
+  const handleViewResume = async () => {
+    if (!id) return;
+    try {
+      setViewingResume(true);
+      setResumeActionError(null);
+      const blob = await managementService.downloadStudentResume(id, true);
+      const fileUrl = window.URL.createObjectURL(blob);
+      window.open(fileUrl, '_blank');
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === 'object' && 'response' in err && (err as any).response?.data?.message
+          ? (err as any).response.data.message
+          : 'Unable to open verified resume';
+      setResumeActionError(msg);
+    } finally {
+      setViewingResume(false);
+    }
+  };
+
+  const handleDownloadResume = async () => {
+    if (!id) return;
+    try {
+      setDownloadingResume(true);
+      setResumeActionError(null);
+      const blob = await managementService.downloadStudentResume(id, false);
+      const fileUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download =
+        drilldown?.resume?.fileName ||
+        `${drilldown?.student?.registerNumber || 'Student'}_Resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(fileUrl);
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === 'object' && 'response' in err && (err as any).response?.data?.message
+          ? (err as any).response.data.message
+          : 'Unable to download verified resume';
+      setResumeActionError(msg);
+    } finally {
+      setDownloadingResume(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -87,7 +148,7 @@ export const AdminStudentPerformancePage: React.FC = () => {
     );
   }
 
-  const { student, summary, assessmentHistory, categoryPerformance, codingPerformance } = drilldown;
+  const { student, summary, assessmentHistory, categoryPerformance, codingPerformance, performanceProgress, resume } = drilldown;
 
   const categoryChartData = categoryPerformance.map((c) => ({
     name: c.displayName,
@@ -101,13 +162,20 @@ export const AdminStudentPerformancePage: React.FC = () => {
 
       {/* Navigation and Title */}
       <Box sx={{ mb: 3 }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/admin/results')}
-          sx={{ mb: 2 }}
-        >
-          Back to Results Registry
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate('/admin/results')}
+          >
+            Back to Results
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => navigate(`/admin/students/${student.id}`)}
+          >
+            View Student Profile
+          </Button>
+        </Box>
 
         {/* Profile Card Banner */}
         <Card sx={{ p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
@@ -135,6 +203,267 @@ export const AdminStudentPerformancePage: React.FC = () => {
           </Box>
         </Card>
       </Box>
+
+      {/* Verified Placement Resume Section */}
+      <Card sx={{ mb: 3, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+          <PictureAsPdfIcon sx={{ color: '#ef4444', fontSize: 26 }} />
+          <Typography variant="h6" fontWeight={700}>
+            Verified Placement Resume
+          </Typography>
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+          Official candidate resume uploaded to the placement portal for campus recruitment.
+        </Typography>
+
+        {resumeActionError && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setResumeActionError(null)}>
+            {resumeActionError}
+          </Alert>
+        )}
+
+        {resume?.exists ? (
+          <Box
+            sx={{
+              p: 2.5,
+              borderRadius: 2,
+              bgcolor: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <PictureAsPdfIcon sx={{ color: '#ef4444', fontSize: 32 }} />
+              <div>
+                <Typography variant="subtitle1" fontWeight={700}>
+                  {resume.fileName || `${student.registerNumber}_Resume.pdf`}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {resume.uploadedAt
+                    ? `Uploaded: ${new Date(resume.uploadedAt).toLocaleDateString()}`
+                    : 'Uploaded'}{' '}
+                  • {resume.fileSize || 'PDF Document'}
+                </Typography>
+              </div>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+              <Chip
+                icon={<CheckCircleIcon />}
+                label={resume.status || 'Verified'}
+                size="small"
+                color={resume.status === 'VERIFIED' ? 'success' : 'warning'}
+                sx={{ fontWeight: 700 }}
+              />
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                startIcon={viewingResume ? <CircularProgress size={16} /> : <VisibilityIcon />}
+                onClick={handleViewResume}
+                disabled={viewingResume}
+              >
+                View Resume
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                startIcon={downloadingResume ? <CircularProgress size={16} color="inherit" /> : <DownloadIcon />}
+                onClick={handleDownloadResume}
+                disabled={downloadingResume}
+              >
+                Download Resume
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Alert severity="info" variant="outlined">
+            No verified placement resume uploaded.
+          </Alert>
+        )}
+      </Card>
+
+      {/* Student Performance Progress Section */}
+      <Card sx={{ mb: 3, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <TimelineIcon color="primary" sx={{ fontSize: 26 }} />
+            <Typography variant="h6" fontWeight={700}>
+              Student Performance Progress
+            </Typography>
+          </Box>
+          {performanceProgress?.canCompare && (
+            <Chip
+              label={`Performance Status: ${performanceProgress.status}`}
+              color={
+                performanceProgress.status === 'Improved'
+                  ? 'success'
+                  : performanceProgress.status === 'Decreased'
+                  ? 'error'
+                  : 'default'
+              }
+              sx={{ fontWeight: 700 }}
+            />
+          )}
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+          Chronological assessment score trajectory comparing latest completed assessment against immediately previous test.
+        </Typography>
+
+        {!performanceProgress || !performanceProgress.hasCompletedAssessments ? (
+          <Alert severity="info" variant="outlined">
+            No completed assessment data available.
+          </Alert>
+        ) : !performanceProgress.canCompare ? (
+          <Box>
+            <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
+              {performanceProgress.statusMessage || 'Previous assessment comparison is not available.'}
+            </Alert>
+            {performanceProgress.currentTest && (
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', maxWidth: 400 }}>
+                <Typography variant="caption" color="text.secondary">Latest Assessment</Typography>
+                <Typography variant="subtitle1" fontWeight={700}>{performanceProgress.currentTest.assessmentTitle}</Typography>
+                <Typography variant="h5" fontWeight={800} color="primary.light">
+                  {performanceProgress.currentTest.score} / {performanceProgress.currentTest.totalMarks} ({performanceProgress.currentTest.percentage}%)
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        ) : (
+          <Box>
+            <Grid container spacing={3} sx={{ mb: 2.5 }}>
+              {/* Previous Test */}
+              <Grid item xs={12} md={5}>
+                <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                  <Typography variant="caption" color="text.secondary" fontWeight={700}>Previous Assessment</Typography>
+                  <Typography variant="h6" fontWeight={700}>{performanceProgress.previousTest?.assessmentTitle}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+                    {performanceProgress.previousTest?.date ? new Date(performanceProgress.previousTest.date).toLocaleDateString() : '—'}
+                  </Typography>
+                  <Typography variant="h4" fontWeight={800}>
+                    {performanceProgress.previousTest?.score} / {performanceProgress.previousTest?.totalMarks}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Percentage: {performanceProgress.previousTest?.percentage}%
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Progress Indicator */}
+              <Grid item xs={12} md={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <Box
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor:
+                      performanceProgress.status === 'Improved'
+                        ? 'rgba(16, 185, 129, 0.12)'
+                        : performanceProgress.status === 'Decreased'
+                        ? 'rgba(239, 68, 68, 0.12)'
+                        : 'rgba(100, 116, 139, 0.12)',
+                    mb: 1,
+                  }}
+                >
+                  {performanceProgress.status === 'Improved' ? (
+                    <TrendingUpIcon sx={{ color: '#10b981', fontSize: 30 }} />
+                  ) : performanceProgress.status === 'Decreased' ? (
+                    <TrendingDownIcon sx={{ color: '#ef4444', fontSize: 30 }} />
+                  ) : (
+                    <HorizontalRuleIcon sx={{ color: '#64748b', fontSize: 30 }} />
+                  )}
+                </Box>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={800}
+                  sx={{
+                    color:
+                      performanceProgress.status === 'Improved'
+                        ? '#10b981'
+                        : performanceProgress.status === 'Decreased'
+                        ? '#ef4444'
+                        : '#94a3b8',
+                    textAlign: 'center',
+                  }}
+                >
+                  {performanceProgress.status === 'Improved'
+                    ? `↑ Improved by ${performanceProgress.percentageChange ? Math.abs(performanceProgress.percentageChange).toFixed(2) + '%' : performanceProgress.percentageChangeDisplay}`
+                    : performanceProgress.status === 'Decreased'
+                    ? `↓ Decreased by ${performanceProgress.percentageChange ? Math.abs(performanceProgress.percentageChange).toFixed(2) + '%' : performanceProgress.percentageChangeDisplay}`
+                    : performanceProgress.percentageChangeDisplay}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center' }}>
+                  Score Change: {performanceProgress.scoreChange !== undefined && performanceProgress.scoreChange > 0 ? `+${performanceProgress.scoreChange}` : performanceProgress.scoreChange} marks
+                </Typography>
+              </Grid>
+
+              {/* Current Test */}
+              <Grid item xs={12} md={5}>
+                <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <Typography variant="caption" color="#34d399" fontWeight={700}>Current Assessment (Latest)</Typography>
+                  <Typography variant="h6" fontWeight={700} color="#34d399">{performanceProgress.currentTest?.assessmentTitle}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+                    {performanceProgress.currentTest?.date ? new Date(performanceProgress.currentTest.date).toLocaleDateString() : '—'}
+                  </Typography>
+                  <Typography variant="h4" fontWeight={800} color="#34d399">
+                    {performanceProgress.currentTest?.score} / {performanceProgress.currentTest?.totalMarks}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Percentage: {performanceProgress.currentTest?.percentage}%
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+
+            {/* Category Breakdown Comparison Table */}
+            {performanceProgress.categoryComparison && performanceProgress.categoryComparison.length > 0 && (
+              <Box sx={{ mt: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                  <CompareArrowsIcon color="primary" fontSize="small" />
+                  <Typography variant="subtitle2" fontWeight={700}>Performance Comparison by Category</Typography>
+                </Box>
+                <TableContainer component={Paper} sx={{ bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                  <Table size="small">
+                    <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.04)' }}>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }} align="right">Previous Score</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }} align="right">Current Score</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }} align="right">Change</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {performanceProgress.categoryComparison.map((cat) => (
+                        <TableRow key={cat.category} hover>
+                          <TableCell sx={{ fontWeight: 600 }}>{cat.displayName}</TableCell>
+                          <TableCell align="right">{cat.previousScore}</TableCell>
+                          <TableCell align="right">{cat.currentScore}</TableCell>
+                          <TableCell align="right">
+                            <Chip
+                              label={cat.change > 0 ? `+${cat.change}` : `${cat.change}`}
+                              size="small"
+                              color={cat.change > 0 ? 'success' : cat.change < 0 ? 'error' : 'default'}
+                              sx={{ fontWeight: 700 }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Card>
 
       {/* Summary KPI Cards */}
       <Grid container spacing={2.5} sx={{ mb: 4 }}>

@@ -252,3 +252,68 @@ export interface StudentOwnPerformanceReportDto {
     proficiencyRating: ProficiencyRating;
   }[];
 }
+
+// 9. GD Performance Report
+export interface GdPerformanceRowDto {
+  roundId: string;
+  roundTitle: string;
+  topic: string;
+  scheduledDate: string;
+  evaluatorName: string;
+  departmentName: string;
+  studentId: string;
+  registerNumber: string;
+  studentName: string;
+  attendance: string;
+  totalScore: number | null;
+  maxPossibleMarks: number | null;
+  percentage: number | null;
+  feedback?: string;
+  evaluatedAt: string | null;
+}
+
+export interface GdPerformanceReportDto {
+  summary: {
+    totalRounds: number;
+    totalParticipants: number;
+    totalPresent: number;
+    totalEvaluated: number;
+    overallAveragePercentage: number;
+  };
+  pagination: PaginationMeta;
+  rows: GdPerformanceRowDto[];
+}
+
+// 10. Interview Performance Report
+export interface InterviewPerformanceRowDto {
+  roundId: string;
+  roundTitle: string;
+  interviewType: string;
+  scheduledDate: string;
+  interviewerName: string;
+  departmentName: string;
+  studentId: string;
+  registerNumber: string;
+  studentName: string;
+  attendance: string;
+  totalScore: number | null;
+  maxPossibleMarks: number | null;
+  percentage: number | null;
+  strengths?: string;
+  areasForImprovement?: string;
+  overallFeedback?: string;
+  evaluatedAt: string | null;
+}
+
+export interface InterviewPerformanceReportDto {
+  summary: {
+    totalRounds: number;
+    totalParticipants: number;
+    totalPresent: number;
+    totalEvaluated: number;
+    overallAveragePercentage: number;
+  };
+  pagination: PaginationMeta;
+  rows: InterviewPerformanceRowDto[];
+}
+

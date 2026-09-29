@@ -15,19 +15,26 @@ import {
   Alert,
   CircularProgress,
   Card,
-  CardContent,
   Stepper,
   Step,
   StepLabel,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import TuneIcon from '@mui/icons-material/Tune';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
+import BusinessIcon from '@mui/icons-material/Business';
 import { assessmentService } from '../../services/assessment.service.js';
+import { managementService } from '../../services/management.service.js';
+import { companyService } from '../../services/company.service.js';
+import { Department } from '../../types/management.types.js';
+import { CompanyDto } from '../../types/company.types.js';
 import {
   AssessmentComponent,
   CreateAssessmentDto,
@@ -48,16 +55,22 @@ const AVAILABLE_COMPONENTS: AssessmentComponent[] = [
 ];
 
 const STEPS = [
-  'General Parameters',
-  'Sections & Topic Configuration',
+  'Basic Details',
+  'Sections & Topics',
   'Review & Schedule',
 ];
 
 export const AssessmentBuilderPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlCompanyId = searchParams.get('companyId') || '';
 
   // Active Wizard Step (0: Details, 1: Sections, 2: Review)
   const [activeStep, setActiveStep] = useState(0);
+
+  // Form State - Company Integration
+  const [companyId, setCompanyId] = useState<string>(urlCompanyId);
+  const [companies, setCompanies] = useState<CompanyDto[]>([]);
 
   // Form State - Step 1: Details
   const [name, setName] = useState('');
@@ -69,6 +82,31 @@ export const AssessmentBuilderPage: React.FC = () => {
   const [negativeMarking, setNegativeMarking] = useState<boolean>(false);
   const [randomQuestions, setRandomQuestions] = useState<boolean>(true);
   const [randomOptions, setRandomOptions] = useState<boolean>(true);
+
+  // Form State - Department Targeting
+  const [departmentTargeting, setDepartmentTargeting] = useState<'ALL' | 'SPECIFIC'>('ALL');
+  const [selectedDepartmentIds, setSelectedDepartmentIds] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  React.useEffect(() => {
+    managementService.getDepartments().then(setDepartments).catch(() => {});
+    companyService
+      .getCompanies({ limit: 100, isActive: true })
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? res.data : [];
+        setCompanies(list);
+        if (urlCompanyId && !name) {
+          const found = list.find((c) => c.id === urlCompanyId);
+          if (found) {
+            setName(`${found.name} Placement Mock Assessment`);
+            if (found.description && !description) {
+              setDescription(found.description);
+            }
+          }
+        }
+      })
+      .catch(() => setCompanies([]));
+  }, [urlCompanyId]);
 
   // Form State - Step 2: Sections
   const [sections, setSections] = useState<CreateAssessmentSectionDto[]>([
@@ -177,6 +215,10 @@ export const AssessmentBuilderPage: React.FC = () => {
         setErrorMessage('Number of papers must be between 1 and 20');
         return false;
       }
+      if (departmentTargeting === 'SPECIFIC' && selectedDepartmentIds.length === 0) {
+        setErrorMessage('Please select at least one department for Specific Department targeting');
+        return false;
+      }
       return true;
     }
 
@@ -239,6 +281,8 @@ export const AssessmentBuilderPage: React.FC = () => {
 
       const payload: CreateAssessmentDto = {
         name: name.trim(),
+        companyId: companyId ? companyId : null,
+        isCompanyAssessment: Boolean(companyId),
         description: description.trim() || null,
         duration,
         maximumAttempts,
@@ -249,18 +293,34 @@ export const AssessmentBuilderPage: React.FC = () => {
         numberOfPapers,
         startDate: startDate || null,
         endDate: endDate || null,
+        departmentTargeting,
+        departmentIds: departmentTargeting === 'SPECIFIC' ? selectedDepartmentIds : [],
         sections,
       };
 
       const created = await assessmentService.createAssessment(payload);
       navigate(`/admin/assessments/${created.id}`);
     } catch (err: unknown) {
-      const responseData = (err as { response?: { data?: { message?: string; error?: { details?: Record<string, string> } } } })?.response?.data;
-      if (responseData?.error?.details) {
-        const detailMsgs = Object.values(responseData.error.details).join(', ');
+      const errObj = err as {
+        message?: string;
+        response?: { data?: { message?: string; error?: { details?: Record<string, string> } } };
+        data?: { message?: string; error?: { details?: Record<string, string> } };
+        details?: Record<string, string>;
+      };
+      const responseData = errObj?.response?.data || errObj?.data;
+      const details = errObj?.details || responseData?.error?.details;
+
+      if (details && typeof details === 'object') {
+        const detailMsgs = Object.entries(details)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('; ');
         setErrorMessage(`Validation error: ${detailMsgs}`);
+      } else if (responseData?.message) {
+        setErrorMessage(responseData.message);
+      } else if (errObj?.message) {
+        setErrorMessage(errObj.message);
       } else {
-        setErrorMessage(responseData?.message || 'Failed to create assessment. Please verify your parameters.');
+        setErrorMessage('Failed to create assessment. Please verify your parameters.');
       }
     } finally {
       setSubmitting(false);
@@ -268,49 +328,38 @@ export const AssessmentBuilderPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
-      <AdminNavTabs />
-
+    <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton onClick={() => navigate('/admin/assessments')} sx={{ color: 'text.secondary' }}>
-          <ArrowBackIcon />
+        <IconButton onClick={() => navigate('/admin/assessments')} sx={{ color: '#475569', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+          <ArrowBackIcon fontSize="small" />
         </IconButton>
         <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Assessment Builder & Selection Engine
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a' }}>
+            Assessment Configuration Wizard
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Configure examination rules, topics, difficulty distribution, and multi-set generation parameters.
+          <Typography variant="body2" color="text.secondary">
+            Set up assessment parameters, select question topics, and generate deterministic test papers.
           </Typography>
         </Box>
       </Box>
 
       {/* Error Alert */}
       {errorMessage && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setErrorMessage(null)}>
+        <Alert severity="error" sx={{ mb: 2.5 }} onClose={() => setErrorMessage(null)}>
           {errorMessage}
         </Alert>
       )}
 
       {/* Stepper Header */}
       <Paper
+        elevation={0}
         sx={{
-          p: 3,
-          mb: 4,
-          borderRadius: 2,
-          background: 'rgba(30, 41, 59, 0.6)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.07)',
+          p: 2,
+          mb: 3,
+          borderRadius: '8px',
+          bgcolor: '#ffffff',
+          border: '1px solid #e2e8f0',
         }}
       >
         <Stepper activeStep={activeStep}>
@@ -327,19 +376,79 @@ export const AssessmentBuilderPage: React.FC = () => {
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
             <Paper
+              elevation={0}
               sx={{
-                p: 3.5,
-                borderRadius: 2,
-                background: 'rgba(30, 41, 59, 0.6)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
+                p: 3,
+                borderRadius: '8px',
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
               }}
             >
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, color: '#f8fafc' }}>
-                Examination Identification & Timing
+              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2.5 }}>
+                1. Basic Details & Examination Rules
               </Typography>
 
               <Grid container spacing={2.5}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="target-company-label">Target Company (Optional Practice Track)</InputLabel>
+                    <Select
+                      labelId="target-company-label"
+                      value={companyId}
+                      label="Target Company (Optional Practice Track)"
+                      onChange={(e) => {
+                        const newId = e.target.value;
+                        setCompanyId(newId);
+                        if (newId) {
+                          const found = companies.find((c) => c.id === newId);
+                          if (found && (!name || name.includes('Placement Mock Assessment'))) {
+                            setName(`${found.name} Placement Mock Assessment`);
+                          }
+                        }
+                      }}
+                    >
+                      <MenuItem value="">
+                        <em>General Placement Assessment (No Specific Company)</em>
+                      </MenuItem>
+                      {companies.map((comp) => (
+                        <MenuItem key={comp.id} value={comp.id}>
+                          🏢 {comp.name} ({comp.code})
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {companyId && (
+                  <Grid item xs={12}>
+                    {(() => {
+                      const selectedComp = companies.find((c) => c.id === companyId);
+                      return (
+                        <Alert
+                          severity="info"
+                          icon={<BusinessIcon fontSize="inherit" />}
+                          sx={{
+                            backgroundColor: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: 2,
+                            '& .MuiAlert-message': { width: '100%' },
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1e40af' }}>
+                              Company Preparation Assessment: {selectedComp?.name} ({selectedComp?.code})
+                            </Typography>
+                            <Chip label="Prep / Practice Mode" size="small" color="primary" sx={{ fontWeight: 600, fontSize: '0.75rem' }} />
+                          </Box>
+                          <Typography variant="body2" sx={{ color: '#1e3a8a', mt: 0.5 }}>
+                            {selectedComp?.description || 'Tailored mock assessment for recruitment pattern readiness.'} The automated paper generator will prioritize questions tagged with this company from the Question Bank.
+                          </Typography>
+                        </Alert>
+                      );
+                    })()}
+                  </Grid>
+                )}
+
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -357,7 +466,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                     multiline
                     rows={3}
                     label="Description & Instructions"
-                    placeholder="Provide assessment instructions for candidates..."
+                    placeholder="Provide candidate guidelines, calculator rules, timing warnings..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
@@ -367,7 +476,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                   <TextField
                     fullWidth
                     type="number"
-                    label="Total Duration (Minutes)"
+                    label="Duration (Minutes)"
                     value={duration}
                     onChange={(e) => setDuration(Number(e.target.value))}
                     inputProps={{ min: 1 }}
@@ -379,7 +488,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                   <TextField
                     fullWidth
                     type="number"
-                    label="Maximum Attempts"
+                    label="Max Attempts Allowed"
                     value={maximumAttempts}
                     onChange={(e) => setMaximumAttempts(Number(e.target.value))}
                     inputProps={{ min: 1 }}
@@ -403,20 +512,123 @@ export const AssessmentBuilderPage: React.FC = () => {
                   <TextField
                     fullWidth
                     type="number"
-                    label="Number of Paper Sets (e.g. Set A, Set B)"
+                    label="Paper Sets to Generate (e.g. Set A, B)"
                     value={numberOfPapers}
                     onChange={(e) => setNumberOfPapers(Number(e.target.value))}
                     inputProps={{ min: 1, max: 10 }}
-                    helperText="Enforces unique questions across all generated sets"
+                    helperText="Generates distinct question sets to minimize cheating"
                     required
                   />
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3.5, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
 
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#f8fafc' }}>
-                Evaluation & Randomization Controls
+              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                Department Targeting
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Select whether this assessment is targeted for specific departments or open to all departments.
+              </Typography>
+
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={12} sm={6}>
+                  <Card
+                    onClick={() => {
+                      setDepartmentTargeting('SPECIFIC');
+                    }}
+                    sx={{
+                      p: 2.5,
+                      cursor: 'pointer',
+                      border: '2px solid',
+                      borderColor: departmentTargeting === 'SPECIFIC' ? '#2563eb' : '#e2e8f0',
+                      bgcolor: departmentTargeting === 'SPECIFIC' ? '#eff6ff' : '#ffffff',
+                      borderRadius: 2,
+                      transition: 'all 0.15s ease',
+                      '&:hover': { borderColor: '#93c5fd' },
+                    }}
+                  >
+                    <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                      Specific Department
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
+                      Restrict assessment eligibility to one or more selected departments.
+                    </Typography>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Card
+                    onClick={() => {
+                      setDepartmentTargeting('ALL');
+                      setSelectedDepartmentIds([]);
+                    }}
+                    sx={{
+                      p: 2.5,
+                      cursor: 'pointer',
+                      border: '2px solid',
+                      borderColor: departmentTargeting === 'ALL' ? '#2563eb' : '#e2e8f0',
+                      bgcolor: departmentTargeting === 'ALL' ? '#eff6ff' : '#ffffff',
+                      borderRadius: 2,
+                      transition: 'all 0.15s ease',
+                      '&:hover': { borderColor: '#93c5fd' },
+                    }}
+                  >
+                    <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                      All Departments
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
+                      Assessment is accessible and assignable across all departments.
+                    </Typography>
+                  </Card>
+                </Grid>
+
+                {departmentTargeting === 'SPECIFIC' && (
+                  <Grid item xs={12}>
+                    <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                      <InputLabel id="target-departments-label">Select Applicable Departments</InputLabel>
+                      <Select
+                        labelId="target-departments-label"
+                        multiple
+                        value={selectedDepartmentIds}
+                        label="Select Applicable Departments"
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setSelectedDepartmentIds(typeof val === 'string' ? val.split(',') : val);
+                        }}
+                        renderValue={(selected) => (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            {selected.map((val) => {
+                              const dept = departments.find((d) => d.id === val);
+                              return (
+                                <Chip
+                                  key={val}
+                                  label={dept ? `${dept.code} — ${dept.name}` : val}
+                                  size="small"
+                                />
+                              );
+                            })}
+                          </Box>
+                        )}
+                      >
+                        {departments.map((dept) => (
+                          <MenuItem key={dept.id} value={dept.id}>
+                            <Checkbox checked={selectedDepartmentIds.indexOf(dept.id) > -1} />
+                            <Typography variant="body2">
+                              {dept.code} — {dept.name}
+                            </Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}
+              </Grid>
+
+              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
+
+              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+                Evaluation Options
               </Typography>
 
               <Grid container spacing={2}>
@@ -431,8 +643,8 @@ export const AssessmentBuilderPage: React.FC = () => {
                     }
                     label="Negative Marking"
                   />
-                  <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
-                    Deduct marks for incorrect MCQ submissions
+                  <Typography variant="caption" display="block" color="text.secondary">
+                    Deduct partial marks for incorrect MCQ submissions
                   </Typography>
                 </Grid>
 
@@ -445,10 +657,10 @@ export const AssessmentBuilderPage: React.FC = () => {
                         color="primary"
                       />
                     }
-                    label="Randomize Questions"
+                    label="Shuffle Questions"
                   />
-                  <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
-                    Shuffle candidate question presentation
+                  <Typography variant="caption" display="block" color="text.secondary">
+                    Randomize question order for each candidate
                   </Typography>
                 </Grid>
 
@@ -461,10 +673,10 @@ export const AssessmentBuilderPage: React.FC = () => {
                         color="primary"
                       />
                     }
-                    label="Randomize Options"
+                    label="Shuffle MCQ Options"
                   />
-                  <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
-                    Deterministic option permutation
+                  <Typography variant="caption" display="block" color="text.secondary">
+                    Permute answer choice order per candidate
                   </Typography>
                 </Grid>
               </Grid>
@@ -474,44 +686,44 @@ export const AssessmentBuilderPage: React.FC = () => {
           {/* Side Summary Card */}
           <Grid item xs={12} md={4}>
             <Card
+              elevation={0}
               sx={{
-                background: 'rgba(30, 41, 59, 0.7)',
-                border: '1px solid rgba(56, 189, 248, 0.2)',
-                borderRadius: 2,
+                p: 2.5,
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
               }}
             >
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                  <TuneIcon sx={{ color: '#38bdf8' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    Selection Blueprint
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <TuneIcon sx={{ color: '#0f3674' }} />
+                <Typography variant="h6" fontWeight={700} color="#0f172a">
+                  Assessment Blueprint
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                The selection engine will automatically fetch unique questions from your bank matching these criteria.
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Paper Sets:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{numberOfPapers} Paper(s)</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Test Duration:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{duration} mins</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Passing Score:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{passingPercentage}%</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Negative Marking:</Typography>
+                  <Typography variant="body2" fontWeight={700} color={negativeMarking ? '#d97706' : '#64748b'}>
+                    {negativeMarking ? 'Active' : 'Disabled'}
                   </Typography>
                 </Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-                  Backend Question Selection Engine executes strict database-side filtering with zero duplicates across papers.
-                </Typography>
-
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Examination Sets:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{numberOfPapers} Paper(s)</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Duration:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{duration} mins</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Passing Threshold:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{passingPercentage}%</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Negative Marking:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: negativeMarking ? 'warning.main' : 'text.secondary' }}>
-                      {negativeMarking ? 'Enabled' : 'Disabled'}
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
+              </Box>
             </Card>
           </Grid>
         </Grid>
@@ -522,17 +734,17 @@ export const AssessmentBuilderPage: React.FC = () => {
         <Box>
           {/* Quick Component Addition Toolbar */}
           <Paper
+            elevation={0}
             sx={{
-              p: 2.5,
+              p: 2,
               mb: 3,
-              borderRadius: 2,
-              background: 'rgba(30, 41, 59, 0.6)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
+              borderRadius: '8px',
+              bgcolor: '#ffffff',
+              border: '1px solid #e2e8f0',
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5, color: '#f8fafc' }}>
-              Add Standard Placement Components:
+            <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1.5 }}>
+              Add Assessment Section:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {AVAILABLE_COMPONENTS.map((comp) => (
@@ -543,14 +755,9 @@ export const AssessmentBuilderPage: React.FC = () => {
                   startIcon={<AddIcon />}
                   onClick={() => handleAddSection(comp)}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '6px',
                     textTransform: 'none',
-                    borderColor: 'rgba(255, 255, 255, 0.15)',
-                    color: '#e2e8f0',
-                    '&:hover': {
-                      borderColor: '#38bdf8',
-                      backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                    },
+                    bgcolor: '#ffffff',
                   }}
                 >
                   {COMPONENT_LABELS[comp]}
@@ -564,13 +771,12 @@ export const AssessmentBuilderPage: React.FC = () => {
             {sections.map((sec, idx) => (
               <Grid item xs={12} key={idx}>
                 <Paper
+                  elevation={0}
                   sx={{
-                    p: 3,
-                    borderRadius: 2,
-                    background: 'rgba(30, 41, 59, 0.7)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(56, 189, 248, 0.25)',
-                    position: 'relative',
+                    p: 2.5,
+                    borderRadius: '8px',
+                    bgcolor: '#ffffff',
+                    border: '1px solid #e2e8f0',
                   }}
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -585,7 +791,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                         label={COMPONENT_LABELS[sec.component]}
                         size="small"
                         variant="outlined"
-                        sx={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)' }}
+                        sx={{ fontWeight: 600, color: '#2563eb', borderColor: '#bfdbfe' }}
                       />
                     </Box>
                     <IconButton
@@ -693,7 +899,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                     <Grid item xs={12}>
                       <Box sx={{ mt: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600 }}>
                             Select Target Topics for {COMPONENT_LABELS[sec.component]}:
                           </Typography>
                           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -742,19 +948,19 @@ export const AssessmentBuilderPage: React.FC = () => {
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
             <Paper
+              elevation={0}
               sx={{
-                p: 3.5,
-                borderRadius: 2,
-                background: 'rgba(30, 41, 59, 0.6)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
+                p: 3,
+                borderRadius: '8px',
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
               }}
             >
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#f8fafc' }}>
+              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
                 Optional Window Scheduling
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-                You can schedule the assessment now or launch it immediately on demand from the detail page.
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                You can specify an exam schedule now, or leave blank to launch it manually at any time.
               </Typography>
 
               <Grid container spacing={2.5}>
@@ -781,10 +987,10 @@ export const AssessmentBuilderPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3.5, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
 
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#f8fafc' }}>
-                Configuration Breakdown
+              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+                Configured Sections Breakdown
               </Typography>
 
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -793,25 +999,25 @@ export const AssessmentBuilderPage: React.FC = () => {
                     key={idx}
                     sx={{
                       p: 2,
-                      borderRadius: 1.5,
-                      backgroundColor: 'rgba(15, 23, 42, 0.6)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderRadius: 2,
+                      bgcolor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#38bdf8' }}>
+                      <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
                         {idx + 1}. {sec.name} ({COMPONENT_LABELS[sec.component]})
                       </Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      <Typography variant="caption" color="text.secondary" fontWeight={600}>
                         {sec.questionsCount} Qs × {numberOfPapers} Papers = {sec.questionsCount * numberOfPapers} Total
                       </Typography>
                     </Box>
-                    <Typography variant="caption" display="block" sx={{ color: 'text.secondary', mb: 1 }}>
+                    <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 1 }}>
                       Difficulty: {sec.difficulty || 'Any'} | Type: {sec.questionType || 'Any'} | Marks: {sec.marksPerQuestion} ea.
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {sec.topics.map((t) => (
-                        <Chip key={t} label={t} size="small" variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                        <Chip key={t} label={t} size="small" variant="outlined" sx={{ fontSize: '0.7rem', bgcolor: '#ffffff' }} />
                       ))}
                     </Box>
                   </Box>
@@ -823,48 +1029,59 @@ export const AssessmentBuilderPage: React.FC = () => {
           {/* Final Summary Card */}
           <Grid item xs={12} md={4}>
             <Card
+              elevation={0}
               sx={{
-                background: 'rgba(30, 41, 59, 0.7)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-                borderRadius: 2,
+                p: 2.5,
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
               }}
             >
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                  <CheckCircleOutlineIcon sx={{ color: '#22c55e' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    Generation Audit
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <CheckCircleOutlineIcon sx={{ color: '#047857' }} />
+                <Typography variant="h6" fontWeight={700} color="#0f172a">
+                  Summary & Verification
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3 }}>
+                {companyId && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">Target Company:</Typography>
+                    <Chip
+                      label={companies.find((c) => c.id === companyId)?.code || 'Company Track'}
+                      size="small"
+                      color="primary"
+                      sx={{ fontWeight: 700, fontSize: '0.75rem' }}
+                    />
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Questions per Paper:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{questionsPerPaper}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Total Marks per Paper:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{marksPerPaper}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" color="text.secondary">Paper Sets:</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#0f172a">{numberOfPapers}</Typography>
+                </Box>
+                <Divider sx={{ my: 1, borderColor: '#e2e8f0' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2" fontWeight={600} color="#2563eb">
+                    Questions Required:
+                  </Typography>
+                  <Typography variant="body2" fontWeight={800} color="#2563eb">
+                    {totalUniqueQuestionsNeeded} Questions
                   </Typography>
                 </Box>
+              </Box>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Questions per Paper:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{questionsPerPaper}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Total Marks per Paper:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{marksPerPaper}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Paper Sets:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 700 }}>{numberOfPapers}</Typography>
-                  </Box>
-                  <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#38bdf8' }}>
-                      Required Unique Pool:
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#38bdf8' }}>
-                      {totalUniqueQuestionsNeeded} Questions
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Alert severity="info" sx={{ fontSize: '0.78rem' }}>
-                  The Question Selection Engine will verify that Question Bank contains at least {totalUniqueQuestionsNeeded} eligible, unused questions before atomic paper generation.
-                </Alert>
-              </CardContent>
+              <Alert severity="info" sx={{ fontSize: '0.8rem' }}>
+                The question selection engine will verify that your bank has at least {totalUniqueQuestionsNeeded} eligible questions before creating the test papers.
+              </Alert>
             </Card>
           </Grid>
         </Grid>
@@ -881,20 +1098,16 @@ export const AssessmentBuilderPage: React.FC = () => {
         </Button>
 
         {activeStep < STEPS.length - 1 ? (
-          <Button variant="contained" onClick={handleNext}>
+          <Button variant="contained" color="primary" onClick={handleNext}>
             Proceed to {STEPS[activeStep + 1]}
           </Button>
         ) : (
           <Button
             variant="contained"
-            color="success"
+            color="primary"
             onClick={handleSubmit}
             disabled={submitting}
-            startIcon={submitting ? <CircularProgress size={18} /> : <CheckCircleOutlineIcon />}
-            sx={{
-              background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-              boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)',
-            }}
+            startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <CheckCircleOutlineIcon />}
           >
             {submitting ? 'Creating Assessment...' : 'Create Assessment'}
           </Button>

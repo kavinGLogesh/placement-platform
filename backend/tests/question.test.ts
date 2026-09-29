@@ -6,6 +6,7 @@ import { createApp } from '../src/app.js';
 let server: http.Server;
 let baseUrl: string;
 let superAdminToken: string;
+let placementAdminToken: string;
 let studentToken: string;
 
 before(async () => {
@@ -29,7 +30,16 @@ before(async () => {
   const adminJson = await adminRes.json();
   superAdminToken = adminJson.data.accessToken;
 
-  // 2. Student Token
+  // 2. Placement Admin Token (Question Bank Authoring)
+  const placementRes = await fetch(`${baseUrl}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'placementadmin@placement.edu', password: 'PlacementAdmin@123' }),
+  });
+  const placementJson = await placementRes.json();
+  placementAdminToken = placementJson.data.accessToken;
+
+  // 3. Student Token
   const studentRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -48,7 +58,7 @@ after(async () => {
 describe('Phase 4 — Category-Topic Matrix & Master Metadata', () => {
   it('1. GET /api/questions/categories returns authoritative category-topics map', async () => {
     const res = await fetch(`${baseUrl}/questions/categories`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 200);
     const body = await res.json();
@@ -66,7 +76,7 @@ describe('Phase 4 — Category-Topic Matrix & Master Metadata', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'QUANTITATIVE_APTITUDE',
@@ -93,7 +103,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'QUANTITATIVE_APTITUDE',
@@ -113,7 +123,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'QUANTITATIVE_APTITUDE',
@@ -134,7 +144,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'TECHNICAL_MCQ',
@@ -162,7 +172,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'TECHNICAL_MCQ',
@@ -183,7 +193,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'TECHNICAL_MCQ',
@@ -205,7 +215,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'VERBAL_ABILITY',
@@ -223,7 +233,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'VERBAL_ABILITY',
@@ -239,7 +249,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'VERBAL_ABILITY',
@@ -257,7 +267,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'TECHNICAL_MCQ',
@@ -276,7 +286,7 @@ describe('Phase 4 — Question Types & Option Validation', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'QUANTITATIVE_APTITUDE',
@@ -303,7 +313,7 @@ describe('Phase 4 — Question CRUD, Filters, Search & Sorting', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'QUANTITATIVE_APTITUDE',
@@ -335,7 +345,7 @@ describe('Phase 4 — Question CRUD, Filters, Search & Sorting', () => {
 
   it('10. GET /api/questions/:id returns detailed question with options', async () => {
     const res = await fetch(`${baseUrl}/questions/${createdQId}`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 200);
     const body = await res.json();
@@ -348,7 +358,7 @@ describe('Phase 4 — Question CRUD, Filters, Search & Sorting', () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         marks: 5.0,
@@ -370,7 +380,7 @@ describe('Phase 4 — Question CRUD, Filters, Search & Sorting', () => {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({ status: 'INACTIVE' }),
     });
@@ -382,7 +392,7 @@ describe('Phase 4 — Question CRUD, Filters, Search & Sorting', () => {
   it('13. Server-side searching, filtering by category/difficulty, and pagination', async () => {
     const res = await fetch(
       `${baseUrl}/questions?category=QUANTITATIVE_APTITUDE&search=shopkeeper&page=1&limit=5&sortBy=marks&sortOrder=desc`,
-      { headers: { Authorization: `Bearer ${superAdminToken}` } }
+      { headers: { Authorization: `Bearer ${placementAdminToken}` } }
     );
     assert.strictEqual(res.status, 200);
     const body = await res.json();
@@ -401,7 +411,7 @@ describe('Phase 4 — Question Usage & Deletion Rules', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'LOGICAL_REASONING',
@@ -423,7 +433,7 @@ describe('Phase 4 — Question Usage & Deletion Rules', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         assessmentId: 'asm-midterm-01',
@@ -440,7 +450,7 @@ describe('Phase 4 — Question Usage & Deletion Rules', () => {
   it('15. Reject deletion of question that has already been recorded in question_usage', async () => {
     const res = await fetch(`${baseUrl}/questions/${reusableQId}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 400);
     const body = await res.json();
@@ -454,7 +464,7 @@ describe('Phase 4 — Question Usage & Deletion Rules', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${superAdminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({
         category: 'CODING',
@@ -469,13 +479,13 @@ describe('Phase 4 — Question Usage & Deletion Rules', () => {
     // Delete it
     const delRes = await fetch(`${baseUrl}/questions/${tempId}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(delRes.status, 200);
 
     // Verify it is gone
     const verifyRes = await fetch(`${baseUrl}/questions/${tempId}`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(verifyRes.status, 404);
   });
@@ -494,9 +504,19 @@ describe('Phase 4 — Security, RBAC & Regression Verification', () => {
     assert.strictEqual(res.status, 403);
   });
 
+  it('18b. SUPER_ADMIN token attempting question bank management returns HTTP 403 Forbidden', async () => {
+    const res = await fetch(`${baseUrl}/questions`, {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.strictEqual(res.status, 403);
+    const body = await res.json();
+    assert.strictEqual(body.success, false);
+    assert.ok(body.message.includes('Forbidden'));
+  });
+
   it('19. IDOR protection: Non-existent question ID returns HTTP 404', async () => {
     const res = await fetch(`${baseUrl}/questions/q-non-existent-uuid`, {
-      headers: { Authorization: `Bearer ${superAdminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.strictEqual(res.status, 404);
   });

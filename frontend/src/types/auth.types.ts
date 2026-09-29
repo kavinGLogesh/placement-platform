@@ -13,6 +13,7 @@ export interface User {
   email: string;
   role: Role;
   isActive: boolean;
+  mustChangePassword?: boolean;
   student?: StudentProfile | null;
 }
 
@@ -37,6 +38,8 @@ export interface AuthContextType {
   accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<User>;
   logout: () => Promise<void>;
+  updatePasswordCompleted: () => void;
 }
+

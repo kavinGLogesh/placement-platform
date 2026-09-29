@@ -17,7 +17,8 @@ The **College Placement Assessment Platform** is designed to support institution
 
 ### Current Implementation Scope: Phase 1
 Phase 1 focuses exclusively on establishing a **production-grade foundation and architecture**:
-- Robust, decoupled multi-tier architecture (Frontend, Backend REST API, MySQL Database, Docker Infrastructure)
+- Robust, decoupled multi-tier architecture (Frontend, Backend REST API, MySQL Database, Docker 
+Infrastructure)
 - Strictly typed interfaces across all boundaries
 - Server state caching and declarative loading/error management via TanStack React Query
 - Secure Express setup with Helmet, CORS, centralized error handling, and structured request logging

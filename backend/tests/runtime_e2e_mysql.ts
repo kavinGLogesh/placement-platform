@@ -37,10 +37,11 @@ async function runE2E() {
 
   try {
     // =========================================================================
-    // STEP 1: ADMIN LOGIN
     // =========================================================================
-    console.log('\n[Step 1] Admin login...');
-    const adminLoginRes = await fetch(`${baseUrl}/auth/login`, {
+    // STEP 1: ADMIN LOGINS & RBAC ROLE SEPARATION
+    // =========================================================================
+    console.log('\n[Step 1] Admin logins...');
+    const superAdminLoginRes = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -48,14 +49,48 @@ async function runE2E() {
         password: 'SuperAdmin@123',
       }),
     });
-    assert.equal(adminLoginRes.status, 200, 'Admin login must succeed');
-    const adminLoginData = await adminLoginRes.json();
-    const adminToken = adminLoginData.data.accessToken;
-    assert(adminToken, 'Admin access token must exist');
-    console.log('Admin login successful. Token acquired.');
+    assert.equal(superAdminLoginRes.status, 200, 'Super admin login must succeed');
+    const superAdminLoginData = await superAdminLoginRes.json();
+    const superAdminToken = superAdminLoginData.data.accessToken;
+    assert(superAdminToken, 'Super admin access token must exist');
+
+    const placementAdminLoginRes = await fetch(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'placementadmin@placement.edu',
+        password: 'PlacementAdmin@123',
+      }),
+    });
+    assert.equal(placementAdminLoginRes.status, 200, 'Placement admin login must succeed');
+    const placementAdminLoginData = await placementAdminLoginRes.json();
+    const placementAdminToken = placementAdminLoginData.data.accessToken;
+    assert(placementAdminToken, 'Placement admin access token must exist');
+    console.log('Admin logins successful. Tokens acquired.');
+
+    // Step 1.5: Verify RBAC Role Separation
+    console.log('\n[Step 1.5] Verifying RBAC role separation...');
+    const saQuestionRes = await fetch(`${baseUrl}/questions`, {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.equal(saQuestionRes.status, 403, 'Super admin must be blocked from /questions with 403');
+
+    const saAssessmentRes = await fetch(`${baseUrl}/assessments`, {
+      headers: { Authorization: `Bearer ${superAdminToken}` },
+    });
+    assert.equal(saAssessmentRes.status, 403, 'Super admin must be blocked from /assessments with 403');
+
+    const paQuestionRes = await fetch(`${baseUrl}/questions`, {
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
+    });
+    assert.equal(paQuestionRes.status, 200, 'Placement admin must access /questions with 200');
+    console.log('RBAC verified: SUPER_ADMIN blocked from questions & assessments; PLACEMENT_ADMIN allowed.');
+
+    // Use superAdminToken for institutional monitoring, analytics & reports
+    const adminToken = superAdminToken;
 
     // =========================================================================
-    // STEP 2: CREATE ASSESSMENT
+    // STEP 2: CREATE ASSESSMENT (PLACEMENT_ADMIN OPERATIONAL ROLE)
     // =========================================================================
     console.log('\n[Step 2] Creating assessment in MySQL...');
     const assessmentPayload = {
@@ -94,7 +129,7 @@ async function runE2E() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify(assessmentPayload),
     });
@@ -109,14 +144,14 @@ async function runE2E() {
     console.log('Verified assessment directly in MySQL database.');
 
     // =========================================================================
-    // STEP 3: GENERATE PAPERS
+    // STEP 3: GENERATE PAPERS (PLACEMENT_ADMIN OPERATIONAL ROLE)
     // =========================================================================
     console.log('\n[Step 3] Generating examination paper from MySQL question bank...');
     const generateRes = await fetch(`${baseUrl}/assessments/${assessmentId}/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({ numberOfPapers: 1 }),
     });
@@ -136,12 +171,12 @@ async function runE2E() {
     console.log('Verified paper and questions directly in MySQL database.');
 
     // =========================================================================
-    // STEP 4: PUBLISH ASSESSMENT
+    // STEP 4: PUBLISH ASSESSMENT (PLACEMENT_ADMIN OPERATIONAL ROLE)
     // =========================================================================
     console.log('\n[Step 4] Publishing assessment...');
     const publishRes = await fetch(`${baseUrl}/assessments/${assessmentId}/publish`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${adminToken}` },
+      headers: { Authorization: `Bearer ${placementAdminToken}` },
     });
     assert.equal(publishRes.status, 200, 'Publish must return 200');
 
@@ -151,14 +186,14 @@ async function runE2E() {
     console.log('Verified assessment status is PUBLISHED in MySQL.');
 
     // =========================================================================
-    // STEP 5: ASSIGN ASSESSMENT TO STUDENT
+    // STEP 5: ASSIGN ASSESSMENT TO STUDENT (PLACEMENT_ADMIN OPERATIONAL ROLE)
     // =========================================================================
     console.log('\n[Step 5] Assigning assessment to student stu-001...');
     const assignRes = await fetch(`${baseUrl}/assessments/${assessmentId}/assign`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${placementAdminToken}`,
       },
       body: JSON.stringify({ studentIds: ['stu-001'] }),
     });

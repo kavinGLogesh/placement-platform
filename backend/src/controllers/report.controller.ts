@@ -156,6 +156,49 @@ export class ReportController {
     }
   };
 
+  // 7a. GET /api/reports/gd
+  getGdReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const query = {
+        page: req.query.page ? parseInt(String(req.query.page), 10) : 1,
+        limit: req.query.limit ? parseInt(String(req.query.limit), 10) : 10,
+        departmentId: req.query.departmentId ? String(req.query.departmentId) : undefined,
+        evaluatorId: req.query.evaluatorId ? String(req.query.evaluatorId) : undefined,
+        status: req.query.status ? String(req.query.status) : undefined,
+        startDate: req.query.startDate ? String(req.query.startDate) : undefined,
+        endDate: req.query.endDate ? String(req.query.endDate) : undefined,
+        search: req.query.search ? String(req.query.search) : undefined,
+      };
+
+      const result = await this.service.getGdPerformanceReport(query);
+      sendSuccess(res, 'GD performance report generated successfully', result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 7b. GET /api/reports/interviews
+  getInterviewReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const query = {
+        page: req.query.page ? parseInt(String(req.query.page), 10) : 1,
+        limit: req.query.limit ? parseInt(String(req.query.limit), 10) : 10,
+        departmentId: req.query.departmentId ? String(req.query.departmentId) : undefined,
+        interviewType: req.query.interviewType ? String(req.query.interviewType) : undefined,
+        evaluatorId: req.query.evaluatorId ? String(req.query.evaluatorId) : undefined,
+        status: req.query.status ? String(req.query.status) : undefined,
+        startDate: req.query.startDate ? String(req.query.startDate) : undefined,
+        endDate: req.query.endDate ? String(req.query.endDate) : undefined,
+        search: req.query.search ? String(req.query.search) : undefined,
+      };
+
+      const result = await this.service.getInterviewPerformanceReport(query);
+      sendSuccess(res, 'Interview performance report generated successfully', result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   // 8. GET /api/reports/:type/export
   exportReport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

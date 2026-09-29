@@ -49,6 +49,12 @@ model User {
   refreshTokens RefreshToken[]
   questions     Question[]
   assessments   Assessment[]
+  gdRoundsEvaluated        GdRound[]              @relation("GdEvaluator")
+  gdRoundsCreated          GdRound[]              @relation("GdCreator")
+  gdEvaluations            GdEvaluation[]
+  interviewRoundsEvaluated InterviewRound[]       @relation("InterviewEvaluator")
+  interviewRoundsCreated   InterviewRound[]       @relation("InterviewCreator")
+  interviewEvaluations     InterviewEvaluation[]
 
   @@map("users")
 }
@@ -99,6 +105,8 @@ model Department {
   courses     Course[]
   classes     Class[]
   students    Student[]
+  gdRounds    GdRound[]
+  interviewRounds InterviewRound[]
 
   @@unique([collegeId, code])
   @@index([collegeId])
@@ -117,6 +125,8 @@ model Course {
   department    Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   classes       Class[]
   students      Student[]
+  gdRounds      GdRound[]
+  interviewRounds InterviewRound[]
 
   @@unique([departmentId, code])
   @@index([departmentId])
@@ -186,6 +196,8 @@ model Student {
   attempts       AssessmentAttempt[]
   results        AssessmentResult[]
   codingSubmissions CodingSubmission[]
+  gdParticipations        GdParticipant[]
+  interviewParticipations InterviewParticipant[]
 
   @@index([departmentId])
   @@index([courseId])
@@ -232,8 +244,29 @@ enum QuestionStatus {
   ARCHIVED
 }
 
+model Company {
+  id          String            @id @default(uuid())
+  code        String            @unique
+  name        String
+  description String?           @db.Text
+  logoUrl     String?
+  website     String?
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  assessments      Assessment[]
+  questions        Question[]
+  companyQuestions CompanyQuestion[]
+  duplicateCandidates QuestionDuplicateCandidate[]
+
+  @@map("companies")
+}
+
 model Question {
   id            String             @id @default(uuid())
+  companyId     String?
+  exactHash     String?            @db.VarChar(64)
   category      QuestionCategory
   topic         String             // Validated against CategoryTopicsMap
   difficulty    QuestionDifficulty @default(MEDIUM)
@@ -248,13 +281,19 @@ model Question {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
+  company       Company?           @relation(fields: [companyId], references: [id], onDelete: SetNull)
   createdBy     User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
   options       QuestionOption[]
   usages        QuestionUsage[]
   assessmentQuestions AssessmentQuestion[]
   attemptAnswers AttemptAnswer[]
   codingSubmissions CodingSubmission[]
+  companyQuestions  CompanyQuestion[]
+  duplicateCandidatesAsOriginal QuestionDuplicateCandidate[] @relation("OriginalQuestionDuplicates")
+  duplicateCandidatesAsCandidate QuestionDuplicateCandidate[] @relation("CandidateQuestionDuplicates")
 
+  @@index([companyId])
+  @@index([exactHash])
   @@index([category])
   @@index([topic])
   @@index([difficulty])
@@ -262,6 +301,53 @@ model Question {
   @@index([status])
   @@index([createdById])
   @@map("questions")
+}
+
+model CompanyQuestion {
+  id              String   @id @default(uuid())
+  companyId       String
+  questionId      String
+  source          String?  @db.VarChar(191) // e.g. "Campus Drive", "NQT", "Reported 2024"
+  year            Int?     // e.g. 2023, 2024, 2025
+  occurrenceCount Int      @default(1)
+  label           String   @default("Company Tagged") @db.VarChar(64) // "Company Tagged" | "Reported Question" | "Repeated Question" | "Frequently Used" | "Possible Duplicate"
+  isReported      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, questionId])
+  @@index([companyId])
+  @@index([questionId])
+  @@index([year])
+  @@index([label])
+  @@map("company_questions")
+}
+
+model QuestionDuplicateCandidate {
+  id                  String   @id @default(uuid())
+  companyId           String?
+  originalQuestionId  String
+  candidateQuestionId String?
+  candidateText       String   @db.Text
+  similarityScore     Float    // e.g. 0.85
+  reason              String   @db.VarChar(255)
+  status              String   @default("PENDING") @db.VarChar(32) // PENDING, CONFIRMED_DUPLICATE, REJECTED
+  metadata            String?  @db.Text // JSON metadata of candidate
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  company             Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  originalQuestion    Question  @relation("OriginalQuestionDuplicates", fields: [originalQuestionId], references: [id], onDelete: Cascade)
+  candidateQuestion   Question? @relation("CandidateQuestionDuplicates", fields: [candidateQuestionId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([originalQuestionId])
+  @@index([candidateQuestionId])
+  @@index([status])
+  @@map("question_duplicate_candidates")
 }
 
 model QuestionOption {
@@ -329,33 +415,38 @@ enum AssignmentStatus {
 }
 
 model Assessment {
-  id                String               @id @default(uuid())
-  name              String
-  description       String?              @db.Text
-  duration          Int                  // in minutes
-  maximumAttempts   Int                  @default(1)
-  negativeMarking   Boolean              @default(false)
-  randomQuestions   Boolean              @default(false)
-  randomOptions     Boolean              @default(false)
-  passingPercentage Float                @default(50.0)
-  startDate         DateTime?
-  endDate           DateTime?
-  status            AssessmentStatus     @default(DRAFT)
-  totalMarks        Float                @default(0.0)
-  totalQuestions    Int                  @default(0)
-  numberOfPapers    Int                  @default(1)
-  createdById       String?
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
+  id                  String               @id @default(uuid())
+  companyId           String?
+  isCompanyAssessment Boolean              @default(false)
+  name                String
+  description         String?              @db.Text
+  duration            Int                  // in minutes
+  maximumAttempts     Int                  @default(1)
+  negativeMarking     Boolean              @default(false)
+  randomQuestions     Boolean              @default(false)
+  randomOptions       Boolean              @default(false)
+  passingPercentage   Float                @default(50.0)
+  startDate           DateTime?
+  endDate             DateTime?
+  status              AssessmentStatus     @default(DRAFT)
+  totalMarks          Float                @default(0.0)
+  totalQuestions      Int                  @default(0)
+  numberOfPapers      Int                  @default(1)
+  createdById         String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
-  createdBy         User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  sections          AssessmentSection[]
-  papers            AssessmentPaper[]
-  assignments       AssessmentAssignment[]
-  usages            QuestionUsage[]
-  attempts          AssessmentAttempt[]
-  results           AssessmentResult[]
+  company             Company?             @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  createdBy           User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  sections            AssessmentSection[]
+  papers              AssessmentPaper[]
+  assignments         AssessmentAssignment[]
+  usages              QuestionUsage[]
+  attempts            AssessmentAttempt[]
+  results             AssessmentResult[]
 
+  @@index([companyId])
+  @@index([isCompanyAssessment])
   @@index([status])
   @@index([createdById])
   @@index([startDate, endDate])
@@ -616,6 +707,252 @@ model CodingExecutionResult {
   @@index([status])
   @@index([isSample])
   @@map("coding_execution_results")
+}
+
+// =============================================================================
+// PHASE 10: STRUCTURED GD + INTERVIEW EVALUATION
+// =============================================================================
+
+enum GdRoundStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum InterviewType {
+  MOCK
+  HR
+  TECHNICAL
+  MANAGERIAL
+}
+
+enum InterviewRoundStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  PENDING
+}
+
+enum EvaluationStatus {
+  PENDING
+  EVALUATED
+}
+
+model GdRound {
+  id              String          @id @default(uuid())
+  title           String
+  topic           String          @db.Text
+  instructions    String?         @db.Text
+  scheduledDate   DateTime
+  durationMinutes Int             @default(30)
+  status          GdRoundStatus   @default(SCHEDULED)
+  evaluatorId     String?
+  departmentId    String?
+  courseId        String?
+  batchYear       Int?
+  createdById     String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  evaluator       User?           @relation("GdEvaluator", fields: [evaluatorId], references: [id], onDelete: SetNull)
+  department      Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  course          Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  createdBy       User?           @relation("GdCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  criteria        GdCriterion[]
+  participants    GdParticipant[]
+
+  @@index([status])
+  @@index([evaluatorId])
+  @@index([scheduledDate])
+  @@index([departmentId])
+  @@map("gd_rounds")
+}
+
+model GdCriterion {
+  id          String             @id @default(uuid())
+  roundId     String
+  name        String
+  maxMarks    Float              @default(10.0)
+  order       Int                @default(0)
+  createdAt   DateTime           @default(now())
+
+  round       GdRound            @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  scores      GdCriterionScore[]
+
+  @@unique([roundId, name])
+  @@index([roundId])
+  @@map("gd_criteria")
+}
+
+model GdParticipant {
+  id          String           @id @default(uuid())
+  roundId     String
+  studentId   String
+  attendance  AttendanceStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  round       GdRound          @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  student     Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  evaluation  GdEvaluation?
+
+  @@unique([roundId, studentId])
+  @@index([roundId])
+  @@index([studentId])
+  @@index([attendance])
+  @@map("gd_participants")
+}
+
+model GdEvaluation {
+  id               String             @id @default(uuid())
+  participantId    String             @unique
+  evaluatorId      String
+  totalScore       Float
+  maxPossibleMarks Float
+  percentage       Float
+  feedback         String?            @db.Text
+  status           EvaluationStatus   @default(EVALUATED)
+  evaluatedAt      DateTime           @default(now())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  participant      GdParticipant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  evaluator        User               @relation(fields: [evaluatorId], references: [id], onDelete: Restrict)
+  criterionScores  GdCriterionScore[]
+
+  @@index([evaluatorId])
+  @@index([evaluatedAt])
+  @@map("gd_evaluations")
+}
+
+model GdCriterionScore {
+  id           String       @id @default(uuid())
+  evaluationId String
+  criterionId  String
+  score        Float
+  maxMarks     Float
+  comment      String?      @db.Text
+
+  evaluation   GdEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  criterion    GdCriterion  @relation(fields: [criterionId], references: [id], onDelete: Restrict)
+
+  @@unique([evaluationId, criterionId])
+  @@index([evaluationId])
+  @@index([criterionId])
+  @@map("gd_criterion_scores")
+}
+
+model InterviewRound {
+  id              String               @id @default(uuid())
+  title           String
+  interviewType   InterviewType        @default(TECHNICAL)
+  instructions    String?              @db.Text
+  scheduledDate   DateTime
+  durationMinutes Int                  @default(30)
+  status          InterviewRoundStatus @default(SCHEDULED)
+  evaluatorId     String?
+  departmentId    String?
+  courseId        String?
+  batchYear       Int?
+  createdById     String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  evaluator       User?                @relation("InterviewEvaluator", fields: [evaluatorId], references: [id], onDelete: SetNull)
+  department      Department?          @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  course          Course?              @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  createdBy       User?                @relation("InterviewCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  criteria        InterviewCriterion[]
+  participants    InterviewParticipant[]
+
+  @@index([status])
+  @@index([interviewType])
+  @@index([evaluatorId])
+  @@index([scheduledDate])
+  @@map("interview_rounds")
+}
+
+model InterviewCriterion {
+  id          String                    @id @default(uuid())
+  roundId     String
+  name        String
+  maxMarks    Float                     @default(10.0)
+  order       Int                       @default(0)
+  createdAt   DateTime                  @default(now())
+
+  round       InterviewRound            @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  scores      InterviewCriterionScore[]
+
+  @@unique([roundId, name])
+  @@index([roundId])
+  @@map("interview_criteria")
+}
+
+model InterviewParticipant {
+  id          String              @id @default(uuid())
+  roundId     String
+  studentId   String
+  attendance  AttendanceStatus    @default(PENDING)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  round       InterviewRound      @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  student     Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  evaluation  InterviewEvaluation?
+
+  @@unique([roundId, studentId])
+  @@index([roundId])
+  @@index([studentId])
+  @@index([attendance])
+  @@map("interview_participants")
+}
+
+model InterviewEvaluation {
+  id                  String                    @id @default(uuid())
+  participantId       String                    @unique
+  evaluatorId         String
+  totalScore          Float
+  maxPossibleMarks    Float
+  percentage          Float
+  strengths           String?                   @db.Text
+  areasForImprovement String?                   @db.Text
+  overallFeedback     String?                   @db.Text
+  status              EvaluationStatus          @default(EVALUATED)
+  evaluatedAt         DateTime                  @default(now())
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+
+  participant         InterviewParticipant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  evaluator           User                      @relation(fields: [evaluatorId], references: [id], onDelete: Restrict)
+  criterionScores     InterviewCriterionScore[]
+
+  @@index([evaluatorId])
+  @@index([evaluatedAt])
+  @@map("interview_evaluations")
+}
+
+model InterviewCriterionScore {
+  id           String              @id @default(uuid())
+  evaluationId String
+  criterionId  String
+  score        Float
+  maxMarks     Float
+  comment      String?             @db.Text
+
+  evaluation   InterviewEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  criterion    InterviewCriterion  @relation(fields: [criterionId], references: [id], onDelete: Restrict)
+
+  @@unique([evaluationId, criterionId])
+  @@index([evaluationId])
+  @@index([criterionId])
+  @@map("interview_criterion_scores")
 }
 
 

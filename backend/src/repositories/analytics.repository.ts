@@ -13,12 +13,16 @@ import {
   StudentDashboardDto,
   StudentPerformanceAnalyticsDto,
   TrendDataPointDto,
+  CategoryComparisonDto,
 } from '../types/analytics.types.js';
 import { attemptRepository } from './attempt.repository.js';
 import { managementRepository } from './management.repository.js';
 import { assessmentRepository } from './assessment.repository.js';
 import { questionRepository } from './question.repository.js';
 import { codingRepository } from './coding.repository.js';
+import { computePerformanceProgress, CATEGORY_DISPLAY_NAMES } from '../utils/calculation.util.js';
+import { getStudentResumeDetails } from '../utils/resume.util.js';
+import { evaluationService } from '../services/evaluation.service.js';
 
 export class AnalyticsRepository {
   // ===========================================================================
@@ -62,12 +66,18 @@ export class AnalyticsRepository {
         ];
       }
 
-      // Sorting
+      // Sorting with deterministic tie-breakers
       let orderBy: any = { createdAt: 'desc' };
       if (query.sortBy) {
         const order = query.sortOrder === 'asc' ? 'asc' : 'desc';
         if (query.sortBy === 'studentName') {
           orderBy = { student: { name: order } };
+        } else if (query.sortBy === 'percentage' || query.sortBy === 'obtainedMarks') {
+          orderBy = [
+            { [query.sortBy]: order },
+            { accuracy: 'desc' },
+            { student: { registerNumber: 'asc' } },
+          ];
         } else {
           orderBy = { [query.sortBy]: order };
         }
@@ -96,28 +106,35 @@ export class AnalyticsRepository {
         }),
       ]);
 
-      const items: ResultListItemDto[] = rows.map((r) => ({
-        id: r.id,
-        attemptId: r.attemptId,
-        assessmentId: r.assessmentId,
-        assessmentTitle: r.assessment?.name || 'Assessment',
-        studentId: r.studentId,
-        studentName: r.student?.name || 'Student',
-        registerNumber: r.student?.registerNumber || '',
-        departmentId: r.student?.departmentId,
-        departmentName: r.student?.department?.name,
-        departmentCode: r.student?.department?.code,
-        totalMarks: r.totalMarks,
-        obtainedMarks: r.obtainedMarks,
-        percentage: r.percentage,
-        accuracy: r.accuracy,
-        isPassed: r.isPassed,
-        correctCount: r.correctCount,
-        incorrectCount: r.incorrectCount,
-        unansweredCount: r.unansweredCount,
-        submittedAt: r.attempt?.submittedAt ? r.attempt.submittedAt.toISOString() : null,
-        createdAt: r.createdAt.toISOString(),
-      }));
+      const items: ResultListItemDto[] = await Promise.all(
+        rows.map(async (r) => {
+          const viols = await attemptRepository.getViolationsByAttempt(r.attemptId);
+          return {
+            id: r.id,
+            attemptId: r.attemptId,
+            assessmentId: r.assessmentId,
+            assessmentTitle: r.assessment?.name || 'Assessment',
+            studentId: r.studentId,
+            studentName: r.student?.name || 'Student',
+            registerNumber: r.student?.registerNumber || '',
+            departmentId: r.student?.departmentId,
+            departmentName: r.student?.department?.name,
+            departmentCode: r.student?.department?.code,
+            totalMarks: r.totalMarks,
+            obtainedMarks: r.obtainedMarks,
+            percentage: r.percentage,
+            accuracy: r.accuracy,
+            isPassed: r.isPassed,
+            correctCount: r.correctCount,
+            incorrectCount: r.incorrectCount,
+            unansweredCount: r.unansweredCount,
+            submittedAt: r.attempt?.submittedAt ? r.attempt.submittedAt.toISOString() : null,
+            createdAt: r.createdAt.toISOString(),
+            violationCount: viols.length,
+            violations: viols,
+          };
+        })
+      );
 
       const totalPages = Math.ceil(totalCount / limit) || 1;
       return {
@@ -144,6 +161,7 @@ export class AnalyticsRepository {
       const student = managementRepository.memStore.students.get(res.studentId);
       const assessment = assessmentRepository.memStore.assessments.get(res.assessmentId);
       const attempt = attemptRepository.memStore.attempts.get(res.attemptId);
+      const viols = attemptRepository.memStore.violations.get(res.attemptId) || [];
 
       const dept = student?.departmentId
         ? managementRepository.memStore.departments.get(student.departmentId)
@@ -170,6 +188,8 @@ export class AnalyticsRepository {
         unansweredCount: res.unansweredCount,
         submittedAt: attempt?.submittedAt ? new Date(attempt.submittedAt).toISOString() : null,
         createdAt: new Date(res.createdAt).toISOString(),
+        violationCount: viols.length,
+        violations: viols,
       };
 
       list.push(item);
@@ -220,6 +240,10 @@ export class AnalyticsRepository {
       }
       if (valA < valB) return isAsc ? -1 : 1;
       if (valA > valB) return isAsc ? 1 : -1;
+      if (sortField === 'percentage' || sortField === 'obtainedMarks') {
+        if (a.accuracy !== b.accuracy) return b.accuracy - a.accuracy;
+        return (a.registerNumber || '').localeCompare(b.registerNumber || '');
+      }
       return 0;
     });
 
@@ -288,6 +312,9 @@ export class AnalyticsRepository {
         sortOrder: 'desc',
       });
 
+      const passedCount = passedResultsCount;
+      const failedCount = Math.max(0, totalResults - passedResultsCount);
+
       return {
         totalStudents,
         activeStudents: activeStudentCount,
@@ -298,6 +325,8 @@ export class AnalyticsRepository {
         averageScore,
         passPercentage,
         overallParticipationRate,
+        passedCount,
+        failedCount,
         recentResults: recentResults.items,
       };
   }
@@ -345,6 +374,8 @@ export class AnalyticsRepository {
       sortOrder: 'desc',
     });
 
+    const failedCount = Math.max(0, totalResults - passedCount);
+
     return {
       totalStudents,
       activeStudents,
@@ -355,6 +386,8 @@ export class AnalyticsRepository {
       averageScore,
       passPercentage,
       overallParticipationRate,
+      passedCount,
+      failedCount,
       recentResults: recentResults.items,
     };
   }
@@ -914,7 +947,7 @@ export class AnalyticsRepository {
   // ===========================================================================
   async getStudentDrilldown(studentId: string): Promise<StudentDrilldownDto | null> {
     if (process.env.NODE_ENV === 'test') {
-      return this.getStudentDrilldownMemStore(studentId);
+      return await this.getStudentDrilldownMemStore(studentId);
     }
       const student = await prisma.student.findUnique({
         where: { id: studentId },
@@ -1022,6 +1055,55 @@ export class AnalyticsRepository {
         }))
       );
 
+      let categoryComparison: CategoryComparisonDto[] = [];
+      if (student.results.length >= 2) {
+        const currAttemptId = student.results[0].attemptId;
+        const prevAttemptId = student.results[1].attemptId;
+
+        const [currAnswers, prevAnswers] = await Promise.all([
+          prisma.attemptAnswer.findMany({
+            where: { attemptId: currAttemptId },
+            include: { question: { select: { category: true, marks: true } } },
+          }),
+          prisma.attemptAnswer.findMany({
+            where: { attemptId: prevAttemptId },
+            include: { question: { select: { category: true, marks: true } } },
+          }),
+        ]);
+
+        const currCatMarks = new Map<string, number>();
+        const prevCatMarks = new Map<string, number>();
+
+        for (const a of currAnswers) {
+          const cat = a.question.category;
+          currCatMarks.set(cat, (currCatMarks.get(cat) || 0) + (a.marksAwarded || 0));
+        }
+        for (const a of prevAnswers) {
+          const cat = a.question.category;
+          prevCatMarks.set(cat, (prevCatMarks.get(cat) || 0) + (a.marksAwarded || 0));
+        }
+
+        const allCats = Array.from(new Set([...currCatMarks.keys(), ...prevCatMarks.keys()]));
+        categoryComparison = allCats.map((cat) => {
+          const pScore = Number((prevCatMarks.get(cat) || 0).toFixed(2));
+          const cScore = Number((currCatMarks.get(cat) || 0).toFixed(2));
+          return {
+            category: cat,
+            displayName: CATEGORY_DISPLAY_NAMES[cat] || cat,
+            previousScore: pScore,
+            currentScore: cScore,
+            change: Number((cScore - pScore).toFixed(2)),
+          };
+        });
+      }
+
+      const performanceProgress = computePerformanceProgress(
+        assessmentHistory,
+        categoryComparison
+      );
+
+      const resume = getStudentResumeDetails(student.id, student.registerNumber, student.updatedAt);
+
       return {
         student: {
           id: student.id,
@@ -1056,10 +1138,13 @@ export class AnalyticsRepository {
           passedTestsRatio,
           languagesUsed: Array.from(languages),
         },
+        performanceProgress,
+        resume,
+        humanEvaluation: await evaluationService.getStudentHumanEvaluationSummary(student.id),
       };
   }
 
-  private getStudentDrilldownMemStore(studentId: string): StudentDrilldownDto | null {
+  private async getStudentDrilldownMemStore(studentId: string): Promise<StudentDrilldownDto | null> {
     const student = managementRepository.memStore.students.get(studentId);
     if (!student) return null;
 
@@ -1186,6 +1271,63 @@ export class AnalyticsRepository {
 
     const catAgg = this.aggregateTopicData(rawAnswers);
 
+    // Sort chronological descending
+    assessmentHistory.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    let categoryComparison: CategoryComparisonDto[] = [];
+    if (assessmentHistory.length >= 2) {
+      const currAttemptId = assessmentHistory[0].attemptId;
+      const prevAttemptId = assessmentHistory[1].attemptId;
+
+      const currAnsMap = attemptRepository.memStore.answers.get(currAttemptId);
+      const prevAnsMap = attemptRepository.memStore.answers.get(prevAttemptId);
+
+      const currCatMarks = new Map<string, number>();
+      const prevCatMarks = new Map<string, number>();
+
+      if (currAnsMap) {
+        for (const ans of currAnsMap.values()) {
+          const q = questionRepository.memStore.questions.get(ans.questionId);
+          if (q) {
+            const cat = q.category;
+            currCatMarks.set(cat, (currCatMarks.get(cat) || 0) + (ans.marksAwarded || 0));
+          }
+        }
+      }
+
+      if (prevAnsMap) {
+        for (const ans of prevAnsMap.values()) {
+          const q = questionRepository.memStore.questions.get(ans.questionId);
+          if (q) {
+            const cat = q.category;
+            prevCatMarks.set(cat, (prevCatMarks.get(cat) || 0) + (ans.marksAwarded || 0));
+          }
+        }
+      }
+
+      const allCats = Array.from(new Set([...currCatMarks.keys(), ...prevCatMarks.keys()]));
+      categoryComparison = allCats.map((cat) => {
+        const pScore = Number((prevCatMarks.get(cat) || 0).toFixed(2));
+        const cScore = Number((currCatMarks.get(cat) || 0).toFixed(2));
+        return {
+          category: cat,
+          displayName: CATEGORY_DISPLAY_NAMES[cat] || cat,
+          previousScore: pScore,
+          currentScore: cScore,
+          change: Number((cScore - pScore).toFixed(2)),
+        };
+      });
+    }
+
+    const performanceProgress = computePerformanceProgress(
+      assessmentHistory,
+      categoryComparison
+    );
+
+    const resume = getStudentResumeDetails(student.id, student.registerNumber, student.updatedAt);
+
     return {
       student: {
         id: student.id,
@@ -1220,6 +1362,9 @@ export class AnalyticsRepository {
         passedTestsRatio,
         languagesUsed: Array.from(languages),
       },
+      performanceProgress,
+      resume,
+      humanEvaluation: await evaluationService.getStudentHumanEvaluationSummary(student.id),
     };
   }
 
@@ -1403,6 +1548,7 @@ export class AnalyticsRepository {
         languagesUsed: [],
       },
       assessmentHistory: history,
+      humanEvaluation: await evaluationService.getStudentHumanEvaluationSummary(studentId),
     };
   }
 }

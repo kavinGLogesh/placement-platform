@@ -12,6 +12,8 @@ import {
   validateStudentInput,
   validateStudentQuery,
 } from '../validators/management.validator.js';
+import { AppError } from '../middleware/errorHandler.js';
+import { resolveStudentId } from '../controllers/attempt.controller.js';
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -81,16 +83,54 @@ sectionRouter.delete('/:id', managementController.deleteSection);
 // =============================================================================
 // 6. STUDENTS & BULK IMPORT (/api/students)
 // =============================================================================
-studentManagementRouter.use(...adminAuth);
 
-// Bulk import & templates (register before /:id parameter)
-studentManagementRouter.post('/import', upload.single('file'), managementController.importStudents);
-studentManagementRouter.get('/import/template', managementController.downloadTemplate);
-studentManagementRouter.post('/import/error-report', managementController.downloadErrorReport);
+// Bulk import & templates (strictly admin only)
+studentManagementRouter.post('/import', ...adminAuth, upload.single('file'), managementController.importStudents);
+studentManagementRouter.get('/import/template', ...adminAuth, managementController.downloadTemplate);
+studentManagementRouter.post('/import/error-report', ...adminAuth, managementController.downloadErrorReport);
 
-// Server-side paginated & filtered CRUD
-studentManagementRouter.get('/', validateStudentQuery, managementController.getStudents);
-studentManagementRouter.post('/', validateStudentInput, managementController.createStudent);
-studentManagementRouter.get('/:id', managementController.getStudentById);
-studentManagementRouter.put('/:id', managementController.updateStudent);
-studentManagementRouter.delete('/:id', managementController.deleteStudent);
+// Student self-profile endpoint (/api/students/me)
+studentManagementRouter.get('/me', authenticateToken, requireRole(Role.STUDENT), async (req, res, next) => {
+  try {
+    const studentId = await resolveStudentId(req);
+    req.params.id = studentId;
+    return managementController.getStudentById(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Admin-only verified placement resume endpoints (SUPER_ADMIN, PLACEMENT_ADMIN)
+studentManagementRouter.get('/:id/resume', ...adminAuth, managementController.getStudentResume);
+studentManagementRouter.get('/:id/resume/download', ...adminAuth, managementController.downloadStudentResume);
+
+// Single student lookup with strict ownership check
+studentManagementRouter.get('/:id', authenticateToken, async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new AppError('Unauthorized: User not authenticated', 401);
+    }
+    const userRole = req.user.role;
+    if (userRole === Role.SUPER_ADMIN || userRole === Role.PLACEMENT_ADMIN) {
+      return managementController.getStudentById(req, res, next);
+    }
+    if (userRole === Role.STUDENT) {
+      const studentId = await resolveStudentId(req);
+      if (req.params.id === studentId) {
+        return managementController.getStudentById(req, res, next);
+      }
+      throw new AppError("Forbidden: Role 'STUDENT' does not have permission to access other student records", 403);
+    }
+    throw new AppError(`Forbidden: Role '${userRole}' does not have permission to access this resource`, 403);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Server-side paginated & filtered CRUD (strictly admin only)
+studentManagementRouter.get('/', ...adminAuth, validateStudentQuery, managementController.getStudents);
+studentManagementRouter.post('/', ...adminAuth, validateStudentInput, managementController.createStudent);
+studentManagementRouter.put('/:id', ...adminAuth, managementController.updateStudent);
+studentManagementRouter.delete('/:id', ...adminAuth, managementController.deleteStudent);
+studentManagementRouter.post('/:id/reset-password', ...adminAuth, managementController.resetStudentPassword);
+

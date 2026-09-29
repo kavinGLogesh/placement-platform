@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -31,7 +32,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
+import CloseIcon from '@mui/icons-material/Close';
 import { DataTable, Column } from '../../components/management/DataTable.js';
 import { ConfirmDialog } from '../../components/management/ConfirmDialog.js';
 import { questionService } from '../../services/question.service.js';
@@ -55,6 +56,10 @@ export const QuestionsPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlCompanyId = searchParams.get('companyId') || '';
+  const [companyFilter, setCompanyFilter] = useState<string>(urlCompanyId);
 
   // Search, Filters & Sorting
   const [search, setSearch] = useState('');
@@ -111,6 +116,7 @@ export const QuestionsPage: React.FC = () => {
         difficulty: difficultyFilter || undefined,
         questionType: typeFilter || undefined,
         status: statusFilter || undefined,
+        companyId: companyFilter || undefined,
         sortBy: sortBy as 'createdAt' | 'marks' | 'difficulty' | 'questionType' | 'category',
         sortOrder,
       });
@@ -122,7 +128,7 @@ export const QuestionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, search, categoryFilter, topicFilter, difficultyFilter, typeFilter, statusFilter, sortBy, sortOrder]);
+  }, [page, rowsPerPage, search, categoryFilter, topicFilter, difficultyFilter, typeFilter, statusFilter, companyFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchQuestions();
@@ -243,10 +249,10 @@ export const QuestionsPage: React.FC = () => {
           formType === 'FILL_BLANK' || formType === 'DESCRIPTIVE'
             ? []
             : formOptions.map((o, idx) => ({
-                optionText: o.optionText.trim(),
-                optionOrder: idx + 1,
-                isCorrect: o.isCorrect,
-              })),
+              optionText: o.optionText.trim(),
+              optionOrder: idx + 1,
+              isCorrect: o.isCorrect,
+            })),
       };
 
       if (editingQuestion) {
@@ -343,10 +349,10 @@ export const QuestionsPage: React.FC = () => {
               q.category === 'TECHNICAL_MCQ'
                 ? 'primary'
                 : q.category === 'CODING'
-                ? 'secondary'
-                : q.category === 'QUANTITATIVE_APTITUDE'
-                ? 'info'
-                : 'default'
+                  ? 'secondary'
+                  : q.category === 'QUANTITATIVE_APTITUDE'
+                    ? 'info'
+                    : 'default'
             }
             sx={{ fontWeight: 700, fontSize: '0.7rem', height: 20, mb: 0.5 }}
           />
@@ -444,23 +450,23 @@ export const QuestionsPage: React.FC = () => {
 
   return (
     <Box>
-      <AdminNavTabs />
-
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Assessment Authoring Engine
+          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            ASSESSMENT AUTHORING ENGINE
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
             Authoritative Question Bank
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Multi-component repository with category tagging, difficulty levels, and automated test set generation.
           </Typography>
         </div>
 
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 1.25, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
-            color="inherit"
             startIcon={<RefreshIcon />}
             onClick={fetchQuestions}
             disabled={loading}
@@ -479,8 +485,29 @@ export const QuestionsPage: React.FC = () => {
       </Box>
 
       {error && (
-        <Alert severity="error" variant="outlined" sx={{ mb: 3 }} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mb: 2.5 }} onClose={() => setError(null)}>
           {error}
+        </Alert>
+      )}
+
+      {companyFilter && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2.5, alignItems: 'center' }}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setCompanyFilter('');
+                setSearchParams({});
+              }}
+            >
+              Clear Filter
+            </Button>
+          }
+        >
+          Filtering Question Bank by Company Track ID: <strong>{companyFilter}</strong>
         </Alert>
       )}
 
@@ -488,17 +515,16 @@ export const QuestionsPage: React.FC = () => {
       <Paper
         elevation={0}
         sx={{
-          p: 2.5,
-          mb: 3,
-          backgroundColor: 'rgba(17, 24, 39, 0.65)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: 2.5,
+          p: 2,
+          mb: 2.5,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <FilterListIcon sx={{ color: 'primary.light', fontSize: 20 }} />
-          <Typography variant="subtitle2" fontWeight={700} color="text.secondary">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+          <FilterListIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
             Multi-Parameter Question Filter
           </Typography>
         </Box>
@@ -521,7 +547,6 @@ export const QuestionsPage: React.FC = () => {
                 <MenuItem value="LOGICAL_REASONING">Logical Reasoning</MenuItem>
                 <MenuItem value="VERBAL_ABILITY">Verbal Ability</MenuItem>
                 <MenuItem value="TECHNICAL_MCQ">Technical MCQ</MenuItem>
-                <MenuItem value="CODING">Coding</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -663,160 +688,213 @@ export const QuestionsPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: 2.5,
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 3,
+            boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSaveQuestion}>
-          <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700 }}>
-            {editingQuestion ? 'Edit Assessment Question' : 'Author New Assessment Question'}
+          <DialogTitle
+            sx={{
+              color: '#0f172a',
+              fontWeight: 700,
+              fontSize: '1.25rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid #e2e8f0',
+              pb: 2,
+            }}
+          >
+            <Box>
+              <Typography variant="h6" fontWeight={700} color="#0f172a">
+                {editingQuestion ? 'Edit Assessment Question' : 'Author New Assessment Question'}
+              </Typography>
+              <Typography variant="caption" color="#64748b">
+                Configure question classification, scoring weights, prompt, and answer choices.
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setDialogOpen(false)} size="small" sx={{ color: '#64748b' }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3, pb: 3 }}>
             {formError && (
               <Alert severity="error" variant="outlined" onClose={() => setFormError(null)}>
                 {formError}
               </Alert>
             )}
 
-            {/* Category & Topic cascading selectors */}
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  select
-                  label="Category"
-                  required
-                  fullWidth
-                  value={formCategory}
-                  onChange={(e) => {
-                    const newCat = e.target.value as QuestionCategory;
-                    setFormCategory(newCat);
-                    const defaultTopic = CATEGORY_TOPICS_MAP[newCat][0] || '';
-                    setFormTopic(defaultTopic);
-                  }}
-                >
-                  <MenuItem value="QUANTITATIVE_APTITUDE">Quantitative Aptitude</MenuItem>
-                  <MenuItem value="LOGICAL_REASONING">Logical Reasoning</MenuItem>
-                  <MenuItem value="VERBAL_ABILITY">Verbal Ability</MenuItem>
-                  <MenuItem value="TECHNICAL_MCQ">Technical MCQ</MenuItem>
-                  <MenuItem value="CODING">Coding</MenuItem>
-                </TextField>
+            {/* SECTION 1: Classification & Scoring */}
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2.5,
+                borderRadius: 2,
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+                1. Question Classification & Scoring
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    select
+                    label="Category"
+                    required
+                    fullWidth
+                    value={formCategory}
+                    onChange={(e) => {
+                      const newCat = e.target.value as QuestionCategory;
+                      setFormCategory(newCat);
+                      const defaultTopic = CATEGORY_TOPICS_MAP[newCat][0] || '';
+                      setFormTopic(defaultTopic);
+                    }}
+                  >
+                    <MenuItem value="QUANTITATIVE_APTITUDE">Quantitative Aptitude</MenuItem>
+                    <MenuItem value="LOGICAL_REASONING">Logical Reasoning</MenuItem>
+                    <MenuItem value="VERBAL_ABILITY">Verbal Ability</MenuItem>
+                    <MenuItem value="TECHNICAL_MCQ">Technical MCQ</MenuItem>
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    select
+                    label="Authoritative Topic"
+                    required
+                    fullWidth
+                    value={formTopic}
+                    onChange={(e) => setFormTopic(e.target.value)}
+                  >
+                    {formAvailableTopics.map((t) => (
+                      <MenuItem key={t} value={t}>
+                        {t}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    select
+                    label="Difficulty"
+                    required
+                    fullWidth
+                    value={formDifficulty}
+                    onChange={(e) => setFormDifficulty(e.target.value as QuestionDifficulty)}
+                  >
+                    <MenuItem value="EASY">Easy</MenuItem>
+                    <MenuItem value="MEDIUM">Medium</MenuItem>
+                    <MenuItem value="HARD">Hard</MenuItem>
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    select
+                    label="Question Type"
+                    required
+                    fullWidth
+                    value={formType}
+                    onChange={(e) => handleTypeChange(e.target.value as QuestionType)}
+                  >
+                    <MenuItem value="SINGLE_CHOICE">Single Choice (1 Correct)</MenuItem>
+                    <MenuItem value="MULTIPLE_CHOICE">Multiple Choice (1+ Correct)</MenuItem>
+                    <MenuItem value="TRUE_FALSE">True / False</MenuItem>
+                    <MenuItem value="FILL_BLANK">Fill in the Blank</MenuItem>
+                    <MenuItem value="DESCRIPTIVE">Descriptive</MenuItem>
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    select
+                    label="Status"
+                    required
+                    fullWidth
+                    value={formStatus}
+                    onChange={(e) => setFormStatus(e.target.value as QuestionStatus)}
+                  >
+                    <MenuItem value="ACTIVE">ACTIVE</MenuItem>
+                    <MenuItem value="DRAFT">DRAFT</MenuItem>
+                    <MenuItem value="INACTIVE">INACTIVE</MenuItem>
+                    <MenuItem value="ARCHIVED">ARCHIVED</MenuItem>
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Marks (Positive)"
+                    type="number"
+                    required
+                    fullWidth
+                    inputProps={{ min: 0.25, max: 50, step: 0.25 }}
+                    value={formMarks}
+                    onChange={(e) => setFormMarks(Number(e.target.value))}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Negative Marks"
+                    type="number"
+                    required
+                    fullWidth
+                    inputProps={{ min: 0, max: formMarks, step: 0.25 }}
+                    value={formNegativeMarks}
+                    onChange={(e) => setFormNegativeMarks(Number(e.target.value))}
+                    helperText={`Deducted on incorrect answer (Max: ${formMarks})`}
+                  />
+                </Grid>
               </Grid>
+            </Paper>
 
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  select
-                  label="Authoritative Topic"
-                  required
-                  fullWidth
-                  value={formTopic}
-                  onChange={(e) => setFormTopic(e.target.value)}
-                >
-                  {formAvailableTopics.map((t) => (
-                    <MenuItem key={t} value={t}>
-                      {t}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
+            {/* SECTION 2: Question Statement / Prompt */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                2. Question Statement / Prompt
+              </Typography>
+              <TextField
+                label="Question Text"
+                required
+                fullWidth
+                multiline
+                rows={3}
+                value={formText}
+                onChange={(e) => setFormText(e.target.value)}
+                placeholder="Enter the complete question prompt, code snippet, or scenario..."
+              />
+            </Box>
 
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Difficulty"
-                  required
-                  fullWidth
-                  value={formDifficulty}
-                  onChange={(e) => setFormDifficulty(e.target.value as QuestionDifficulty)}
-                >
-                  <MenuItem value="EASY">Easy</MenuItem>
-                  <MenuItem value="MEDIUM">Medium</MenuItem>
-                  <MenuItem value="HARD">Hard</MenuItem>
-                </TextField>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Question Type"
-                  required
-                  fullWidth
-                  value={formType}
-                  onChange={(e) => handleTypeChange(e.target.value as QuestionType)}
-                >
-                  <MenuItem value="SINGLE_CHOICE">Single Choice (1 Correct)</MenuItem>
-                  <MenuItem value="MULTIPLE_CHOICE">Multiple Choice (1+ Correct)</MenuItem>
-                  <MenuItem value="TRUE_FALSE">True / False</MenuItem>
-                  <MenuItem value="FILL_BLANK">Fill in the Blank</MenuItem>
-                  <MenuItem value="DESCRIPTIVE">Descriptive</MenuItem>
-                </TextField>
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  select
-                  label="Status"
-                  required
-                  fullWidth
-                  value={formStatus}
-                  onChange={(e) => setFormStatus(e.target.value as QuestionStatus)}
-                >
-                  <MenuItem value="ACTIVE">ACTIVE</MenuItem>
-                  <MenuItem value="DRAFT">DRAFT</MenuItem>
-                  <MenuItem value="INACTIVE">INACTIVE</MenuItem>
-                  <MenuItem value="ARCHIVED">ARCHIVED</MenuItem>
-                </TextField>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Marks (Positive)"
-                  type="number"
-                  required
-                  fullWidth
-                  inputProps={{ min: 0.25, max: 50, step: 0.25 }}
-                  value={formMarks}
-                  onChange={(e) => setFormMarks(Number(e.target.value))}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Negative Marks"
-                  type="number"
-                  required
-                  fullWidth
-                  inputProps={{ min: 0, max: formMarks, step: 0.25 }}
-                  value={formNegativeMarks}
-                  onChange={(e) => setFormNegativeMarks(Number(e.target.value))}
-                  helperText={`Cannot exceed ${formMarks} marks`}
-                />
-              </Grid>
-            </Grid>
-
-            {/* Question Text */}
-            <TextField
-              label="Question Text"
-              required
-              fullWidth
-              multiline
-              rows={3}
-              value={formText}
-              onChange={(e) => setFormText(e.target.value)}
-              placeholder="Enter the complete question prompt, code snippet, or scenario..."
-            />
-
-            {/* Dynamic Options Management */}
+            {/* SECTION 3: Dynamic Options Management */}
             {(formType === 'SINGLE_CHOICE' || formType === 'MULTIPLE_CHOICE' || formType === 'TRUE_FALSE') && (
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(11, 15, 25, 0.6)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2.5,
+                  borderRadius: 2,
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    Options & Correct Answer Selection
-                  </Typography>
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                      3. Options & Correct Answer Selection
+                    </Typography>
+                    <Typography variant="caption" color="#64748b">
+                      Mark the correct option using the selector on the left.
+                    </Typography>
+                  </Box>
                   {formType !== 'TRUE_FALSE' && formOptions.length < 6 && (
                     <Button
                       size="small"
+                      variant="outlined"
                       startIcon={<AddIcon />}
                       onClick={() =>
                         setFormOptions([
@@ -824,6 +902,7 @@ export const QuestionsPage: React.FC = () => {
                           { optionText: '', optionOrder: formOptions.length + 1, isCorrect: false },
                         ])
                       }
+                      sx={{ bgcolor: '#ffffff' }}
                     >
                       Add Option
                     </Button>
@@ -832,10 +911,24 @@ export const QuestionsPage: React.FC = () => {
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   {formOptions.map((opt, idx) => (
-                    <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Paper
+                      key={idx}
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        backgroundColor: opt.isCorrect ? '#f0fdf4' : '#ffffff',
+                        border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                        borderRadius: 2,
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
                       {formType === 'SINGLE_CHOICE' || formType === 'TRUE_FALSE' ? (
                         <Radio
                           checked={opt.isCorrect}
+                          color="success"
                           onChange={() => {
                             const updated = formOptions.map((o, i) => ({
                               ...o,
@@ -847,6 +940,7 @@ export const QuestionsPage: React.FC = () => {
                       ) : (
                         <Checkbox
                           checked={opt.isCorrect}
+                          color="success"
                           onChange={(e) => {
                             const updated = [...formOptions];
                             updated[idx].isCorrect = e.target.checked;
@@ -866,7 +960,7 @@ export const QuestionsPage: React.FC = () => {
                           updated[idx].optionText = e.target.value;
                           setFormOptions(updated);
                         }}
-                        placeholder={`Option ${idx + 1} text`}
+                        placeholder={`Enter Option ${idx + 1} text`}
                       />
 
                       {formType !== 'TRUE_FALSE' && formOptions.length > 2 && (
@@ -881,54 +975,69 @@ export const QuestionsPage: React.FC = () => {
                           <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                       )}
-                    </Box>
+                    </Paper>
                   ))}
                 </Box>
-              </Box>
+              </Paper>
             )}
 
             {/* Fill Blank Correct Answer */}
             {formType === 'FILL_BLANK' && (
-              <TextField
-                label="Exact Correct Answer"
-                required
-                fullWidth
-                value={formCorrectAnswer}
-                onChange={(e) => setFormCorrectAnswer(e.target.value)}
-                placeholder="Enter exact keyword or phrase expected from student..."
-                helperText="Case-insensitive evaluation against student input"
-              />
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                  3. Exact Correct Answer Key
+                </Typography>
+                <TextField
+                  label="Exact Correct Answer"
+                  required
+                  fullWidth
+                  value={formCorrectAnswer}
+                  onChange={(e) => setFormCorrectAnswer(e.target.value)}
+                  placeholder="Enter exact keyword or phrase expected from student..."
+                  helperText="Case-insensitive exact match evaluation against student input"
+                />
+              </Box>
             )}
 
             {/* Descriptive Model Criteria */}
             {formType === 'DESCRIPTIVE' && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                  3. Model Answer & Scoring Rubric
+                </Typography>
+                <TextField
+                  label="Model Answer / Scoring Rubric"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={formCorrectAnswer}
+                  onChange={(e) => setFormCorrectAnswer(e.target.value)}
+                  placeholder="Optional grading guidelines or expected points..."
+                />
+              </Box>
+            )}
+
+            {/* SECTION 4: Explanation */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                4. Solution Explanation & Notes
+              </Typography>
               <TextField
-                label="Model Answer / Scoring Rubric"
+                label="Solution Explanation (Provided after assessment)"
                 fullWidth
                 multiline
                 rows={2}
-                value={formCorrectAnswer}
-                onChange={(e) => setFormCorrectAnswer(e.target.value)}
-                placeholder="Optional grading guidelines or expected points..."
+                value={formExplanation}
+                onChange={(e) => setFormExplanation(e.target.value)}
+                placeholder="Step-by-step reasoning or theoretical derivation..."
               />
-            )}
-
-            {/* Explanation */}
-            <TextField
-              label="Solution Explanation (Provided after assessment)"
-              fullWidth
-              multiline
-              rows={2}
-              value={formExplanation}
-              onChange={(e) => setFormExplanation(e.target.value)}
-              placeholder="Step-by-step reasoning or theoretical derivation..."
-            />
+            </Box>
           </DialogContent>
-          <DialogActions sx={{ p: 2.5 }}>
-            <Button onClick={() => setDialogOpen(false)} color="inherit">
+          <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+            <Button onClick={() => setDialogOpen(false)} variant="outlined" color="inherit">
               Cancel
             </Button>
-            <Button type="submit" variant="contained" color="primary" disabled={saving}>
+            <Button type="submit" variant="contained" color="primary" disabled={saving} sx={{ px: 3 }}>
               {saving ? <CircularProgress size={20} color="inherit" /> : 'Save Question'}
             </Button>
           </DialogActions>
@@ -943,18 +1052,29 @@ export const QuestionsPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: 2.5,
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 3,
+            boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1)',
           },
         }}
       >
         {viewQuestion && (
           <>
-            <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <DialogTitle
+              sx={{
+                color: '#0f172a',
+                fontWeight: 700,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid #e2e8f0',
+                pb: 2,
+              }}
+            >
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Chip label={viewQuestion.category.replace('_', ' ')} color="primary" size="small" sx={{ fontWeight: 700 }} />
-                <Chip label={viewQuestion.topic} variant="outlined" size="small" sx={{ fontWeight: 600 }} />
+                <Chip label={viewQuestion.topic} variant="outlined" size="small" sx={{ fontWeight: 600, color: '#334155', borderColor: '#cbd5e1' }} />
                 <Chip
                   label={viewQuestion.difficulty}
                   size="small"
@@ -962,11 +1082,19 @@ export const QuestionsPage: React.FC = () => {
                   sx={{ fontWeight: 700 }}
                 />
               </Box>
-              <Chip label={`+${viewQuestion.marks} / -${viewQuestion.negativeMarks} Marks`} size="small" sx={{ fontWeight: 700 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Chip label={`+${viewQuestion.marks} / -${viewQuestion.negativeMarks} Marks`} size="small" sx={{ fontWeight: 700, bgcolor: '#eff6ff', color: '#1d4ed8' }} />
+                <IconButton onClick={() => setViewQuestion(null)} size="small" sx={{ color: '#64748b' }}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Box>
             </DialogTitle>
-            <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
-              <Paper sx={{ p: 2.5, bgcolor: 'rgba(11, 15, 25, 0.8)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <Typography variant="body1" fontWeight={600} sx={{ whiteSpace: 'pre-wrap' }}>
+            <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 3 }}>
+              <Paper variant="outlined" sx={{ p: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 2 }}>
+                <Typography variant="caption" fontWeight={700} color="#64748b" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
+                  Question Statement
+                </Typography>
+                <Typography variant="body1" fontWeight={600} color="#0f172a" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                   {viewQuestion.questionText}
                 </Typography>
               </Paper>
@@ -974,30 +1102,35 @@ export const QuestionsPage: React.FC = () => {
               {/* Options Breakdown */}
               {viewQuestion.options.length > 0 && (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
-                    Options & Correctness:
+                  <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1.5 }}>
+                    Options & Correctness Evaluation:
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {viewQuestion.options.map((opt) => (
                       <Paper
                         key={opt.id}
+                        elevation={0}
                         sx={{
                           p: 1.5,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 1.5,
-                          bgcolor: opt.isCorrect ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                          border: opt.isCorrect ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.06)',
+                          bgcolor: opt.isCorrect ? '#f0fdf4' : '#ffffff',
+                          border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                          borderRadius: 2,
                         }}
                       >
                         {opt.isCorrect ? (
-                          <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />
+                          <CheckCircleIcon sx={{ color: '#16a34a', fontSize: 20 }} />
                         ) : (
-                          <Box sx={{ width: 20, height: 20, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)' }} />
+                          <Box sx={{ width: 18, height: 18, borderRadius: '50%', border: '1px solid #cbd5e1' }} />
                         )}
-                        <Typography variant="body2" fontWeight={opt.isCorrect ? 700 : 400}>
+                        <Typography variant="body2" color="#0f172a" fontWeight={opt.isCorrect ? 700 : 500}>
                           {opt.optionText}
                         </Typography>
+                        {opt.isCorrect && (
+                          <Chip label="Correct Answer" size="small" color="success" sx={{ ml: 'auto', height: 20, fontSize: '0.7rem', fontWeight: 700 }} />
+                        )}
                       </Paper>
                     ))}
                   </Box>
@@ -1006,11 +1139,11 @@ export const QuestionsPage: React.FC = () => {
 
               {/* Text answer if Fill Blank */}
               {viewQuestion.questionType === 'FILL_BLANK' && viewQuestion.correctAnswer && (
-                <Box sx={{ p: 2, bgcolor: 'rgba(16, 185, 129, 0.1)', borderRadius: 2, border: '1px solid #10b981' }}>
-                  <Typography variant="caption" color="success.main" fontWeight={700}>
+                <Box sx={{ p: 2, bgcolor: '#f0fdf4', borderRadius: 2, border: '1px solid #86efac' }}>
+                  <Typography variant="caption" color="#166534" fontWeight={700}>
                     Correct Answer:
                   </Typography>
-                  <Typography variant="body1" fontWeight={700}>
+                  <Typography variant="body1" fontWeight={700} color="#14532d">
                     {viewQuestion.correctAnswer}
                   </Typography>
                 </Box>
@@ -1018,29 +1151,29 @@ export const QuestionsPage: React.FC = () => {
 
               {/* Explanation */}
               {viewQuestion.explanation && (
-                <Box sx={{ p: 2, bgcolor: 'rgba(99, 102, 241, 0.08)', borderRadius: 2, border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-                  <Typography variant="caption" color="primary.light" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Box sx={{ p: 2, bgcolor: '#eff6ff', borderRadius: 2, border: '1px solid #bfdbfe' }}>
+                  <Typography variant="caption" color="#1d4ed8" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <HelpOutlineIcon fontSize="inherit" /> Solution Explanation:
                   </Typography>
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
+                  <Typography variant="body2" color="#1e3a8a" sx={{ mt: 0.5, lineHeight: 1.6 }}>
                     {viewQuestion.explanation}
                   </Typography>
                 </Box>
               )}
 
-              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+              <Divider sx={{ borderColor: '#e2e8f0' }} />
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary">
-                  Assessment Usages: {viewQuestion._count?.usages ?? 0} times
+                <Typography variant="caption" color="#64748b">
+                  Assessment Usages: <strong>{viewQuestion._count?.usages ?? 0} times</strong>
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Created: {new Date(viewQuestion.createdAt).toLocaleDateString()}
+                <Typography variant="caption" color="#64748b">
+                  Created: <strong>{new Date(viewQuestion.createdAt).toLocaleDateString()}</strong>
                 </Typography>
               </Box>
             </DialogContent>
-            <DialogActions sx={{ p: 2.5 }}>
-              <Button onClick={() => setViewQuestion(null)} color="inherit">
+            <DialogActions sx={{ p: 2.5, bgcolor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+              <Button onClick={() => setViewQuestion(null)} variant="outlined" color="inherit">
                 Close
               </Button>
             </DialogActions>

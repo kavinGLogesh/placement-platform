@@ -32,11 +32,11 @@ before(async () => {
     });
   });
 
-  // 1. Admin login
+  // 1. Admin login (Placement Admin has assessment authoring permissions)
   const adminRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'superadmin@placement.edu', password: 'SuperAdmin@123' }),
+    body: JSON.stringify({ email: 'placementadmin@placement.edu', password: 'PlacementAdmin@123' }),
   });
   const adminJson = await adminRes.json();
   adminToken = adminJson.data.accessToken;

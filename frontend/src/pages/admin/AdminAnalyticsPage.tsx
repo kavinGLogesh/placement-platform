@@ -17,7 +17,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -35,7 +34,6 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import LayersIcon from '@mui/icons-material/Layers';
 import SchoolIcon from '@mui/icons-material/School';
 import CategoryIcon from '@mui/icons-material/Category';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
 import { analyticsService } from '../../services/analytics.service.js';
 import { managementService } from '../../services/management.service.js';
 import { assessmentService } from '../../services/assessment.service.js';
@@ -132,25 +130,26 @@ export const AdminAnalyticsPage: React.FC = () => {
 
   return (
     <Box>
-      <AdminNavTabs />
-
       {/* Header */}
       <Box
         sx={{
-          mb: 4,
+          mb: 3,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
         }}
       >
         <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Phase 8 • Authoritative Institutional Intelligence
+          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            INSTITUTIONAL INTELLIGENCE & BENCHMARKS
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
             Analytics, Placement Funnel & Performance Hub
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Cohort progression funnel, departmental benchmark distributions, and topic mastery diagnostics.
           </Typography>
         </div>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
@@ -165,10 +164,10 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Box>
 
       {/* Filter Toolbar */}
-      <Card sx={{ mb: 4, p: 2.5, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <FilterAltIcon color="primary" />
-          <Typography variant="subtitle1" fontWeight={700}>
+      <Card elevation={0} sx={{ mb: 3, p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+          <FilterAltIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
             Authoritative Filters
           </Typography>
         </Box>
@@ -248,71 +247,73 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Card>
 
       {/* 1. Placement Funnel Visualizer */}
-      <Card sx={{ mb: 4, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <LayersIcon color="primary" />
-          <Typography variant="h6" fontWeight={700}>
+      <Card elevation={0} sx={{ mb: 3.5, p: 2.5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+          <LayersIcon sx={{ color: '#0f3674', fontSize: 20 }} />
+          <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
             End-to-End Placement Pipeline Funnel
           </Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 2.5, display: 'block' }}>
           Pipeline stages computed strictly from real student attempt and result database records.
         </Typography>
 
         {loadingFunnel ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress />
+            <CircularProgress size={28} />
           </Box>
         ) : funnel ? (
-          <Grid container spacing={2}>
+          <Grid container spacing={1.5}>
             {funnel.stages.map((st, index) => {
               const colors = [
-                '#6366f1',
-                '#38bdf8',
-                '#34d399',
-                '#10b981',
-                '#94a3b8',
+                '#0f3674',
+                '#0284c7',
+                '#047857',
+                '#059669',
                 '#64748b',
+                '#94a3b8',
               ];
               const color = colors[index % colors.length];
 
               return (
                 <Grid item xs={12} sm={6} md={4} lg={2} key={st.stage}>
                   <Card
+                    elevation={0}
                     sx={{
-                      p: 2,
+                      p: 1.75,
                       height: '100%',
-                      bgcolor: st.isImplemented ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+                      bgcolor: st.isImplemented ? '#f8fafc' : '#ffffff',
                       border: '1px solid',
-                      borderColor: st.isImplemented ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                      borderTop: `4px solid ${color}`,
+                      borderColor: st.isImplemented ? '#cbd5e1' : '#f1f5f9',
+                      borderTop: `3px solid ${color}`,
+                      borderRadius: '6px',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
                     }}
                   >
                     <Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={800} color="text.primary">
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
+                        <Typography variant="caption" fontWeight={700} color="#1e293b">
                           {index + 1}. {st.stage}
                         </Typography>
                         {!st.isImplemented ? (
-                          <Chip label="Future" size="small" sx={{ height: 18, fontSize: '0.65rem' }} />
+                          <Chip label="Future" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#f1f5f9', color: '#94a3b8', borderRadius: '3px' }} />
                         ) : (
-                          <Chip label="Active" size="small" color="primary" variant="outlined" sx={{ height: 18, fontSize: '0.65rem' }} />
+                          <Chip label="Active" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#eff6ff', color: '#0f3674', borderRadius: '3px' }} />
                         )}
                       </Box>
-                      <Typography variant="h4" fontWeight={800} sx={{ color, my: 1 }}>
+                      <Typography variant="h5" fontWeight={700} sx={{ color, my: 0.5 }}>
                         {st.count}
                       </Typography>
                       <LinearProgress
                         variant="determinate"
                         value={Math.min(100, st.conversionRate)}
                         sx={{
-                          height: 6,
-                          borderRadius: 3,
-                          mb: 1,
-                          bgcolor: 'rgba(255, 255, 255, 0.06)',
+                          height: 4,
+                          borderRadius: '2px',
+                          mb: 0.75,
+                          bgcolor: '#e2e8f0',
                           '& .MuiLinearProgress-bar': { bgcolor: color },
                         }}
                       />
@@ -325,7 +326,7 @@ export const AdminAnalyticsPage: React.FC = () => {
                         </Typography>
                       )}
                     </Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1.5, display: 'block', fontSize: '0.7rem' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block', fontSize: '0.68rem', lineHeight: 1.3 }}>
                       {st.description}
                     </Typography>
                   </Card>
@@ -339,39 +340,39 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Card>
 
       {/* 2. Department Comparisons & Category Mastery */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
         {/* Department Comparison Chart */}
         <Grid item xs={12} lg={6}>
-          <Card sx={{ p: 3, height: '100%', bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <SchoolIcon color="primary" />
-              <Typography variant="h6" fontWeight={700}>
+          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <SchoolIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
                 Department Performance Comparison
               </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2.5, display: 'block' }}>
               Comparative average score %, pass percentage %, and cohort participation rate %.
             </Typography>
 
             {loadingDept ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                <CircularProgress />
+                <CircularProgress size={28} />
               </Box>
             ) : deptChartData.length > 0 ? (
-              <Box sx={{ width: '100%', height: 320 }}>
+              <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={deptChartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                    <XAxis dataKey="name" stroke="#94a3b8" />
-                    <YAxis unit="%" domain={[0, 100]} stroke="#94a3b8" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 12 }} />
+                    <YAxis unit="%" domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 12 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
                       formatter={(val: any) => [`${val}%`]}
                     />
-                    <Legend />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="passRate" name="Pass Rate %" fill="#10b981" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="participation" name="Participation %" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0f3674" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="passRate" name="Pass Rate %" fill="#047857" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="participation" name="Participation %" fill="#0284c7" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
@@ -383,35 +384,35 @@ export const AdminAnalyticsPage: React.FC = () => {
 
         {/* Category Accuracy Chart */}
         <Grid item xs={12} lg={6}>
-          <Card sx={{ p: 3, height: '100%', bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <CategoryIcon color="primary" />
-              <Typography variant="h6" fontWeight={700}>
+          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <CategoryIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
                 Assessment Component Accuracy
               </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2.5, display: 'block' }}>
               Accuracy percentage across Aptitude, Reasoning, Verbal, Technical MCQ & Coding.
             </Typography>
 
             {loadingTopics ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                <CircularProgress />
+                <CircularProgress size={28} />
               </Box>
             ) : categoryChartData.length > 0 ? (
-              <Box sx={{ width: '100%', height: 320 }}>
+              <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryChartData} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                    <XAxis type="number" unit="%" domain={[0, 100]} stroke="#94a3b8" />
-                    <YAxis dataKey="category" type="category" width={110} stroke="#94a3b8" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis type="number" unit="%" domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 12 }} />
+                    <YAxis dataKey="category" type="category" width={110} stroke="#64748b" tick={{ fontSize: 11 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
                       formatter={(val: any) => [`${val}%`]}
                     />
-                    <Legend />
-                    <Bar dataKey="accuracy" name="Accuracy %" fill="#f59e0b" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Bar dataKey="accuracy" name="Accuracy %" fill="#b45309" radius={[0, 3, 3, 0]} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0f3674" radius={[0, 3, 3, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
@@ -423,58 +424,59 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Grid>
 
       {/* 3. Topic Strengths and Weaknesses Matrix */}
-      <Card sx={{ mb: 4, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Card elevation={0} sx={{ mb: 4, p: 2.5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
           <Box>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
               Topic Strengths & Weaknesses Matrix
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="caption" color="text.secondary">
               Authoritative granular accuracy breakdown per question topic.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Chip label="Strong (≥75%)" color="success" size="small" />
-            <Chip label="Average (50-74%)" color="warning" size="small" />
-            <Chip label="Weak (<50%)" color="error" size="small" />
+            <Chip label="Strong (≥75%)" size="small" sx={{ bgcolor: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', fontWeight: 600, fontSize: '0.7rem', borderRadius: '4px' }} />
+            <Chip label="Average (50-74%)" size="small" sx={{ bgcolor: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', fontWeight: 600, fontSize: '0.7rem', borderRadius: '4px' }} />
+            <Chip label="Weak (<50%)" size="small" sx={{ bgcolor: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca', fontWeight: 600, fontSize: '0.7rem', borderRadius: '4px' }} />
           </Box>
         </Box>
 
         {topicAnalytics?.topics && topicAnalytics.topics.length > 0 ? (
-          <TableContainer component={Paper} sx={{ bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+          <TableContainer sx={{ border: '1px solid #e2e8f0', borderRadius: '6px' }}>
             <Table size="small">
-              <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.04)' }}>
+              <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700 }}>Topic Name</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Component</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Questions Answered</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Correct</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Accuracy</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Average Score</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Classification</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Topic Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Component</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Questions Answered</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Correct</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Accuracy</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Average Score</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Classification</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {topicAnalytics.topics.map((t) => (
-                  <TableRow key={`${t.category}-${t.topic}`} hover>
-                    <TableCell sx={{ fontWeight: 600 }}>{t.topic}</TableCell>
-                    <TableCell color="text.secondary">{t.category}</TableCell>
-                    <TableCell>{t.attemptedCount}</TableCell>
-                    <TableCell>{t.correctCount}</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>{t.accuracy}%</TableCell>
-                    <TableCell>{t.averageScore}%</TableCell>
+                  <TableRow key={`${t.category}-${t.topic}`} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                    <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{t.topic}</TableCell>
+                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{t.category}</TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem' }}>{t.attemptedCount}</TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem' }}>{t.correctCount}</TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.82rem' }}>{t.accuracy}%</TableCell>
+                    <TableCell sx={{ fontSize: '0.8rem' }}>{t.averageScore}%</TableCell>
                     <TableCell>
                       <Chip
                         label={t.strength}
                         size="small"
-                        color={
-                          t.strength === 'STRONG'
-                            ? 'success'
-                            : t.strength === 'AVERAGE'
-                            ? 'warning'
-                            : 'error'
-                        }
-                        sx={{ fontWeight: 700, fontSize: '0.7rem' }}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.68rem',
+                          borderRadius: '4px',
+                          bgcolor: t.strength === 'STRONG' ? '#ecfdf5' : t.strength === 'AVERAGE' ? '#fef3c7' : '#fef2f2',
+                          color: t.strength === 'STRONG' ? '#047857' : t.strength === 'AVERAGE' ? '#b45309' : '#b91c1c',
+                          border: '1px solid',
+                          borderColor: t.strength === 'STRONG' ? '#a7f3d0' : t.strength === 'AVERAGE' ? '#fde68a' : '#fecaca',
+                        }}
                       />
                     </TableCell>
                   </TableRow>

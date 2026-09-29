@@ -101,6 +101,7 @@ export interface CreateQuestionOptionInput {
 
 export interface Question {
   id: string;
+  companyId?: string | null;
   category: QuestionCategory;
   topic: string;
   difficulty: QuestionDifficulty;
@@ -116,12 +117,14 @@ export interface Question {
   updatedAt: string;
   options: QuestionOption[];
   createdBy?: { id: string; email: string } | null;
+  company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
   _count?: {
     usages: number;
   };
 }
 
 export interface CreateQuestionInput {
+  companyId?: string | null;
   category: QuestionCategory;
   topic: string;
   difficulty?: QuestionDifficulty;
@@ -136,6 +139,7 @@ export interface CreateQuestionInput {
 }
 
 export interface UpdateQuestionInput {
+  companyId?: string | null;
   category?: QuestionCategory;
   topic?: string;
   difficulty?: QuestionDifficulty;
@@ -158,6 +162,7 @@ export interface QuestionFilters {
   difficulty?: QuestionDifficulty;
   questionType?: QuestionType;
   status?: QuestionStatus;
+  companyId?: string | null;
   sortBy?: 'createdAt' | 'marks' | 'difficulty' | 'questionType' | 'category';
   sortOrder?: 'asc' | 'desc';
 }

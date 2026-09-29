@@ -21,6 +21,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import TimerIcon from '@mui/icons-material/Timer';
+import BusinessIcon from '@mui/icons-material/Business';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { attemptService } from '../../services/attempt.service.js';
 import { StudentAssessmentItemDto, StudentTestStatus } from '../../types/attempt.types.js';
@@ -38,6 +39,8 @@ export const StudentTestsPage: React.FC = () => {
   };
 
   const [activeTab, setActiveTab] = useState<StudentTestStatus | 'ALL'>(getTabFromPath());
+  const [trackFilter, setTrackFilter] = useState<'ALL' | 'GENERAL' | 'COMPANY'>('ALL');
+  const [selectedCompanyCode, setSelectedCompanyCode] = useState<string>('ALL');
   const [tests, setTests] = useState<StudentAssessmentItemDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [startingId, setStartingId] = useState<string | null>(null);
@@ -93,23 +96,45 @@ export const StudentTestsPage: React.FC = () => {
     }
   };
 
+  // Distinct company codes present in student's tests
+  const availableCompanyCodes = Array.from(
+    new Set(
+      tests
+        .filter((t) => t.company?.code)
+        .map((t) => t.company!.code.toUpperCase())
+    )
+  );
+
+  // Filter tests based on track and company
+  const filteredTests = tests.filter((t) => {
+    if (trackFilter === 'GENERAL' && t.isCompanyAssessment) return false;
+    if (trackFilter === 'COMPANY' && !t.isCompanyAssessment) return false;
+    if (selectedCompanyCode !== 'ALL') {
+      if (!t.company || t.company.code.toUpperCase() !== selectedCompanyCode) return false;
+    }
+    return true;
+  });
+
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <Box>
       {/* Top Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Placement Examination System
+          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            CAMPUS PLACEMENT EXAMINATIONS
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-            My Assigned Assessments
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+            My Assessments & Examination Schedule
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            General placement tests, corporate recruiter mock papers, and active examination sessions.
           </Typography>
         </div>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"
             size="small"
-            startIcon={<AssessmentIcon />}
+            startIcon={<AssessmentIcon sx={{ fontSize: 16 }} />}
             onClick={() => navigate('/student/results')}
           >
             My Results
@@ -118,48 +143,181 @@ export const StudentTestsPage: React.FC = () => {
             variant="text"
             size="small"
             onClick={() => navigate('/student/dashboard')}
+            sx={{ fontWeight: 600, color: '#475569' }}
           >
-            Profile
+            Dashboard
           </Button>
         </Box>
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mb: 2.5 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
+      {/* Track & Company Filter Bar */}
+      <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.25 }}>
+        <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569', mr: 0.5, letterSpacing: '0.04em' }}>
+          TRACK:
+        </Typography>
+        <Chip
+          label="All Assessments"
+          clickable
+          size="small"
+          onClick={() => {
+            setTrackFilter('ALL');
+            setSelectedCompanyCode('ALL');
+          }}
+          sx={{
+            fontWeight: 600,
+            borderRadius: '4px',
+            backgroundColor: trackFilter === 'ALL' ? '#0f3674' : '#ffffff',
+            color: trackFilter === 'ALL' ? '#ffffff' : '#475569',
+            border: '1px solid',
+            borderColor: trackFilter === 'ALL' ? '#0f3674' : '#cbd5e1',
+          }}
+        />
+        <Chip
+          label="General Placement Only"
+          clickable
+          size="small"
+          onClick={() => {
+            setTrackFilter('GENERAL');
+            setSelectedCompanyCode('ALL');
+          }}
+          sx={{
+            fontWeight: 600,
+            borderRadius: '4px',
+            backgroundColor: trackFilter === 'GENERAL' ? '#0f3674' : '#ffffff',
+            color: trackFilter === 'GENERAL' ? '#ffffff' : '#475569',
+            border: '1px solid',
+            borderColor: trackFilter === 'GENERAL' ? '#0f3674' : '#cbd5e1',
+          }}
+        />
+        <Chip
+          icon={<BusinessIcon sx={{ fontSize: '14px !important' }} />}
+          label="Company Mock Prep"
+          clickable
+          size="small"
+          onClick={() => setTrackFilter('COMPANY')}
+          sx={{
+            fontWeight: 600,
+            borderRadius: '4px',
+            backgroundColor: trackFilter === 'COMPANY' ? '#0f3674' : '#ffffff',
+            color: trackFilter === 'COMPANY' ? '#ffffff' : '#475569',
+            border: '1px solid',
+            borderColor: trackFilter === 'COMPANY' ? '#0f3674' : '#cbd5e1',
+          }}
+        />
+
+        {/* Company Pills if Company Mock Prep or All */}
+        {trackFilter !== 'GENERAL' && availableCompanyCodes.length > 0 && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { xs: 0, sm: 1 }, flexWrap: 'wrap' }}>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+              Company:
+            </Typography>
+            <Chip
+              label="All Companies"
+              size="small"
+              clickable
+              onClick={() => setSelectedCompanyCode('ALL')}
+              sx={{
+                fontWeight: 600,
+                fontSize: '0.72rem',
+                borderRadius: '4px',
+                backgroundColor: selectedCompanyCode === 'ALL' ? '#0f3674' : '#f8fafc',
+                color: selectedCompanyCode === 'ALL' ? '#ffffff' : '#475569',
+                border: '1px solid #cbd5e1',
+              }}
+            />
+            {availableCompanyCodes.map((code) => (
+              <Chip
+                key={code}
+                label={code}
+                size="small"
+                clickable
+                onClick={() => setSelectedCompanyCode(code)}
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.72rem',
+                  borderRadius: '4px',
+                  backgroundColor: selectedCompanyCode === code ? '#0f3674' : '#ffffff',
+                  color: selectedCompanyCode === code ? '#ffffff' : '#475569',
+                  border: '1px solid #cbd5e1',
+                }}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      {/* Company Mock Prep Disclaimer Banner */}
+      {(trackFilter === 'COMPANY' || filteredTests.some((t) => t.isCompanyAssessment)) && (
+        <Alert
+          severity="info"
+          icon={<BusinessIcon sx={{ color: '#0f3674' }} />}
+          sx={{
+            mb: 2.5,
+            backgroundColor: '#f8fafc',
+            border: '1px solid #cbd5e1',
+            borderRadius: '6px',
+            color: '#1e293b',
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+            Company-Specific Placement Preparation & Mock Practice Module
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#475569', mt: 0.25, display: 'block' }}>
+            Assessments tagged with corporate recruiters (TCS, Wipro, Cognizant, Infosys, Accenture, HCL) are simulated mock patterns designed for placement examination preparation.
+          </Typography>
+        </Alert>
+      )}
+
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+      <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0', mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          sx={{
+            minHeight: 40,
+            '& .MuiTab-root': {
+              minHeight: 40,
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              px: 2,
+            },
+          }}
+        >
           <Tab label="All Tests" value="ALL" />
-          <Tab label="Available" value="AVAILABLE" icon={<PlayArrowIcon fontSize="small" />} iconPosition="start" />
-          <Tab label="Upcoming" value="UPCOMING" icon={<ScheduleIcon fontSize="small" />} iconPosition="start" />
-          <Tab label="Completed" value="COMPLETED" icon={<CheckCircleIcon fontSize="small" />} iconPosition="start" />
+          <Tab label="Available Now" value="AVAILABLE" icon={<PlayArrowIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+          <Tab label="Upcoming Scheduled" value="UPCOMING" icon={<ScheduleIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+          <Tab label="Completed Scorecards" value="COMPLETED" icon={<CheckCircleIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
         </Tabs>
       </Box>
 
       {/* Content */}
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+          <CircularProgress size={28} />
         </Box>
-      ) : tests.length === 0 ? (
-        <Card sx={{ textAlign: 'center', py: 6, px: 3, background: 'rgba(255,255,255,0.02)' }}>
-          <AssignmentIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" fontWeight={700} gutterBottom>
+      ) : filteredTests.length === 0 ? (
+        <Card elevation={0} sx={{ textAlign: 'center', py: 6, px: 3, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+          <AssignmentIcon sx={{ fontSize: 40, color: '#94a3b8', mb: 1.5 }} />
+          <Typography variant="subtitle1" fontWeight={700} color="#0f172a" gutterBottom>
             No Assessments Found
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="caption" color="text.secondary">
             {activeTab === 'ALL'
-              ? 'You do not have any assessments assigned at this time.'
-              : `You have no ${activeTab.toLowerCase()} assessments.`}
+              ? 'You do not have any matching assessments assigned at this time.'
+              : `You have no ${activeTab.toLowerCase()} assessments matching this filter.`}
           </Typography>
         </Card>
       ) : (
-        <Grid container spacing={3}>
-          {tests.map((test) => {
+        <Grid container spacing={2.5}>
+          {filteredTests.map((test) => {
             const isAvailable = test.status === 'AVAILABLE';
             const isUpcoming = test.status === 'UPCOMING';
             const isCompleted = test.status === 'COMPLETED';
@@ -168,86 +326,140 @@ export const StudentTestsPage: React.FC = () => {
             return (
               <Grid item xs={12} sm={6} lg={4} key={test.id}>
                 <Card
+                  elevation={0}
                   sx={{
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
-                    border: hasActiveAttempt
-                      ? '1px solid rgba(59, 130, 246, 0.5)'
-                      : '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: hasActiveAttempt ? '0 4px 20px rgba(59, 130, 246, 0.15)' : undefined,
+                    bgcolor: '#ffffff',
+                    border: hasActiveAttempt ? '2px solid #0f3674' : '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    transition: 'border-color 0.15s ease',
+                    '&:hover': {
+                      borderColor: hasActiveAttempt ? '#0f3674' : '#94a3b8',
+                    },
                   }}
                 >
-                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                      <Typography variant="h6" fontWeight={700} sx={{ pr: 1 }}>
-                        {test.name}
-                      </Typography>
+                  <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, gap: 1 }}>
+                      <Box>
+                        {test.company && (
+                          <Chip
+                            icon={<BusinessIcon sx={{ fontSize: '13px !important' }} />}
+                            label={`${test.company.name} (${test.company.code})`}
+                            size="small"
+                            sx={{
+                              mb: 0.75,
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              backgroundColor: '#eff6ff',
+                              color: '#0f3674',
+                              border: '1px solid #bfdbfe',
+                              borderRadius: '4px',
+                            }}
+                          />
+                        )}
+                        {test.isCompanyAssessment && !test.company && (
+                          <Chip
+                            icon={<BusinessIcon sx={{ fontSize: '13px !important' }} />}
+                            label="Company Mock Test"
+                            size="small"
+                            sx={{
+                              mb: 0.75,
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              backgroundColor: '#eff6ff',
+                              color: '#0f3674',
+                              borderRadius: '4px',
+                            }}
+                          />
+                        )}
+                        <Typography variant="subtitle1" fontWeight={700} color="#0f172a" sx={{ pr: 1 }}>
+                          {test.name}
+                        </Typography>
+                      </Box>
                       <Chip
                         size="small"
                         label={hasActiveAttempt ? 'IN PROGRESS' : test.status}
-                        color={
-                          hasActiveAttempt
-                            ? 'warning'
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.7rem',
+                          borderRadius: '4px',
+                          bgcolor: hasActiveAttempt
+                            ? '#fef3c7'
                             : isAvailable
-                            ? 'success'
+                            ? '#ecfdf5'
                             : isUpcoming
-                            ? 'info'
-                            : 'default'
-                        }
-                        sx={{ fontWeight: 700 }}
+                            ? '#eff6ff'
+                            : '#f1f5f9',
+                          color: hasActiveAttempt
+                            ? '#b45309'
+                            : isAvailable
+                            ? '#047857'
+                            : isUpcoming
+                            ? '#0369a1'
+                            : '#64748b',
+                          border: '1px solid',
+                          borderColor: hasActiveAttempt
+                            ? '#fde68a'
+                            : isAvailable
+                            ? '#a7f3d0'
+                            : isUpcoming
+                            ? '#bfdbfe'
+                            : '#cbd5e1',
+                        }}
                       />
                     </Box>
 
                     {test.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 32 }}>
                         {test.description}
                       </Typography>
                     )}
 
-                    <Divider sx={{ my: 1.5 }} />
+                    <Divider sx={{ my: 1.25, borderColor: '#f1f5f9' }} />
 
                     {/* Metadata Grid */}
-                    <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                    <Grid container spacing={1} sx={{ mt: 0.25 }}>
                       <Grid item xs={6}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <TimerIcon sx={{ fontSize: 14 }} /> Duration
+                          <TimerIcon sx={{ fontSize: 13 }} /> Duration
                         </Typography>
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={600} color="#0f172a">
                           {test.duration} mins
                         </Typography>
                       </Grid>
 
                       <Grid item xs={6}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <HelpOutlineIcon sx={{ fontSize: 14 }} /> Questions
+                          <HelpOutlineIcon sx={{ fontSize: 13 }} /> Questions
                         </Typography>
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={600} color="#0f172a">
                           {test.totalQuestions || 'Multiple'}
                         </Typography>
                       </Grid>
 
-                      <Grid item xs={6} sx={{ mt: 1 }}>
+                      <Grid item xs={6} sx={{ mt: 0.5 }}>
                         <Typography variant="caption" color="text.secondary">
-                          Passing Mark
+                          Passing Cut-off
                         </Typography>
-                        <Typography variant="body2" fontWeight={600}>
+                        <Typography variant="body2" fontWeight={600} color="#0f172a">
                           {test.passingPercentage}%
                         </Typography>
                       </Grid>
 
-                      <Grid item xs={6} sx={{ mt: 1 }}>
+                      <Grid item xs={6} sx={{ mt: 0.5 }}>
                         <Typography variant="caption" color="text.secondary">
                           Negative Marking
                         </Typography>
-                        <Typography variant="body2" fontWeight={600} color={test.negativeMarking ? 'warning.main' : 'text.primary'}>
-                          {test.negativeMarking ? 'Yes' : 'No'}
+                        <Typography variant="body2" fontWeight={600} color={test.negativeMarking ? '#b45309' : '#64748b'}>
+                          {test.negativeMarking ? 'Yes (-0.25)' : 'None'}
                         </Typography>
                       </Grid>
                     </Grid>
 
-                    <Box sx={{ mt: 2, pt: 1, borderTop: '1px dashed rgba(255,255,255,0.08)' }}>
+                    <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed #e2e8f0' }}>
                       <Typography variant="caption" color="text.secondary">
                         Attempts: {test.attemptsCount} of {test.maximumAttempts} used
                       </Typography>
@@ -255,48 +467,42 @@ export const StudentTestsPage: React.FC = () => {
                   </CardContent>
 
                   <CardActions sx={{ p: 2, pt: 0 }}>
-                    {isAvailable && (
+                    {hasActiveAttempt ? (
                       <Button
                         fullWidth
                         variant="contained"
-                        color={hasActiveAttempt ? 'warning' : 'primary'}
-                        startIcon={<PlayArrowIcon />}
-                        disabled={startingId === test.id}
-                        onClick={() =>
-                          hasActiveAttempt && test.activeAttemptId
-                            ? navigate(`/student/attempt/${test.activeAttemptId}`)
-                            : handleStartTest(test.id)
-                        }
+                        sx={{ bgcolor: '#b45309', '&:hover': { bgcolor: '#92400e' } }}
+                        onClick={() => navigate(`/student/attempt/${test.activeAttemptId}`)}
                       >
-                        {startingId === test.id
-                          ? 'Starting...'
-                          : hasActiveAttempt
-                          ? 'Resume Assessment'
-                          : 'Start Assessment'}
+                        Resume Assessment
                       </Button>
-                    )}
-
-                    {isUpcoming && (
-                      <Button fullWidth variant="outlined" disabled startIcon={<ScheduleIcon />}>
-                        Opens on {test.startDate ? new Date(test.startDate).toLocaleDateString() : 'Scheduled'}
+                    ) : isAvailable ? (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleStartTest(test.id)}
+                        disabled={startingId === test.id}
+                      >
+                        {startingId === test.id ? <CircularProgress size={20} color="inherit" /> : 'Start Assessment'}
                       </Button>
-                    )}
-
-                    {isCompleted && test.lastResultId && (
+                    ) : isCompleted ? (
                       <Button
                         fullWidth
                         variant="outlined"
-                        color="success"
-                        startIcon={<AssessmentIcon />}
-                        onClick={() => navigate(`/student/results/${test.lastResultId}`)}
+                        onClick={() => {
+                          if (test.lastResultId) {
+                            navigate(`/student/results/${test.lastResultId}`);
+                          } else {
+                            navigate('/student/results');
+                          }
+                        }}
                       >
-                        View Results
+                        View Scorecard
                       </Button>
-                    )}
-
-                    {isCompleted && !test.lastResultId && (
+                    ) : (
                       <Button fullWidth variant="outlined" disabled>
-                        Completed
+                        Upcoming
                       </Button>
                     )}
                   </CardActions>
@@ -309,3 +515,5 @@ export const StudentTestsPage: React.FC = () => {
     </Box>
   );
 };
+
+

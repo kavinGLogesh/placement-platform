@@ -16,20 +16,24 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import CategoryIcon from '@mui/icons-material/Category';
 import CodeIcon from '@mui/icons-material/Code';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import GroupsIcon from '@mui/icons-material/Groups';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -39,6 +43,7 @@ import {
   Legend,
 } from 'recharts';
 import { analyticsService } from '../../services/analytics.service.js';
+import { evaluationService } from '../../services/evaluation.service.js';
 
 export const StudentPerformancePage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +57,12 @@ export const StudentPerformancePage: React.FC = () => {
   } = useQuery({
     queryKey: ['studentPerformanceData'],
     queryFn: () => analyticsService.getStudentPerformance(),
+    staleTime: 30000,
+  });
+
+  const { data: humanEvalSummary } = useQuery({
+    queryKey: ['studentHumanEvaluationSummary'],
+    queryFn: () => evaluationService.getStudentEvaluationSummary(),
     staleTime: 30000,
   });
 
@@ -87,7 +98,7 @@ export const StudentPerformancePage: React.FC = () => {
     );
   }
 
-  const { summary, trends, categoryPerformance, topicPerformance, codingPerformance, assessmentHistory } =
+  const { summary, categoryPerformance, topicPerformance, codingPerformance, assessmentHistory } =
     performance;
 
   const categoryChartData = categoryPerformance.map((c) => ({
@@ -95,6 +106,53 @@ export const StudentPerformancePage: React.FC = () => {
     accuracy: c.accuracy,
     avgScore: c.averageScore,
   }));
+
+  // Assessment Improvement: Chronological comparison between previous and latest completed assessment
+  const sortedHistory = [...(assessmentHistory || [])].sort(
+    (a, b) => new Date(a.createdAt || a.submittedAt || 0).getTime() - new Date(b.createdAt || b.submittedAt || 0).getTime()
+  );
+
+  const hasAtLeastTwo = sortedHistory.length >= 2;
+  const previousAssessment = hasAtLeastTwo ? sortedHistory[sortedHistory.length - 2] : null;
+  const currentAssessment = hasAtLeastTwo ? sortedHistory[sortedHistory.length - 1] : null;
+
+  let previousNormalized = 0;
+  let currentNormalized = 0;
+  let pointsDiff = 0;
+  let relativeChange = 0;
+  let changeStatus: 'IMPROVED' | 'DECREASED' | 'NO_CHANGE' = 'NO_CHANGE';
+
+  if (previousAssessment && currentAssessment) {
+    // Normalize scores to 100 before comparison if assessments have different maximum marks
+    previousNormalized =
+      previousAssessment.totalMarks > 0
+        ? Math.round(((previousAssessment.obtainedMarks / previousAssessment.totalMarks) * 100) * 100) / 100
+        : previousAssessment.percentage || 0;
+
+    currentNormalized =
+      currentAssessment.totalMarks > 0
+        ? Math.round(((currentAssessment.obtainedMarks / currentAssessment.totalMarks) * 100) * 100) / 100
+        : currentAssessment.percentage || 0;
+
+    // Improvement points = Current normalized score - Previous normalized score
+    pointsDiff = Math.round((currentNormalized - previousNormalized) * 100) / 100;
+
+    // Relative percentage change calculated from previous normalized score, handling base 0 safely
+    if (previousNormalized > 0) {
+      relativeChange =
+        Math.round(((currentNormalized - previousNormalized) / previousNormalized) * 10000) / 100;
+    } else {
+      relativeChange = pointsDiff > 0 ? 100 : 0;
+    }
+
+    if (pointsDiff > 0) {
+      changeStatus = 'IMPROVED';
+    } else if (pointsDiff < 0) {
+      changeStatus = 'DECREASED';
+    } else {
+      changeStatus = 'NO_CHANGE';
+    }
+  }
 
   return (
     <Box>
@@ -135,9 +193,9 @@ export const StudentPerformancePage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* KPI Cards */}
+      {/* KPI Cards (Retaining Tests Taken, Tests Passed, Accuracy) */}
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={4} lg={2}>
+        <Grid item xs={12} sm={4}>
           <Card sx={{ bgcolor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
             <CardContent>
               <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
@@ -153,7 +211,7 @@ export const StudentPerformancePage: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4} lg={2}>
+        <Grid item xs={12} sm={4}>
           <Card sx={{ bgcolor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
             <CardContent>
               <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
@@ -169,23 +227,7 @@ export const StudentPerformancePage: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4} lg={2}>
-          <Card sx={{ bgcolor: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                Average Score
-              </Typography>
-              <Typography variant="h4" fontWeight={800} color="#38bdf8" sx={{ my: 0.5 }}>
-                {summary.averageScore}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Across all attempts
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={2}>
+        <Grid item xs={12} sm={4}>
           <Card sx={{ bgcolor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
             <CardContent>
               <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
@@ -200,85 +242,256 @@ export const StudentPerformancePage: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={2}>
-          <Card sx={{ bgcolor: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                Highest Score
-              </Typography>
-              <Typography variant="h4" fontWeight={800} color="#c084fc" sx={{ my: 0.5 }}>
-                {summary.highestScore}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Personal best record
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={2}>
-          <Card sx={{ bgcolor: 'rgba(236, 72, 153, 0.08)', border: '1px solid rgba(236, 72, 153, 0.2)' }}>
-            <CardContent>
-              <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                Pass Rate
-              </Typography>
-              <Typography variant="h4" fontWeight={800} color="#f472b6" sx={{ my: 0.5 }}>
-                {summary.passRate}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Clearance percentage
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
 
-      {/* Score & Accuracy Progression Trends */}
+      {/* Assessment Improvement Comparison Section */}
       <Card sx={{ mb: 4, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <TrendingUpIcon color="primary" />
+          <CompareArrowsIcon color="primary" />
           <Typography variant="h6" fontWeight={700}>
-            Score & Accuracy Timeline Trends
+            Assessment Improvement
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Chronological performance trajectory across completed assessments.
+          Factual comparative analysis between your previous assessment and latest assessment.
         </Typography>
 
-        {trends.length > 0 ? (
-          <Box sx={{ width: '100%', height: 320 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trends} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                <XAxis dataKey="date" stroke="#94a3b8" />
-                <YAxis unit="%" domain={[0, 100]} stroke="#94a3b8" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: 8 }}
-                  formatter={(val: any) => [`${val}%`]}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="percentage"
-                  name="Score %"
-                  stroke="#6366f1"
-                  strokeWidth={3}
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="accuracy"
-                  name="Accuracy %"
-                  stroke="#38bdf8"
-                  strokeWidth={2}
-                  strokeDasharray="4 4"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
+        {!hasAtLeastTwo ? (
+          <Alert severity="info">Complete another assessment to compare your improvement.</Alert>
         ) : (
-          <Alert severity="info">Complete at least one assessment to visualize your score progression timeline.</Alert>
+          <Box>
+            {/* Top Status Banner */}
+            <Box
+              sx={{
+                p: 2.5,
+                mb: 3,
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 2,
+                bgcolor:
+                  changeStatus === 'IMPROVED'
+                    ? 'rgba(16, 185, 129, 0.08)'
+                    : changeStatus === 'DECREASED'
+                    ? 'rgba(239, 68, 68, 0.08)'
+                    : 'rgba(148, 163, 184, 0.08)',
+                border: '1px solid',
+                borderColor:
+                  changeStatus === 'IMPROVED'
+                    ? 'rgba(16, 185, 129, 0.25)'
+                    : changeStatus === 'DECREASED'
+                    ? 'rgba(239, 68, 68, 0.25)'
+                    : 'rgba(148, 163, 184, 0.25)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor:
+                      changeStatus === 'IMPROVED'
+                        ? 'rgba(16, 185, 129, 0.15)'
+                        : changeStatus === 'DECREASED'
+                        ? 'rgba(239, 68, 68, 0.15)'
+                        : 'rgba(148, 163, 184, 0.15)',
+                    color:
+                      changeStatus === 'IMPROVED'
+                        ? '#34d399'
+                        : changeStatus === 'DECREASED'
+                        ? '#f87171'
+                        : '#94a3b8',
+                  }}
+                >
+                  {changeStatus === 'IMPROVED' ? (
+                    <TrendingUpIcon fontSize="medium" />
+                  ) : changeStatus === 'DECREASED' ? (
+                    <TrendingDownIcon fontSize="medium" />
+                  ) : (
+                    <TrendingFlatIcon fontSize="medium" />
+                  )}
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    fontWeight={800}
+                    sx={{
+                      color:
+                        changeStatus === 'IMPROVED'
+                          ? '#34d399'
+                          : changeStatus === 'DECREASED'
+                          ? '#f87171'
+                          : '#cbd5e1',
+                    }}
+                  >
+                    {changeStatus === 'IMPROVED'
+                      ? 'Improvement'
+                      : changeStatus === 'DECREASED'
+                      ? 'Performance Decreased'
+                      : 'No Change'}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {changeStatus === 'IMPROVED'
+                      ? 'Your normalized score increased compared to the previous assessment.'
+                      : changeStatus === 'DECREASED'
+                      ? 'Your normalized score decreased compared to the previous assessment.'
+                      : 'Your normalized score remained unchanged from the previous assessment.'}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                  <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                    POINTS CHANGE
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    fontWeight={800}
+                    sx={{
+                      color:
+                        changeStatus === 'IMPROVED'
+                          ? '#34d399'
+                          : changeStatus === 'DECREASED'
+                          ? '#f87171'
+                          : '#94a3b8',
+                    }}
+                  >
+                    {pointsDiff > 0 ? `+${pointsDiff}` : `${pointsDiff}`} points
+                  </Typography>
+                </Box>
+                <Divider orientation="vertical" flexItem sx={{ height: 36, alignSelf: 'center', borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                  <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                    PERCENTAGE CHANGE
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    fontWeight={800}
+                    sx={{
+                      color:
+                        changeStatus === 'IMPROVED'
+                          ? '#34d399'
+                          : changeStatus === 'DECREASED'
+                          ? '#f87171'
+                          : '#94a3b8',
+                    }}
+                  >
+                    {changeStatus === 'IMPROVED'
+                      ? `+${relativeChange}% improvement`
+                      : `${relativeChange}%`}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Assessment Cards Side-by-Side */}
+            <Grid container spacing={2.5}>
+              {/* Previous Assessment */}
+              <Grid item xs={12} md={6}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    bgcolor: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}
+                >
+                  <Typography variant="caption" fontWeight={700} color="text.secondary" textTransform="uppercase" letterSpacing={0.5}>
+                    Previous Assessment
+                  </Typography>
+                  <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 0.5, mb: 1 }}>
+                    {previousAssessment?.assessmentTitle}
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Date Completed:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {previousAssessment?.createdAt ? new Date(previousAssessment.createdAt).toLocaleDateString() : 'N/A'}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Raw Score:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {previousAssessment?.obtainedMarks} / {previousAssessment?.totalMarks} marks
+                    </Typography>
+                  </Box>
+
+                  <Divider sx={{ my: 1.5, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" fontWeight={700} color="text.secondary">
+                      Normalized Score:
+                    </Typography>
+                    <Typography variant="h6" fontWeight={800} color="primary.light">
+                      Score = {previousNormalized} / 100
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+
+              {/* Current Assessment */}
+              <Grid item xs={12} md={6}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    bgcolor: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}
+                >
+                  <Typography variant="caption" fontWeight={700} color="text.secondary" textTransform="uppercase" letterSpacing={0.5}>
+                    Current Assessment (Latest)
+                  </Typography>
+                  <Typography variant="subtitle1" fontWeight={700} sx={{ mt: 0.5, mb: 1 }}>
+                    {currentAssessment?.assessmentTitle}
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Date Completed:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {currentAssessment?.createdAt ? new Date(currentAssessment.createdAt).toLocaleDateString() : 'N/A'}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Raw Score:
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {currentAssessment?.obtainedMarks} / {currentAssessment?.totalMarks} marks
+                    </Typography>
+                  </Box>
+
+                  <Divider sx={{ my: 1.5, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" fontWeight={700} color="text.secondary">
+                      Normalized Score:
+                    </Typography>
+                    <Typography variant="h6" fontWeight={800} color="primary.light">
+                      Score = {currentNormalized} / 100
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
         )}
       </Card>
 
@@ -427,6 +640,185 @@ export const StudentPerformancePage: React.FC = () => {
           </TableContainer>
         </Card>
       )}
+
+      {/* Human Evaluation: Group Discussion & Structured Interviews */}
+      <Box sx={{ mt: 5, mb: 2 }}>
+        <Typography variant="overline" sx={{ fontWeight: 800, color: '#16a34a', letterSpacing: 1.5 }}>
+          Human Evaluation: Structured GD & Interviews
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#0f172a' }}>
+          Qualitative & Evaluator Assessment Progress
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          Independent human evaluator scoring for Communication, Subject Knowledge, Confidence, and Technical/HR Interviews.
+        </Typography>
+      </Box>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* GD Card */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ p: 3, border: '1px solid rgba(22, 163, 74, 0.2)', bgcolor: 'background.paper', height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <GroupsIcon sx={{ color: '#16a34a' }} />
+                <Typography variant="h6" fontWeight={700}>
+                  Group Discussion (GD)
+                </Typography>
+              </Box>
+              <Chip
+                label={`${humanEvalSummary?.gd.totalEvaluated || 0} Evaluated`}
+                size="small"
+                color="success"
+              />
+            </Box>
+
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid item xs={6}>
+                <Typography variant="caption" color="text.secondary">AVERAGE SCORE</Typography>
+                <Typography variant="h5" fontWeight={800} color="#16a34a">
+                  {humanEvalSummary?.gd.averagePercentage ? `${humanEvalSummary.gd.averagePercentage}%` : '—'}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="caption" color="text.secondary">LATEST SCORE</Typography>
+                <Typography variant="h5" fontWeight={800} color="#0f172a">
+                  {humanEvalSummary?.gd.latestPercentage ? `${humanEvalSummary.gd.latestPercentage}%` : '—'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 1.5 }} />
+
+            <Typography variant="caption" color="text.secondary" fontWeight={700} display="block" sx={{ mb: 1 }}>
+              PROGRESSION & IMPROVEMENT:
+            </Typography>
+
+            {humanEvalSummary?.gd.progression && humanEvalSummary.gd.progression.length > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {humanEvalSummary.gd.progression.map((p, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 1.5,
+                      bgcolor: 'rgba(241, 245, 249, 0.6)',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight={600} color="#0f172a">
+                      {p.displayText}
+                    </Typography>
+                    {p.difference !== null && (
+                      <Chip
+                        icon={p.difference >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
+                        label={p.difference >= 0 ? `+${p.difference} pts` : `${p.difference} pts`}
+                        size="small"
+                        color={p.difference >= 0 ? 'success' : 'error'}
+                        sx={{ fontWeight: 700 }}
+                      />
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', py: 1 }}>
+                No previous evaluation available.
+              </Typography>
+            )}
+
+            <Box sx={{ mt: 2, textAlign: 'right' }}>
+              <Button size="small" onClick={() => navigate('/student/gd')}>
+                View All GD Rounds →
+              </Button>
+            </Box>
+          </Card>
+        </Grid>
+
+        {/* Interview Card */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ p: 3, border: '1px solid rgba(37, 99, 235, 0.2)', bgcolor: 'background.paper', height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <WorkOutlineIcon sx={{ color: '#2563eb' }} />
+                <Typography variant="h6" fontWeight={700}>
+                  Structured Interviews
+                </Typography>
+              </Box>
+              <Chip
+                label={`${humanEvalSummary?.interview.totalEvaluated || 0} Evaluated`}
+                size="small"
+                color="primary"
+              />
+            </Box>
+
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid item xs={6}>
+                <Typography variant="caption" color="text.secondary">AVERAGE SCORE</Typography>
+                <Typography variant="h5" fontWeight={800} color="#2563eb">
+                  {humanEvalSummary?.interview.averagePercentage ? `${humanEvalSummary.interview.averagePercentage}%` : '—'}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="caption" color="text.secondary">LATEST SCORE</Typography>
+                <Typography variant="h5" fontWeight={800} color="#0f172a">
+                  {humanEvalSummary?.interview.latestPercentage ? `${humanEvalSummary.interview.latestPercentage}%` : '—'}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 1.5 }} />
+
+            <Typography variant="caption" color="text.secondary" fontWeight={700} display="block" sx={{ mb: 1 }}>
+              PROGRESSION & IMPROVEMENT:
+            </Typography>
+
+            {humanEvalSummary?.interview.progression && humanEvalSummary.interview.progression.length > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {humanEvalSummary.interview.progression.map((p, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 1.5,
+                      bgcolor: 'rgba(241, 245, 249, 0.6)',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight={600} color="#0f172a">
+                      {p.displayText}
+                    </Typography>
+                    {p.difference !== null && (
+                      <Chip
+                        icon={p.difference >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
+                        label={p.difference >= 0 ? `+${p.difference} pts` : `${p.difference} pts`}
+                        size="small"
+                        color={p.difference >= 0 ? 'success' : 'error'}
+                        sx={{ fontWeight: 700 }}
+                      />
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', py: 1 }}>
+                No previous evaluation available.
+              </Typography>
+            )}
+
+            <Box sx={{ mt: 2, textAlign: 'right' }}>
+              <Button size="small" onClick={() => navigate('/student/interviews')}>
+                View All Interviews →
+              </Button>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Assessment History Table */}
       <Card sx={{ mb: 4, p: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>

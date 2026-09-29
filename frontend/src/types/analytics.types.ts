@@ -32,6 +32,13 @@ export interface ResultListItemDto {
   unansweredCount: number;
   submittedAt: string | null;
   createdAt: string;
+  violationCount?: number;
+  violations?: Array<{
+    id: string;
+    violationType: string;
+    timestamp: string;
+    details?: string;
+  }>;
 }
 
 export interface PaginatedResultsDto {
@@ -56,6 +63,8 @@ export interface AdminAnalyticsSummaryDto {
   averageScore: number;
   passPercentage: number;
   overallParticipationRate: number;
+  passedCount?: number;
+  failedCount?: number;
   recentResults: ResultListItemDto[];
 }
 
@@ -116,6 +125,51 @@ export interface PlacementFunnelDto {
   };
 }
 
+export interface CategoryComparisonDto {
+  category: string;
+  displayName: string;
+  previousScore: number;
+  currentScore: number;
+  change: number;
+}
+
+export interface AssessmentComparisonDto {
+  hasCompletedAssessments: boolean;
+  canCompare: boolean;
+  statusMessage?: string;
+  previousTest?: {
+    assessmentId: string;
+    assessmentTitle: string;
+    date: string;
+    score: number;
+    totalMarks: number;
+    percentage: number;
+  };
+  currentTest?: {
+    assessmentId: string;
+    assessmentTitle: string;
+    date: string;
+    score: number;
+    totalMarks: number;
+    percentage: number;
+  };
+  scoreChange?: number;
+  percentageChange?: number | null;
+  percentageChangeDisplay?: string;
+  status?: 'Improved' | 'Decreased' | 'No Change';
+  categoryComparison?: CategoryComparisonDto[];
+}
+
+export interface StudentResumeMetadataDto {
+  exists: boolean;
+  fileName?: string;
+  fileUrl?: string | null;
+  uploadedAt?: string;
+  status?: string;
+  fileSize?: string;
+  message?: string;
+}
+
 export interface StudentDrilldownDto {
   student: {
     id: string;
@@ -149,6 +203,34 @@ export interface StudentDrilldownDto {
     failedCount: number;
     passedTestsRatio: number;
     languagesUsed: string[];
+  };
+  performanceProgress?: AssessmentComparisonDto;
+  resume?: StudentResumeMetadataDto;
+  humanEvaluation?: {
+    gd: {
+      totalAssigned: number;
+      totalEvaluated: number;
+      averagePercentage: number;
+      latestPercentage: number | null;
+      progression: Array<{
+        previousScore: number | null;
+        currentScore: number;
+        difference: number | null;
+        displayText: string;
+      }>;
+    };
+    interview: {
+      totalAssigned: number;
+      totalEvaluated: number;
+      averagePercentage: number;
+      latestPercentage: number | null;
+      progression: Array<{
+        previousScore: number | null;
+        currentScore: number;
+        difference: number | null;
+        displayText: string;
+      }>;
+    };
   };
 }
 
@@ -205,4 +287,30 @@ export interface StudentPerformanceAnalyticsDto {
     languagesUsed: string[];
   };
   assessmentHistory: ResultListItemDto[];
+  humanEvaluation?: {
+    gd: {
+      totalAssigned: number;
+      totalEvaluated: number;
+      averagePercentage: number;
+      latestPercentage: number | null;
+      progression: Array<{
+        previousScore: number | null;
+        currentScore: number;
+        difference: number | null;
+        displayText: string;
+      }>;
+    };
+    interview: {
+      totalAssigned: number;
+      totalEvaluated: number;
+      averagePercentage: number;
+      latestPercentage: number | null;
+      progression: Array<{
+        previousScore: number | null;
+        currentScore: number;
+        difference: number | null;
+        displayText: string;
+      }>;
+    };
+  };
 }

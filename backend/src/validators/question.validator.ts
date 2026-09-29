@@ -128,6 +128,10 @@ export const validateCreateQuestion = (req: Request, _res: Response, next: NextF
   try {
     const body = req.body as CreateQuestionDto;
 
+    if (body.companyId && typeof body.companyId !== 'string') {
+      throw new AppError('companyId must be a valid string', 400);
+    }
+
     if (!body.category) throw new AppError('Question category is required', 400);
     if (!body.topic) throw new AppError('Question topic is required', 400);
     if (!body.questionText || !body.questionText.trim()) {

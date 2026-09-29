@@ -19,6 +19,8 @@ import {
   Paper,
   TablePagination,
   InputAdornment,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -28,7 +30,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import BusinessIcon from '@mui/icons-material/Business';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { analyticsService } from '../../services/analytics.service.js';
 import { managementService } from '../../services/management.service.js';
 import { assessmentService } from '../../services/assessment.service.js';
@@ -36,6 +41,9 @@ import { ResultsFilterQuery } from '../../types/analytics.types.js';
 
 export const AdminResultsPage: React.FC = () => {
   const navigate = useNavigate();
+
+  // 4 Result Views: 'overall' | 'department' | 'assessment' | 'student'
+  const [activeView, setActiveView] = useState<'overall' | 'department' | 'assessment' | 'student'>('overall');
 
   // State
   const [page, setPage] = useState<number>(0); // 0-indexed for MUI TablePagination
@@ -46,7 +54,7 @@ export const AdminResultsPage: React.FC = () => {
   const [passFilter, setPassFilter] = useState<string>(''); // '', 'true', 'false'
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [sortBy, setSortBy] = useState<ResultsFilterQuery['sortBy']>('createdAt');
+  const [sortBy, setSortBy] = useState<ResultsFilterQuery['sortBy']>('percentage');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Filter dropdown data
@@ -67,8 +75,8 @@ export const AdminResultsPage: React.FC = () => {
     page: page + 1,
     limit: rowsPerPage,
     search: search.trim() || undefined,
-    departmentId: selectedDeptId || undefined,
-    assessmentId: selectedAssessmentId || undefined,
+    departmentId: activeView === 'department' ? selectedDeptId || undefined : (activeView === 'overall' ? undefined : selectedDeptId || undefined),
+    assessmentId: activeView === 'assessment' ? selectedAssessmentId || undefined : (activeView === 'overall' ? undefined : selectedAssessmentId || undefined),
     isPassed: passFilter === 'true' ? true : passFilter === 'false' ? false : undefined,
     startDate: startDate || undefined,
     endDate: endDate || undefined,
@@ -87,6 +95,39 @@ export const AdminResultsPage: React.FC = () => {
     queryFn: () => analyticsService.getResults(filterQuery),
   });
 
+  const handleViewChange = (newView: 'overall' | 'department' | 'assessment' | 'student') => {
+    setActiveView(newView);
+    setPage(0);
+    if (newView === 'overall') {
+      setSortBy('percentage');
+      setSortOrder('desc');
+      setSelectedDeptId('');
+      setSelectedAssessmentId('');
+      setSearch('');
+    } else if (newView === 'department') {
+      setSortBy('percentage');
+      setSortOrder('desc');
+      setSelectedAssessmentId('');
+      setSearch('');
+      if (!selectedDeptId && departments && departments.length > 0) {
+        setSelectedDeptId(departments[0].id);
+      }
+    } else if (newView === 'assessment') {
+      setSortBy('percentage');
+      setSortOrder('desc');
+      setSelectedDeptId('');
+      setSearch('');
+      if (!selectedAssessmentId && assessmentsData?.data && assessmentsData.data.length > 0) {
+        setSelectedAssessmentId(assessmentsData.data[0].id);
+      }
+    } else if (newView === 'student') {
+      setSortBy('createdAt');
+      setSortOrder('desc');
+      setSelectedDeptId('');
+      setSelectedAssessmentId('');
+    }
+  };
+
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -98,37 +139,46 @@ export const AdminResultsPage: React.FC = () => {
 
   const handleResetFilters = () => {
     setSearch('');
-    setSelectedDeptId('');
-    setSelectedAssessmentId('');
+    if (activeView === 'department') {
+      setSelectedDeptId(departments?.[0]?.id || '');
+    } else {
+      setSelectedDeptId('');
+    }
+    if (activeView === 'assessment') {
+      setSelectedAssessmentId(assessmentsData?.data?.[0]?.id || '');
+    } else {
+      setSelectedAssessmentId('');
+    }
     setPassFilter('');
     setStartDate('');
     setEndDate('');
-    setSortBy('createdAt');
+    setSortBy(activeView === 'student' ? 'createdAt' : 'percentage');
     setSortOrder('desc');
     setPage(0);
   };
 
   return (
     <Box>
-      <AdminNavTabs />
-
       {/* Header */}
       <Box
         sx={{
-          mb: 4,
+          mb: 3,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
         }}
       >
         <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Authoritative Assessment Registry • Phase 8
+          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            EXAMINATION EVALUATION REGISTRY
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-            Results & Scoring Registry
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+            Assessment Results & Scoring Registry
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Authoritative examination records, candidate scorecards, departmental benchmarks, and qualification status.
           </Typography>
         </div>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
@@ -142,12 +192,57 @@ export const AdminResultsPage: React.FC = () => {
         </Box>
       </Box>
 
+      {/* 4-View Result Mode Selector */}
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 2.5,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+        }}
+      >
+        <Tabs
+          value={activeView}
+          onChange={(_, val) => handleViewChange(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            minHeight: 40,
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.84rem',
+              py: 1.25,
+              minHeight: 40,
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+            },
+          }}
+        >
+          <Tab value="overall" label="Overall Results (Toppers Ranked)" icon={<EmojiEventsIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+          <Tab value="department" label="Department Cohort Results" icon={<BusinessIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+          <Tab value="assessment" label="Assessment-wise Results" icon={<AssignmentIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+          <Tab value="student" label="Student History Search" icon={<PersonSearchIcon sx={{ fontSize: 16 }} />} iconPosition="start" />
+        </Tabs>
+      </Paper>
+
       {/* Filters & Search Toolbar */}
-      <Card sx={{ mb: 4, p: 2.5, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <FilterAltIcon color="primary" />
-          <Typography variant="subtitle1" fontWeight={700}>
-            Search, Filter & Sort Results
+      <Card
+        elevation={0}
+        sx={{
+          mb: 3,
+          p: 2,
+          bgcolor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+          <FilterAltIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+            Search, Filter & Sort Records
           </Typography>
         </Box>
         <Grid container spacing={2} alignItems="center">
@@ -331,6 +426,7 @@ export const AdminResultsPage: React.FC = () => {
             <Table size="small">
               <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)' }}>
                 <TableRow>
+                  <TableCell sx={{ fontWeight: 700, width: 80 }}>Rank</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Candidate Name</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Register Number</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Department</TableCell>
@@ -339,13 +435,22 @@ export const AdminResultsPage: React.FC = () => {
                   <TableCell sx={{ fontWeight: 700 }}>Percentage</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Accuracy</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Pass / Fail</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Integrity</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
                   <TableCell sx={{ fontWeight: 700 }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {resultsData.items.map((r) => (
+                {resultsData.items.map((r, idx) => (
                   <TableRow key={r.id} hover>
+                    <TableCell sx={{ fontWeight: 800 }}>
+                      <Chip
+                        label={`#${page * rowsPerPage + idx + 1}`}
+                        size="small"
+                        color={page * rowsPerPage + idx === 0 ? 'warning' : page * rowsPerPage + idx < 3 ? 'primary' : 'default'}
+                        sx={{ fontWeight: 800, fontSize: '0.75rem' }}
+                      />
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>{r.studentName}</TableCell>
                     <TableCell color="text.secondary">{r.registerNumber}</TableCell>
                     <TableCell>
@@ -379,6 +484,45 @@ export const AdminResultsPage: React.FC = () => {
                         color={r.isPassed ? 'success' : 'error'}
                         sx={{ fontWeight: 700 }}
                       />
+                    </TableCell>
+                    <TableCell>
+                      {r.violationCount && r.violationCount > 0 ? (
+                        <Chip
+                          icon={<WarningAmberIcon style={{ fontSize: 16, color: '#b91c1c' }} />}
+                          label={`${r.violationCount} Violation${r.violationCount > 1 ? 's' : ''}`}
+                          size="small"
+                          sx={{
+                            bgcolor: '#fee2e2',
+                            color: '#b91c1c',
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            border: '1px solid #fecaca',
+                          }}
+                          title={
+                            r.violations && r.violations.length > 0
+                              ? r.violations
+                                  .map(
+                                    (v) =>
+                                      `${v.violationType}: ${v.details || 'Detected'} (${new Date(v.timestamp).toLocaleTimeString()})`
+                                  )
+                                  .join('\n')
+                              : `${r.violationCount} integrity violations recorded`
+                          }
+                        />
+                      ) : (
+                        <Chip
+                          icon={<CheckCircleOutlineIcon style={{ fontSize: 16, color: '#15803d' }} />}
+                          label="Clean"
+                          size="small"
+                          sx={{
+                            bgcolor: '#f0fdf4',
+                            color: '#15803d',
+                            fontWeight: 600,
+                            fontSize: '0.72rem',
+                            border: '1px solid #bbf7d0',
+                          }}
+                        />
+                      )}
                     </TableCell>
                     <TableCell color="text.secondary">
                       {new Date(r.createdAt).toLocaleDateString()}

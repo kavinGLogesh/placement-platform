@@ -21,7 +21,15 @@
     "test:coding": "tsx --test --import ./tests/setup.ts tests/coding.test.ts",
     "test:analytics": "tsx --test --import ./tests/setup.ts tests/analytics.test.ts",
     "test:report": "tsx --test --import ./tests/setup.ts tests/report.test.ts",
-    "test:all": "tsx --test --import ./tests/setup.ts tests/auth.test.ts tests/management.test.ts tests/question.test.ts tests/assessment.test.ts tests/attempt.test.ts tests/coding.test.ts tests/analytics.test.ts tests/report.test.ts"
+    "test:roles": "tsx --test --import ./tests/setup.ts tests/role_separation.test.ts",
+    "test:progress": "tsx --test --import ./tests/setup.ts tests/student_performance_progress.test.ts",
+    "test:student-flow": "tsx --test --import ./tests/setup.ts tests/student_account_flow.test.ts",
+    "test:audit-gaps": "tsx --test --import ./tests/setup.ts tests/critical_audit_gaps.test.ts",
+    "test:anti-cheating": "tsx --test --import ./tests/setup.ts tests/advanced_anti_cheating.test.ts",
+    "test:evaluation": "tsx --test --import ./tests/setup.ts tests/structured_evaluation.test.ts",
+    "test:company": "tsx --test --import ./tests/setup.ts tests/company_assessment.test.ts",
+    "test:company-intelligence": "tsx --test --import ./tests/setup.ts tests/company_intelligence.test.ts",
+    "test:all": "tsx --test --import ./tests/setup.ts tests/auth.test.ts tests/management.test.ts tests/question.test.ts tests/assessment.test.ts tests/attempt.test.ts tests/coding.test.ts tests/analytics.test.ts tests/report.test.ts tests/role_separation.test.ts tests/student_account_flow.test.ts tests/critical_audit_gaps.test.ts tests/advanced_anti_cheating.test.ts tests/structured_evaluation.test.ts tests/company_assessment.test.ts tests/company_intelligence.test.ts"
   },
   "keywords": [
     "express",

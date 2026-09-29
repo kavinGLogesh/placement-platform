@@ -18,8 +18,18 @@ import { codingRouter } from './coding.router.js';
 import { analyticsRouter, resultsRouter } from './analytics.router.js';
 
 import { reportRouter } from './report.router.js';
+import {
+  gdAdminRouter,
+  interviewAdminRouter,
+  studentEvaluationRouter,
+  evaluationsAdminRouter,
+} from './evaluation.router.js';
+import { companyRouter } from './company.router.js';
 
 export const apiRouter = Router();
+
+// Company-wise Assessment module: Companies Directory & Management
+apiRouter.use('/companies', companyRouter);
 
 // Phase 1 System Health routes
 apiRouter.use('/health', healthRouter);
@@ -57,3 +67,10 @@ apiRouter.use('/analytics', analyticsRouter);
 
 // Phase 9 Reports, Export & Printing routes
 apiRouter.use('/reports', reportRouter);
+
+// Phase 10 Structured GD + Interview Evaluation routes
+apiRouter.use('/gd', gdAdminRouter);
+apiRouter.use('/interviews', interviewAdminRouter);
+apiRouter.use('/student/evaluations', studentEvaluationRouter);
+apiRouter.use('/evaluations', evaluationsAdminRouter);
+

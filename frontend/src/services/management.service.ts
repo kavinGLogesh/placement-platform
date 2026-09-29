@@ -1,4 +1,5 @@
 import { apiClient } from '../api/axios.client.js';
+import { StudentResumeMetadataDto } from '../types/analytics.types.js';
 import {
   College,
   CreateCollegeInput,
@@ -11,12 +12,15 @@ import {
   Section,
   CreateSectionInput,
   Student,
+  StudentFullProfile,
+  StudentResume,
   CreateStudentInput,
   UpdateStudentInput,
   StudentFilters,
   PaginatedResult,
   ExcelImportResult,
   ExcelImportRowError,
+  ResetPasswordResponse,
 } from '../types/management.types.js';
 
 interface ApiResponse<T> {
@@ -172,6 +176,47 @@ export const managementService = {
     return res.data.data;
   },
 
+  async getStudentProfile(): Promise<StudentFullProfile> {
+    const res = await apiClient.get<ApiResponse<StudentFullProfile>>('/student/profile');
+    return res.data.data;
+  },
+
+  async updateStudentProfile(payload: { phone?: string; skills?: any[] }): Promise<StudentFullProfile> {
+    const res = await apiClient.put<ApiResponse<StudentFullProfile>>('/student/profile', payload);
+    return res.data.data;
+  },
+
+  async uploadResume(file: File): Promise<StudentResume> {
+    const formData = new FormData();
+    formData.append('resume', file);
+    const res = await apiClient.post<ApiResponse<StudentResume>>('/student/resume', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data.data;
+  },
+
+  async downloadResume(): Promise<Blob> {
+    const res = await apiClient.get('/student/resume/download', {
+      responseType: 'blob',
+    });
+    return res.data;
+  },
+
+  async getStudentResume(studentId: string): Promise<StudentResumeMetadataDto> {
+    const res = await apiClient.get<ApiResponse<StudentResumeMetadataDto>>(`/students/${studentId}/resume`);
+    return res.data.data;
+  },
+
+  async downloadStudentResume(studentId: string, inline = false): Promise<Blob> {
+    const res = await apiClient.get(`/students/${studentId}/resume/download`, {
+      params: inline ? { inline: true } : undefined,
+      responseType: 'blob',
+    });
+    return res.data;
+  },
+
   async createStudent(payload: CreateStudentInput): Promise<Student> {
     const res = await apiClient.post<ApiResponse<Student>>('/students', payload);
     return res.data.data;
@@ -184,6 +229,11 @@ export const managementService = {
 
   async deleteStudent(id: string): Promise<void> {
     await apiClient.delete(`/students/${id}`);
+  },
+
+  async resetStudentPassword(id: string): Promise<ResetPasswordResponse> {
+    const res = await apiClient.post<ApiResponse<ResetPasswordResponse>>(`/students/${id}/reset-password`);
+    return res.data.data;
   },
 
   // 7. Bulk Excel Import & Error Handling

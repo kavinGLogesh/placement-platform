@@ -91,6 +91,8 @@ export interface CreateAssessmentSectionDto {
 
 export interface AssessmentDto {
   id: string;
+  companyId?: string | null;
+  isCompanyAssessment?: boolean;
   name: string;
   description?: string | null;
   duration: number;
@@ -108,13 +110,18 @@ export interface AssessmentDto {
   createdById?: string | null;
   createdAt: string;
   updatedAt: string;
+  company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
   sections?: AssessmentSectionDto[];
   papersCount?: number;
   assignmentsCount?: number;
+  departmentTargeting?: 'ALL' | 'SPECIFIC';
+  departmentIds?: string[];
 }
 
 export interface CreateAssessmentDto {
   name: string;
+  companyId?: string | null;
+  isCompanyAssessment?: boolean;
   description?: string | null;
   duration: number;
   maximumAttempts?: number;
@@ -125,11 +132,15 @@ export interface CreateAssessmentDto {
   startDate?: string | null;
   endDate?: string | null;
   numberOfPapers?: number;
+  departmentTargeting?: 'ALL' | 'SPECIFIC';
+  departmentIds?: string[];
   sections: CreateAssessmentSectionDto[];
 }
 
 export interface UpdateAssessmentDto {
   name?: string;
+  companyId?: string | null;
+  isCompanyAssessment?: boolean;
   description?: string | null;
   duration?: number;
   maximumAttempts?: number;
@@ -140,6 +151,8 @@ export interface UpdateAssessmentDto {
   startDate?: string | null;
   endDate?: string | null;
   numberOfPapers?: number;
+  departmentTargeting?: 'ALL' | 'SPECIFIC';
+  departmentIds?: string[];
   sections?: CreateAssessmentSectionDto[];
 }
 
@@ -212,6 +225,8 @@ export interface AssessmentQueryFilters {
   limit?: number;
   search?: string;
   status?: AssessmentStatus;
+  companyId?: string;
+  isCompanyAssessment?: boolean;
   sortBy?: 'name' | 'duration' | 'totalQuestions' | 'createdAt' | 'status' | 'startDate';
   sortOrder?: 'asc' | 'desc';
 }

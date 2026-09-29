@@ -48,15 +48,18 @@ export const StudentResultsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
+    <Box>
       {/* Header */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ mb: 3.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <div>
-          <Typography variant="overline" color="success.light" fontWeight={700} letterSpacing={1.2}>
-            Performance Evaluation
+          <Typography variant="overline" sx={{ color: '#2563eb', fontWeight: 700, letterSpacing: '0.08em' }}>
+            PERFORMANCE & QUALIFICATION EVALUATION
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
+          <Typography variant="h4" fontWeight={800} sx={{ color: '#0f172a', letterSpacing: '-0.02em', mb: 0.5 }}>
             My Assessment Results
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Authoritative test scores, pass/fail status, and detailed question-by-question performance breakdowns.
           </Typography>
         </div>
 
@@ -65,7 +68,7 @@ export const StudentResultsPage: React.FC = () => {
             Assigned Tests
           </Button>
           <Button variant="text" size="small" onClick={() => navigate('/student/dashboard')}>
-            Profile
+            Dashboard
           </Button>
         </Box>
       </Box>
@@ -77,13 +80,13 @@ export const StudentResultsPage: React.FC = () => {
       )}
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8, bgcolor: '#ffffff', borderRadius: 2.5, border: '1px solid #e2e8f0' }}>
+          <CircularProgress size={32} />
         </Box>
       ) : results.length === 0 ? (
-        <Card sx={{ textAlign: 'center', py: 8, px: 3, background: 'rgba(255,255,255,0.02)' }}>
-          <AssessmentIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" fontWeight={700} gutterBottom>
+        <Card sx={{ textAlign: 'center', py: 8, px: 3, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 2.5 }}>
+          <AssessmentIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
+          <Typography variant="h6" fontWeight={700} color="#0f172a" gutterBottom>
             No Completed Results Yet
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -104,31 +107,40 @@ export const StudentResultsPage: React.FC = () => {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    transition: 'all 0.2s ease',
+                    bgcolor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: 2.5,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+                    transition: 'all 0.15s ease',
                     '&:hover': {
-                      borderColor: isPassed ? 'success.main' : 'error.main',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                      borderColor: isPassed ? '#10b981' : '#f87171',
+                      boxShadow: '0 6px 20px rgba(15, 23, 42, 0.08)',
                     },
                   }}
                 >
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Typography variant="h6" fontWeight={700} sx={{ pr: 1 }}>
+                      <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ pr: 1 }}>
                         {result.assessment?.name || 'Assessment Result'}
                       </Typography>
                       <Chip
                         size="small"
-                        icon={isPassed ? <CheckCircleIcon /> : <CancelIcon />}
+                        icon={isPassed ? <CheckCircleIcon sx={{ '&&': { fontSize: 16 } }} /> : <CancelIcon sx={{ '&&': { fontSize: 16 } }} />}
                         label={isPassed ? 'PASSED' : 'FAILED'}
-                        color={isPassed ? 'success' : 'error'}
-                        sx={{ fontWeight: 800 }}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.72rem',
+                          bgcolor: isPassed ? '#ecfdf5' : '#fef2f2',
+                          color: isPassed ? '#059669' : '#dc2626',
+                          border: '1px solid',
+                          borderColor: isPassed ? '#a7f3d0' : '#fecaca',
+                        }}
                       />
                     </Box>
 
                     {/* Big Score Display */}
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, my: 2 }}>
-                      <Typography variant="h3" fontWeight={800} color={isPassed ? 'success.main' : 'text.primary'}>
+                      <Typography variant="h3" fontWeight={800} sx={{ color: isPassed ? '#059669' : '#0f172a' }}>
                         {result.percentage}%
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -136,7 +148,7 @@ export const StudentResultsPage: React.FC = () => {
                       </Typography>
                     </Box>
 
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{ my: 2, borderColor: '#e2e8f0' }} />
 
                     {/* Breakdown Metrics */}
                     <Grid container spacing={1}>
@@ -144,7 +156,7 @@ export const StudentResultsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Correct Answers
                         </Typography>
-                        <Typography variant="body2" fontWeight={700} color="success.main">
+                        <Typography variant="body2" fontWeight={700} sx={{ color: '#059669' }}>
                           {result.correctCount}
                         </Typography>
                       </Grid>
@@ -153,7 +165,7 @@ export const StudentResultsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Accuracy
                         </Typography>
-                        <Typography variant="body2" fontWeight={700}>
+                        <Typography variant="body2" fontWeight={700} color="#0f172a">
                           {result.accuracy}%
                         </Typography>
                       </Grid>
@@ -162,7 +174,7 @@ export const StudentResultsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Incorrect
                         </Typography>
-                        <Typography variant="body2" fontWeight={700} color="error.main">
+                        <Typography variant="body2" fontWeight={700} sx={{ color: '#dc2626' }}>
                           {result.incorrectCount}
                         </Typography>
                       </Grid>
@@ -177,7 +189,7 @@ export const StudentResultsPage: React.FC = () => {
                       </Grid>
                     </Grid>
 
-                    <Box sx={{ mt: 2, pt: 1, borderTop: '1px dashed rgba(255,255,255,0.08)' }}>
+                    <Box sx={{ mt: 2, pt: 1, borderTop: '1px dashed #e2e8f0' }}>
                       <Typography variant="caption" color="text.secondary">
                         Date: {new Date(result.createdAt).toLocaleDateString()} at{' '}
                         {new Date(result.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -185,14 +197,15 @@ export const StudentResultsPage: React.FC = () => {
                     </Box>
                   </CardContent>
 
-                  <CardActions sx={{ p: 2, pt: 0 }}>
+                  <CardActions sx={{ p: 2.5, pt: 0 }}>
                     <Button
                       fullWidth
                       variant="outlined"
                       endIcon={<ArrowForwardIcon />}
                       onClick={() => navigate(`/student/results/${result.id}`)}
+                      sx={{ fontWeight: 600 }}
                     >
-                      View Detailed Report
+                      View Detailed Scorecard
                     </Button>
                   </CardActions>
                 </Card>

@@ -12,6 +12,7 @@ import { ClassesPage } from '../pages/admin/ClassesPage.js';
 import { SectionsPage } from '../pages/admin/SectionsPage.js';
 import { StudentsPage } from '../pages/admin/StudentsPage.js';
 import { StudentDetailPage } from '../pages/admin/StudentDetailPage.js';
+import { CompaniesPage } from '../pages/admin/CompaniesPage.js';
 import { QuestionsPage } from '../pages/admin/QuestionsPage.js';
 import { AssessmentsPage } from '../pages/admin/AssessmentsPage.js';
 import { AssessmentBuilderPage } from '../pages/admin/AssessmentBuilderPage.js';
@@ -23,9 +24,15 @@ import { StudentResultDetailPage } from '../pages/student/StudentResultDetailPag
 import { AdminAnalyticsPage } from '../pages/admin/AdminAnalyticsPage.js';
 import { AdminResultsPage } from '../pages/admin/AdminResultsPage.js';
 import { AdminStudentPerformancePage } from '../pages/admin/AdminStudentPerformancePage.js';
+import { AdminGdPage } from '../pages/admin/AdminGdPage.js';
+import { AdminInterviewsPage } from '../pages/admin/AdminInterviewsPage.js';
 import { StudentPerformancePage } from '../pages/student/StudentPerformancePage.js';
+import { StudentGdPage } from '../pages/student/StudentGdPage.js';
+import { StudentInterviewsPage } from '../pages/student/StudentInterviewsPage.js';
 import { AdminReportsPage } from '../pages/admin/AdminReportsPage.js';
 import { StudentReportsPage } from '../pages/student/StudentReportsPage.js';
+import { StudentProfilePage } from '../pages/student/StudentProfilePage.js';
+import { StudentChangePasswordPage } from '../pages/student/StudentChangePasswordPage.js';
 import { ProtectedRoute } from './ProtectedRoute.js';
 
 export const AppRoutes: React.FC = () => {
@@ -35,6 +42,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<RootLayout />}>
           {/* Phase 1 Health & Architecture Console */}
           <Route index element={<HealthStatusPage />} />
+          <Route path="admin/health" element={<HealthStatusPage />} />
 
           {/* Phase 2 Auth: Public Login */}
           <Route path="login" element={<LoginPage />} />
@@ -45,6 +53,30 @@ export const AppRoutes: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/companies"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <CompaniesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/company-assessment"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <CompaniesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/company-assessments"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <CompaniesPage />
               </ProtectedRoute>
             }
           />
@@ -107,7 +139,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="admin/questions"
             element={
-              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+              <ProtectedRoute allowedRoles={['PLACEMENT_ADMIN']}>
                 <QuestionsPage />
               </ProtectedRoute>
             }
@@ -115,7 +147,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="admin/assessments"
             element={
-              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+              <ProtectedRoute allowedRoles={['PLACEMENT_ADMIN']}>
                 <AssessmentsPage />
               </ProtectedRoute>
             }
@@ -123,7 +155,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="admin/assessments/create"
             element={
-              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+              <ProtectedRoute allowedRoles={['PLACEMENT_ADMIN']}>
                 <AssessmentBuilderPage />
               </ProtectedRoute>
             }
@@ -131,7 +163,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="admin/assessments/:id"
             element={
-              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+              <ProtectedRoute allowedRoles={['PLACEMENT_ADMIN']}>
                 <AssessmentDetailPage />
               </ProtectedRoute>
             }
@@ -168,13 +200,45 @@ export const AppRoutes: React.FC = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="admin/gd"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <AdminGdPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/interviews"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <AdminInterviewsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Phase 2 & 8 RBAC: Protected Student Workspace */}
+          <Route
+            path="student/change-password"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <StudentChangePasswordPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="student/dashboard"
             element={
               <ProtectedRoute allowedRoles={['STUDENT']}>
                 <StudentDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="student/profile"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <StudentProfilePage />
               </ProtectedRoute>
             }
           />
@@ -191,6 +255,22 @@ export const AppRoutes: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['STUDENT']}>
                 <StudentReportsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="student/gd"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <StudentGdPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="student/interviews"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <StudentInterviewsPage />
               </ProtectedRoute>
             }
           />

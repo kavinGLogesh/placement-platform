@@ -6,6 +6,8 @@ export interface TokenPayload {
   sub: string;
   email: string;
   role: Role;
+  studentId?: string;
+  mustChangePassword?: boolean;
 }
 
 export interface StudentProfileDto {
@@ -21,6 +23,7 @@ export interface CurrentUserDto {
   email: string;
   role: Role;
   isActive: boolean;
+  mustChangePassword?: boolean;
   student?: StudentProfileDto | null;
 }
 
@@ -41,6 +44,11 @@ export interface RefreshDto {
 
 export interface LogoutDto {
   refreshToken: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
 }
 
 // Extend Express Request to include authenticated user

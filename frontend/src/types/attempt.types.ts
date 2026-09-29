@@ -47,6 +47,8 @@ export interface AssessmentAttemptDto {
   updatedAt: Date | string;
   assessment?: {
     id: string;
+    companyId?: string | null;
+    isCompanyAssessment?: boolean;
     name: string;
     description?: string | null;
     duration: number;
@@ -54,9 +56,12 @@ export interface AssessmentAttemptDto {
     negativeMarking: boolean;
     totalMarks?: number;
     totalQuestions?: number;
+    company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
   };
   questions?: SanitizedPaperQuestionDto[];
   answers?: AttemptAnswerDto[];
+  violationCount?: number;
+  violations?: AttemptViolationDto[];
 }
 
 export interface AssessmentResultDto {
@@ -76,9 +81,12 @@ export interface AssessmentResultDto {
   updatedAt: Date | string;
   assessment?: {
     id: string;
+    companyId?: string | null;
+    isCompanyAssessment?: boolean;
     name: string;
     duration: number;
     passingPercentage: number;
+    company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
   };
 }
 
@@ -86,6 +94,8 @@ export type StudentTestStatus = 'AVAILABLE' | 'UPCOMING' | 'COMPLETED';
 
 export interface StudentAssessmentItemDto {
   id: string;
+  companyId?: string | null;
+  isCompanyAssessment?: boolean;
   name: string;
   description?: string | null;
   duration: number;
@@ -100,6 +110,7 @@ export interface StudentAssessmentItemDto {
   attemptsCount: number;
   activeAttemptId?: string | null;
   lastResultId?: string | null;
+  company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
 }
 
 export interface SaveAnswerDto {
@@ -115,4 +126,25 @@ export interface SaveAnswerDto {
 export interface BatchSyncAnswersDto {
   answers: SaveAnswerDto[];
   currentQuestion?: number;
+}
+
+export type AttemptViolationType =
+  | 'TAB_SWITCH'
+  | 'WINDOW_BLUR'
+  | 'FULLSCREEN_EXIT'
+  | 'SCREENSHOT_ATTEMPT';
+
+export interface AttemptViolationDto {
+  id: string;
+  attemptId: string;
+  studentId: string;
+  violationType: AttemptViolationType;
+  timestamp: string; // ISO server timestamp
+  details?: string;
+}
+
+export interface RecordViolationDto {
+  violationType: AttemptViolationType;
+  details?: string;
+  clientTimestamp?: string;
 }

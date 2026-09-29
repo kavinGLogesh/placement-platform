@@ -21,3 +21,7 @@ authRouter.post('/logout', validateLogoutInput, authController.logout);
 
 // GET /api/auth/me
 authRouter.get('/me', authenticateToken, authController.me);
+
+// POST /api/auth/change-password
+authRouter.post('/change-password', authenticateToken, authController.changePassword);
+

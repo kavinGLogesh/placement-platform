@@ -5,9 +5,9 @@ import { Role } from '../types/auth.types.js';
 
 export const assessmentRouter = Router();
 
-// All assessment management routes are strictly restricted to SUPER_ADMIN & PLACEMENT_ADMIN
+// Assessment builder & operational management routes are strictly restricted to PLACEMENT_ADMIN
 assessmentRouter.use(authenticateToken);
-assessmentRouter.use(requireRole(Role.SUPER_ADMIN, Role.PLACEMENT_ADMIN));
+assessmentRouter.use(requireRole(Role.PLACEMENT_ADMIN));
 
 // Assessment CRUD
 assessmentRouter.post('/', assessmentController.createAssessment);

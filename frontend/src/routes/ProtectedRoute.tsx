@@ -26,12 +26,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0) {
-    const isSuperAdmin = user.role === 'SUPER_ADMIN';
-    const hasRole = allowedRoles.includes(user.role);
-    const hasAdminAccess = isSuperAdmin && !allowedRoles.includes('STUDENT');
+  // Enforce first-time password change for students with temporary credentials
+  if (user.role === 'STUDENT' && user.mustChangePassword) {
+    if (location.pathname !== '/student/change-password') {
+      return <Navigate to="/student/change-password" replace />;
+    }
+  } else if (user.role === 'STUDENT' && !user.mustChangePassword) {
+    if (location.pathname === '/student/change-password') {
+      return <Navigate to="/student/dashboard" replace />;
+    }
+  }
 
-    if (!hasRole && !hasAdminAccess) {
+  if (allowedRoles && allowedRoles.length > 0) {
+    const hasRole = allowedRoles.includes(user.role);
+
+    if (!hasRole) {
       return (
         <Box sx={{ maxWidth: 500, mx: 'auto', mt: 8 }}>
           <Card sx={{ border: '1px solid rgba(239, 68, 68, 0.3)', backgroundColor: 'rgba(239, 68, 68, 0.05)' }}>

@@ -3,7 +3,6 @@ import {
   Typography,
   Box,
   Card,
-  CardContent,
   Grid,
   Chip,
   Button,
@@ -15,30 +14,25 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   LinearProgress,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import BusinessIcon from '@mui/icons-material/Business';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import ClassIcon from '@mui/icons-material/Class';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import QuizIcon from '@mui/icons-material/Quiz';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import FactCheckIcon from '@mui/icons-material/FactCheck';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import DescriptionIcon from '@mui/icons-material/Description';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import AddIcon from '@mui/icons-material/Add';
+import BusinessIcon from '@mui/icons-material/Business';
+import QuizIcon from '@mui/icons-material/Quiz';
 import { useAuth } from '../hooks/useAuth.js';
-import { AdminNavTabs } from '../components/management/AdminNavTabs.js';
 import { analyticsService } from '../services/analytics.service.js';
 
 export const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   const {
     data: overview,
@@ -58,110 +52,97 @@ export const AdminDashboardPage: React.FC = () => {
     staleTime: 60000,
   });
 
-  const modules = [
-    {
-      title: 'Analytics Hub',
-      tier: 'Phase 8',
-      path: '/admin/analytics',
-      icon: <BarChartIcon sx={{ fontSize: 32, color: '#3b82f6' }} />,
-      desc: 'Placement funnel, department comparisons, and topic strengths/weaknesses',
-    },
-    {
-      title: 'Results Registry',
-      tier: 'Phase 8',
-      path: '/admin/results',
-      icon: <FactCheckIcon sx={{ fontSize: 32, color: '#10b981' }} />,
-      desc: 'Authoritative student marks, percentages, accuracy, pass/fail status & search',
-    },
-    {
-      title: 'Assessment Builder',
-      tier: 'Phase 5',
-      path: '/admin/assessments',
-      icon: <AssignmentIcon sx={{ fontSize: 32, color: '#38bdf8' }} />,
-      desc: 'Assessment configuration, selection engine, multi-paper generation & assignment',
-    },
-    {
-      title: 'Question Bank',
-      tier: 'Phase 4',
-      path: '/admin/questions',
-      icon: <QuizIcon sx={{ fontSize: 32, color: '#f43f5e' }} />,
-      desc: 'Authoritative assessment questions, types, marks & options',
-    },
-    {
-      title: 'Student Registry',
-      tier: 'Tier 6',
-      path: '/admin/students',
-      icon: <PeopleAltIcon sx={{ fontSize: 32, color: '#8b5cf6' }} />,
-      desc: 'Student CRUD, server pagination & bulk Excel import',
-    },
-    {
-      title: 'Departments',
-      tier: 'Tier 2',
-      path: '/admin/departments',
-      icon: <BusinessIcon sx={{ fontSize: 32, color: '#06b6d4' }} />,
-      desc: 'Academic engineering & science departments',
-    },
-    {
-      title: 'Degree Courses',
-      tier: 'Tier 3',
-      path: '/admin/courses',
-      icon: <MenuBookIcon sx={{ fontSize: 32, color: '#10b981' }} />,
-      desc: 'Undergraduate and postgraduate degrees',
-    },
-    {
-      title: 'Classes & Batches',
-      tier: 'Tier 4',
-      path: '/admin/classes',
-      icon: <ClassIcon sx={{ fontSize: 32, color: '#f59e0b' }} />,
-      desc: 'Graduation cohorts and academic years',
-    },
-  ];
-
   return (
     <Box>
-      <AdminNavTabs />
-
-      {/* Header Banner */}
+      {/* Enterprise Executive Banner */}
       <Box
         sx={{
-          mb: 4,
+          mb: 3,
+          p: { xs: 2.5, md: 3 },
+          borderRadius: '8px',
+          bgcolor: '#ffffff',
+          border: '1px solid #e2e8f0',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
         }}
       >
-        <div>
-          <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-            Administration Console • Phase 8 Authoritative Analytics
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+              CAMPUS PLACEMENT SYSTEM
+            </Typography>
+            <Chip
+              label={isSuperAdmin ? 'Super Administrator (Governance)' : 'Placement Administrator'}
+              size="small"
+              sx={{
+                height: 22,
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                borderRadius: '4px',
+                bgcolor: isSuperAdmin ? '#f8fafc' : '#eff6ff',
+                color: isSuperAdmin ? '#0f3674' : '#0f3674',
+                border: '1px solid #cbd5e1',
+              }}
+            />
+          </Box>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+            {isSuperAdmin ? 'Institutional Governance & Oversight Console' : 'Placement Operations Dashboard'}
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em">
-            Institutional Control Center & Assessment Dashboard
+          <Typography variant="body2" color="text.secondary">
+            {isSuperAdmin
+              ? 'Institutional oversight across candidate readiness, departmental benchmarks, placement funnel, and governance audits.'
+              : 'Real-time candidate readiness tracking, drive examination scheduling, and recruiter mock assessment management.'}
           </Typography>
-        </div>
-        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<BarChartIcon />}
-            onClick={() => navigate('/admin/analytics')}
-          >
-            Analytics Hub
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<FactCheckIcon />}
-            onClick={() => navigate('/admin/results')}
-          >
-            All Results
-          </Button>
-          <Chip
-            icon={<AdminPanelSettingsIcon />}
-            label={`Role: ${user?.role}`}
-            color={user?.role === 'SUPER_ADMIN' ? 'primary' : 'secondary'}
-            sx={{ fontWeight: 700, py: 2, px: 1 }}
-          />
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 1.25, flexWrap: 'wrap' }}>
+          {isSuperAdmin ? (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<BarChartIcon />}
+                onClick={() => navigate('/admin/analytics')}
+              >
+                Analytics Hub
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<DescriptionIcon />}
+                onClick={() => navigate('/admin/reports')}
+              >
+                Executive Reports
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => navigate('/admin/assessments/create')}
+              >
+                Create Assessment
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<BusinessIcon />}
+                onClick={() => navigate('/admin/company-assessments')}
+              >
+                Recruiter Tracks
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<QuizIcon />}
+                onClick={() => navigate('/admin/questions')}
+              >
+                Question Bank
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
 
@@ -179,169 +160,216 @@ export const AdminDashboardPage: React.FC = () => {
         </Alert>
       )}
 
-      {/* Executive KPI Cards */}
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-        Executive Key Performance Indicators
-      </Typography>
-
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
+      {/* Key Performance Indicators */}
+      <Box sx={{ mb: 3.5 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Box>
+            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+              Real-Time Placement Performance Metrics
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Authoritative indicators aggregated across all test attempts and departmental cohorts
+            </Typography>
+          </Box>
+          <Button
+            size="small"
+            endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
+            onClick={() => navigate('/admin/analytics')}
+            sx={{ fontWeight: 600, fontSize: '0.8rem' }}
+          >
+            Analytics Hub
+          </Button>
         </Box>
-      ) : (
-        <Grid container spacing={2.5} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Total Students
+
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <CircularProgress size={28} />
+          </Box>
+        ) : (
+          <Grid container spacing={2}>
+            {/* Card 1: Registered Candidates */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                elevation={0}
+                sx={{
+                  p: 2.25,
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  REGISTERED CANDIDATES
                 </Typography>
-                <Typography variant="h4" fontWeight={800} color="#818cf8" sx={{ my: 0.5 }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.5 }}>
                   {overview?.totalStudents || 0}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Active: {overview?.activeStudents || 0} candidates
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <Chip
+                    label={`${overview?.activeStudents || 0} Active`}
+                    size="small"
+                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#f1f5f9', color: '#334155', fontWeight: 600, borderRadius: '4px' }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    across all departments
+                  </Typography>
+                </Box>
+              </Card>
+            </Grid>
 
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Participation
+            {/* Card 2: Attendance Rate (Cleaned of duplicate text) */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                elevation={0}
+                sx={{
+                  p: 2.25,
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  ASSESSMENT ATTENDANCE
                 </Typography>
-                <Typography variant="h4" fontWeight={800} color="#38bdf8" sx={{ my: 0.5 }}>
-                  {overview?.overallParticipationRate || 0}%
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Across registered cohorts
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Average Score
-                </Typography>
-                <Typography variant="h4" fontWeight={800} color="#34d399" sx={{ my: 0.5 }}>
-                  {overview?.averageScore || 0}%
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f3674', my: 0.5 }}>
+                  {overview?.activeStudents || 0} <Typography component="span" variant="body2" sx={{ color: '#64748b' }}>/ {overview?.totalStudents || 0}</Typography>
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  All completed results
+                  Appeared for at least 1 placement evaluation
                 </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Card>
+            </Grid>
 
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Pass Percentage
+            {/* Card 3: Assessment Outcomes */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                elevation={0}
+                sx={{
+                  p: 2.25,
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  QUALIFICATION OUTCOMES
                 </Typography>
-                <Typography variant="h4" fontWeight={800} color="#fbbf24" sx={{ my: 0.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: 0.5 }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: '#047857', fontWeight: 700 }}>
+                      Passed:
+                    </Typography>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#047857' }}>
+                      {overview?.passedCount ?? 0}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ height: 32, width: '1px', bgcolor: '#e2e8f0' }} />
+                  <Box>
+                    <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 700 }}>
+                      Needs Prep:
+                    </Typography>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#b91c1c' }}>
+                      {overview?.failedCount ?? 0}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {((overview?.passedCount ?? 0) + (overview?.failedCount ?? 0))} evaluated submissions
+                </Typography>
+              </Card>
+            </Grid>
+
+            {/* Card 4: Pass Percentage */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Card
+                elevation={0}
+                sx={{
+                  p: 2.25,
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  OVERALL PASS RATE
+                </Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#b45309', my: 0.5 }}>
                   {overview?.passPercentage || 0}%
                 </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(100, overview?.passPercentage || 0)}
+                  sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#f1f5f9', '& .MuiLinearProgress-bar': { bgcolor: '#b45309' } }}
+                />
                 <Typography variant="caption" color="text.secondary">
-                  Meeting assessment cut-off
+                  Candidates meeting cut-off criteria
                 </Typography>
-              </CardContent>
-            </Card>
+              </Card>
+            </Grid>
           </Grid>
+        )}
+      </Box>
 
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Total Attempts
-                </Typography>
-                <Typography variant="h4" fontWeight={800} color="#c084fc" sx={{ my: 0.5 }}>
-                  {overview?.totalAttempts || 0}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Assessment attempts started
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4} lg={2}>
-            <Card sx={{ bgcolor: 'rgba(236, 72, 153, 0.08)', border: '1px solid rgba(236, 72, 153, 0.2)' }}>
-              <CardContent>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="uppercase">
-                  Assessments
-                </Typography>
-                <Typography variant="h4" fontWeight={800} color="#f472b6" sx={{ my: 0.5 }}>
-                  {overview?.totalAssessments || 0}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Active: {overview?.activeAssessments || 0}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      )}
-
-      {/* Placement Funnel Snapshot */}
+      {/* Placement Pipeline Funnel */}
       {funnelData && (
-        <Card sx={{ mb: 4, p: 2.5, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Card
+          elevation={0}
+          sx={{
+            mb: 3.5,
+            p: 2.5,
+            bgcolor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: '8px',
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
             <Box>
-              <Typography variant="h6" fontWeight={700}>
-                Placement Pipeline & Assessment Funnel
+              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                Placement Pipeline Progression Funnel
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Registered → Appeared → Completed → Passed → Interview (Future) → Selected (Future)
+                Candidate conversion flow from portal registration through assessment qualification
               </Typography>
             </Box>
             <Button
               size="small"
-              endIcon={<ArrowForwardIcon />}
+              endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
               onClick={() => navigate('/admin/analytics')}
+              sx={{ fontWeight: 600, fontSize: '0.8rem' }}
             >
-              Detailed Funnel Analytics
+              Detailed Pipeline
             </Button>
           </Box>
 
-          <Grid container spacing={2}>
+          <Grid container spacing={1.5}>
             {funnelData.stages.map((st) => (
               <Grid item xs={6} sm={4} md={2} key={st.stage}>
                 <Box
                   sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    bgcolor: st.isImplemented
-                      ? 'rgba(255, 255, 255, 0.03)'
-                      : 'rgba(255, 255, 255, 0.01)',
+                    p: 1.75,
+                    borderRadius: '6px',
+                    bgcolor: st.isImplemented ? '#f8fafc' : '#ffffff',
                     border: '1px solid',
-                    borderColor: st.isImplemented
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : 'rgba(255, 255, 255, 0.03)',
+                    borderColor: st.isImplemented ? '#cbd5e1' : '#f1f5f9',
                   }}
                 >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle2" fontWeight={700}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
+                    <Typography variant="caption" fontWeight={700} color="#334155">
                       {st.stage}
                     </Typography>
                     {!st.isImplemented && (
-                      <Chip label="Future" size="small" sx={{ fontSize: '0.65rem', height: 18 }} />
+                      <Chip label="Upcoming" size="small" sx={{ fontSize: '0.62rem', height: 16, bgcolor: '#f1f5f9', color: '#94a3b8', borderRadius: '3px' }} />
                     )}
                   </Box>
-                  <Typography variant="h5" fontWeight={800} sx={{ my: 0.5 }}>
+                  <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ my: 0.25 }}>
                     {st.count}
                   </Typography>
                   <LinearProgress
                     variant="determinate"
                     value={Math.min(100, st.conversionRate)}
-                    sx={{ height: 6, borderRadius: 3, mb: 0.5 }}
+                    sx={{ height: 4, borderRadius: '2px', mb: 0.5, bgcolor: '#e2e8f0' }}
                   />
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" color="text.secondary" fontWeight={500}>
                     {st.conversionRate}% of cohort
                   </Typography>
                 </Box>
@@ -351,68 +379,92 @@ export const AdminDashboardPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Live Results Stream Table */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" fontWeight={700}>
-            Live Assessment Results Feed
-          </Typography>
+      {/* Live Results Feed Table */}
+      <Card
+        elevation={0}
+        sx={{
+          mb: 4,
+          bgcolor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+          <Box>
+            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+              Recent Assessment Submissions
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Latest student completions with scoring accuracy and qualification verdicts
+            </Typography>
+          </Box>
           <Button
             size="small"
-            endIcon={<ArrowForwardIcon />}
+            variant="outlined"
+            endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
             onClick={() => navigate('/admin/results')}
+            sx={{ fontWeight: 600, fontSize: '0.8rem' }}
           >
-            View Full Results Registry ({overview?.totalAttempts || 0})
+            All Results ({overview?.totalAttempts || 0})
           </Button>
         </Box>
 
         {overview?.recentResults && overview.recentResults.length > 0 ? (
-          <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+          <TableContainer>
             <Table size="small">
-              <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)' }}>
+              <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700 }}>Candidate</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Register No.</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Assessment</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Department</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Score</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Accuracy</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Action</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Candidate</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Register No.</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Assessment</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Department</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Score</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Accuracy</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }} align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {overview.recentResults.map((item) => (
-                  <TableRow key={item.id} hover>
-                    <TableCell sx={{ fontWeight: 600 }}>{item.studentName}</TableCell>
-                    <TableCell color="text.secondary">{item.registerNumber}</TableCell>
-                    <TableCell>{item.assessmentTitle}</TableCell>
-                    <TableCell>{item.departmentCode || item.departmentName || '—'}</TableCell>
+                  <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                    <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{item.studentName}</TableCell>
+                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{item.registerNumber}</TableCell>
+                    <TableCell sx={{ color: '#1e293b', fontSize: '0.82rem' }}>{item.assessmentTitle}</TableCell>
+                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{item.departmentCode || item.departmentName || '—'}</TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={700}>
+                      <Typography variant="body2" fontWeight={700} color="#0f172a" sx={{ fontSize: '0.82rem' }}>
                         {item.percentage}%
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {item.obtainedMarks}/{item.totalMarks} marks
                       </Typography>
                     </TableCell>
-                    <TableCell>{item.accuracy}%</TableCell>
+                    <TableCell sx={{ color: '#334155', fontWeight: 600, fontSize: '0.82rem' }}>{item.accuracy}%</TableCell>
                     <TableCell>
                       <Chip
-                        icon={item.isPassed ? <CheckCircleOutlineIcon /> : <CancelOutlinedIcon />}
+                        icon={item.isPassed ? <CheckCircleOutlineIcon sx={{ '&&': { fontSize: 14 } }} /> : <CancelOutlinedIcon sx={{ '&&': { fontSize: 14 } }} />}
                         label={item.isPassed ? 'PASS' : 'FAIL'}
                         size="small"
-                        color={item.isPassed ? 'success' : 'error'}
-                        sx={{ fontWeight: 700 }}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.7rem',
+                          borderRadius: '4px',
+                          bgcolor: item.isPassed ? '#ecfdf5' : '#fef2f2',
+                          color: item.isPassed ? '#047857' : '#b91c1c',
+                          border: '1px solid',
+                          borderColor: item.isPassed ? '#a7f3d0' : '#fecaca',
+                        }}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="right">
                       <Button
                         size="small"
                         variant="text"
                         onClick={() => navigate(`/admin/students/${item.studentId}/performance`)}
+                        sx={{ fontWeight: 600, fontSize: '0.78rem' }}
                       >
-                        Performance
+                        Scorecard
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -421,62 +473,14 @@ export const AdminDashboardPage: React.FC = () => {
             </Table>
           </TableContainer>
         ) : (
-          <Card sx={{ p: 3, textAlign: 'center', border: '1px dashed rgba(255, 255, 255, 0.1)' }}>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              No recent assessment results submitted yet. Results will stream here in real-time as students complete assessments.
+              No recent assessment results submitted yet. Results will appear here as students complete their assessments.
             </Typography>
-          </Card>
+          </Box>
         )}
-      </Box>
-
-      {/* Institutional Modules Grid */}
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-        Management Hub & Institutional Hierarchy
-      </Typography>
-      <Grid container spacing={2.5}>
-        {modules.map((m) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={m.title}>
-            <Card
-              sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                  borderColor: 'primary.main',
-                },
-              }}
-            >
-              <CardContent sx={{ pb: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  {m.icon}
-                  <Chip label={m.tier} size="small" variant="outlined" sx={{ fontWeight: 600, fontSize: '0.7rem' }} />
-                </Box>
-                <Typography variant="h6" fontWeight={700} gutterBottom>
-                  {m.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ minHeight: 40 }}>
-                  {m.desc}
-                </Typography>
-              </CardContent>
-              <Box sx={{ p: 2, pt: 0 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  endIcon={<ArrowForwardIcon />}
-                  onClick={() => navigate(m.path)}
-                >
-                  Open {m.title}
-                </Button>
-              </Box>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      </Card>
     </Box>
   );
 };
+

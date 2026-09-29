@@ -28,9 +28,6 @@ import { useQuery } from '@tanstack/react-query';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AssessmentIcon from '@mui/icons-material/Assignment';
 import BusinessIcon from '@mui/icons-material/Business';
-import PsychologyIcon from '@mui/icons-material/Psychology';
-import QuizIcon from '@mui/icons-material/Quiz';
-import CodeIcon from '@mui/icons-material/Code';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import DownloadIcon from '@mui/icons-material/Download';
 import PrintIcon from '@mui/icons-material/Print';
@@ -38,20 +35,14 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ClearIcon from '@mui/icons-material/Clear';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import GroupsIcon from '@mui/icons-material/Groups';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
 import { reportService } from '../../services/report.service.js';
+import { managementService } from '../../services/management.service.js';
 import { ExportFormat } from '../../types/report.types.js';
 
-type ReportType =
-  | 'students'
-  | 'assessments'
-  | 'departments'
-  | 'topics'
-  | 'questions'
-  | 'coding'
-  | 'funnel';
+type ReportType = 'students' | 'assessments' | 'departments' | 'gd' | 'interviews';
 
 export const AdminReportsPage: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<ReportType>('students');
@@ -61,18 +52,17 @@ export const AdminReportsPage: React.FC = () => {
   const [limit] = useState<number>(10);
   const [departmentId, setDepartmentId] = useState<string>('');
   const [assessmentId, setAssessmentId] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
   const [isPassed, setIsPassed] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [search, setSearch] = useState<string>('');
   const [exportLoading, setExportLoading] = useState<string | null>(null);
+  const [exportFeedback, setExportFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Clear filters helper
   const handleClearFilters = () => {
     setDepartmentId('');
     setAssessmentId('');
-    setCategory('');
     setIsPassed('');
     setStartDate('');
     setEndDate('');
@@ -86,7 +76,6 @@ export const AdminReportsPage: React.FC = () => {
     limit,
     departmentId: departmentId || undefined,
     assessmentId: assessmentId || undefined,
-    category: category || undefined,
     isPassed: isPassed !== '' ? isPassed === 'true' : undefined,
     startDate: startDate || undefined,
     endDate: endDate || undefined,
@@ -110,14 +99,10 @@ export const AdminReportsPage: React.FC = () => {
           return reportService.getAssessmentReport(queryParams);
         case 'departments':
           return reportService.getDepartmentReport(queryParams);
-        case 'topics':
-          return reportService.getTopicReport(queryParams);
-        case 'questions':
-          return reportService.getQuestionReport(queryParams);
-        case 'coding':
-          return reportService.getCodingReport(queryParams);
-        case 'funnel':
-          return reportService.getFunnelReport(queryParams);
+        case 'gd':
+          return reportService.getGdReport(queryParams);
+        case 'interviews':
+          return reportService.getInterviewReport(queryParams);
         default:
           return null;
       }
@@ -125,54 +110,74 @@ export const AdminReportsPage: React.FC = () => {
     staleTime: 10000,
   });
 
+  const { data: departments = [] } = useQuery({
+    queryKey: ['adminDepartmentsList'],
+    queryFn: () => managementService.getDepartments(),
+    staleTime: 60000,
+  });
+
   // Handle Export Download
   const handleExport = async (format: ExportFormat) => {
     try {
+      setExportFeedback(null);
       setExportLoading(format);
-      await reportService.downloadReport(selectedReport, format, queryParams);
-    } catch (err) {
+      const filename = await reportService.downloadReport(selectedReport, format, queryParams);
+      setExportFeedback({
+        type: 'success',
+        message: `Report successfully generated and downloaded: ${filename}`,
+      });
+    } catch (err: any) {
       console.error('Export failed:', err);
-      alert('Failed to generate export file. Please verify parameters and try again.');
+      const errorMessage =
+        err?.message ||
+        err?.response?.data?.message ||
+        'Failed to generate export file. Please verify parameters and try again.';
+      setExportFeedback({
+        type: 'error',
+        message: errorMessage,
+      });
     } finally {
       setExportLoading(null);
     }
   };
 
   const reportTabs = [
-    { value: 'students', label: 'Student Performance', icon: <DescriptionIcon fontSize="small" /> },
+    { value: 'students', label: 'Overall Student Results', icon: <DescriptionIcon fontSize="small" /> },
     { value: 'assessments', label: 'Assessment Results', icon: <AssessmentIcon fontSize="small" /> },
     { value: 'departments', label: 'Department Performance', icon: <BusinessIcon fontSize="small" /> },
-    { value: 'topics', label: 'Topic Performance', icon: <PsychologyIcon fontSize="small" /> },
-    { value: 'questions', label: 'Question Analysis', icon: <QuizIcon fontSize="small" /> },
-    { value: 'coding', label: 'Coding Assessments', icon: <CodeIcon fontSize="small" /> },
-    { value: 'funnel', label: 'Placement Funnel', icon: <TrendingUpIcon fontSize="small" /> },
+    { value: 'gd', label: 'GD Evaluations', icon: <GroupsIcon fontSize="small" /> },
+    { value: 'interviews', label: 'Interview Evaluations', icon: <WorkOutlineIcon fontSize="small" /> },
   ];
 
   const currentData = reportData as any;
   const currentRows: any[] = currentData?.rows || [];
-  const currentStages: any[] = currentData?.stages || [];
   const currentPagination = currentData?.pagination;
 
   return (
     <Box>
       {/* Header Banner */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="overline" color="primary.light" fontWeight={700} letterSpacing={1.2}>
-          Institutional Audit & Export Module • Phase 9
+        <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+          INSTITUTIONAL AUDIT & EXPORT REPOSITORY
         </Typography>
-        <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 1 }}>
-          Placement Reports, Exports & Printing Center
+        <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
+          Placement Reports & Compliance Center
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: '#64748b' }}>
           Generate official placement audit reports, psychometric evaluations, department scorecards, and multi-format exports (Excel, CSV, PDF, Print HTML).
         </Typography>
       </Box>
 
-      {/* Main Admin Navigation */}
-      <AdminNavTabs />
-
       {/* Report Selector Tabs */}
-      <Paper sx={{ mb: 3, bgcolor: 'background.paper', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+        }}
+      >
         <Tabs
           value={selectedReport}
           onChange={(_, val) => {
@@ -187,11 +192,17 @@ export const AdminReportsPage: React.FC = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              fontSize: '0.88rem',
+              fontSize: '0.875rem',
               py: 1.5,
+              minHeight: 48,
               display: 'flex',
               flexDirection: 'row',
               gap: 1,
+              color: '#64748b',
+              '&.Mui-selected': {
+                color: '#0f3674',
+                fontWeight: 700,
+              },
             },
           }}
         >
@@ -201,10 +212,28 @@ export const AdminReportsPage: React.FC = () => {
         </Tabs>
       </Paper>
 
+      {exportFeedback && (
+        <Alert
+          severity={exportFeedback.type}
+          onClose={() => setExportFeedback(null)}
+          sx={{ mb: 3, borderRadius: '8px' }}
+        >
+          {exportFeedback.message}
+        </Alert>
+      )}
+
       {/* Action Bar & Filter Section */}
-      <Card sx={{ mb: 3, bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <CardContent sx={{ py: 2 }}>
-          {/* Export Buttons */}
+      <Card
+        elevation={0}
+        sx={{
+          mb: 3,
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+        }}
+      >
+        <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+          {/* Export Buttons Bar */}
           <Box
             sx={{
               display: 'flex',
@@ -212,15 +241,15 @@ export const AdminReportsPage: React.FC = () => {
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: 2,
-              mb: 2,
+              mb: 2.5,
               pb: 2,
-              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+              borderBottom: '1px solid #f1f5f9',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FilterAltIcon color="primary" fontSize="small" />
-              <Typography variant="subtitle2" fontWeight={700}>
-                Report Filters & Parameters
+              <FilterAltIcon sx={{ color: '#0f3674' }} fontSize="small" />
+              <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                Report Filters & Export Tools
               </Typography>
             </Box>
 
@@ -228,40 +257,74 @@ export const AdminReportsPage: React.FC = () => {
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={exportLoading === 'xlsx' ? <CircularProgress size={16} /> : <TableChartIcon />}
+                startIcon={exportLoading === 'xlsx' ? <CircularProgress size={14} /> : <TableChartIcon fontSize="small" />}
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('xlsx')}
-                sx={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}
+                sx={{
+                  color: '#047857',
+                  borderColor: '#a7f3d0',
+                  bgcolor: '#ecfdf5',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '6px',
+                  '&:hover': { bgcolor: '#d1fae5', borderColor: '#6ee7b7' },
+                }}
               >
                 Excel (.xlsx)
               </Button>
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={exportLoading === 'csv' ? <CircularProgress size={16} /> : <DownloadIcon />}
+                startIcon={exportLoading === 'csv' ? <CircularProgress size={14} /> : <DownloadIcon fontSize="small" />}
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('csv')}
-                sx={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)' }}
+                sx={{
+                  color: '#0369a1',
+                  borderColor: '#bae6fd',
+                  bgcolor: '#f0f9ff',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '6px',
+                  '&:hover': { bgcolor: '#e0f2fe', borderColor: '#7dd3fc' },
+                }}
               >
                 CSV
               </Button>
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={exportLoading === 'pdf' ? <CircularProgress size={16} /> : <PictureAsPdfIcon />}
+                startIcon={exportLoading === 'pdf' ? <CircularProgress size={14} /> : <PictureAsPdfIcon fontSize="small" />}
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('pdf')}
-                sx={{ color: '#f43f5e', borderColor: 'rgba(244, 63, 94, 0.4)' }}
+                sx={{
+                  color: '#b91c1c',
+                  borderColor: '#fecaca',
+                  bgcolor: '#fef2f2',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '6px',
+                  '&:hover': { bgcolor: '#fee2e2', borderColor: '#fca5a5' },
+                }}
               >
                 PDF Document
               </Button>
               <Button
                 variant="contained"
                 size="small"
-                color="primary"
-                startIcon={exportLoading === 'html' ? <CircularProgress size={16} /> : <PrintIcon />}
+                startIcon={exportLoading === 'html' ? <CircularProgress size={14} /> : <PrintIcon fontSize="small" />}
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('html')}
+                sx={{
+                  bgcolor: '#0f3674',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '6px',
+                  '&:hover': { bgcolor: '#0c2b5e' },
+                }}
               >
                 Print Preview
               </Button>
@@ -270,7 +333,7 @@ export const AdminReportsPage: React.FC = () => {
 
           {/* Filter Inputs */}
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={2.5}>
               <TextField
                 fullWidth
                 size="small"
@@ -279,6 +342,27 @@ export const AdminReportsPage: React.FC = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+            </Grid>
+
+            <Grid item xs={6} sm={3} md={2.5}>
+              <TextField
+                fullWidth
+                size="small"
+                select
+                label="Department"
+                value={departmentId}
+                onChange={(e) => {
+                  setDepartmentId(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <MenuItem value="">All Departments</MenuItem>
+                {departments.map((d: any) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.code} — {d.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
 
             <Grid item xs={6} sm={3} md={2}>
@@ -295,26 +379,6 @@ export const AdminReportsPage: React.FC = () => {
                 <MenuItem value="false">Failed Only</MenuItem>
               </TextField>
             </Grid>
-
-            {(selectedReport === 'topics' || selectedReport === 'questions') && (
-              <Grid item xs={6} sm={3} md={2}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  select
-                  label="Category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  <MenuItem value="">All Categories</MenuItem>
-                  <MenuItem value="QUANTITATIVE_APTITUDE">Quantitative Aptitude</MenuItem>
-                  <MenuItem value="LOGICAL_REASONING">Logical Reasoning</MenuItem>
-                  <MenuItem value="VERBAL_ABILITY">Verbal Ability</MenuItem>
-                  <MenuItem value="TECHNICAL_MCQ">Technical MCQ</MenuItem>
-                  <MenuItem value="CODING">Coding Challenge</MenuItem>
-                </TextField>
-              </Grid>
-            )}
 
             <Grid item xs={6} sm={3} md={2}>
               <TextField
@@ -342,12 +406,12 @@ export const AdminReportsPage: React.FC = () => {
 
             <Grid item xs={12} sm={6} md={1} sx={{ display: 'flex', gap: 1 }}>
               <Tooltip title="Clear Filters">
-                <IconButton size="small" onClick={handleClearFilters} color="inherit">
+                <IconButton size="small" onClick={handleClearFilters} sx={{ color: '#64748b' }}>
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Refresh Data">
-                <IconButton size="small" onClick={() => refetch()} color="primary">
+                <IconButton size="small" onClick={() => refetch()} sx={{ color: '#0f3674' }}>
                   <RefreshIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -358,7 +422,7 @@ export const AdminReportsPage: React.FC = () => {
 
       {/* Error Alert */}
       {isError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
           {error instanceof Error ? error.message : 'Failed to fetch report data from server'}
         </Alert>
       )}
@@ -366,7 +430,7 @@ export const AdminReportsPage: React.FC = () => {
       {/* Loading State */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+          <CircularProgress size={32} sx={{ color: '#0f3674' }} />
         </Box>
       ) : (
         <>
@@ -375,12 +439,19 @@ export const AdminReportsPage: React.FC = () => {
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {Object.entries(reportData.summary).map(([key, val]) => (
                 <Grid item xs={6} sm={4} md={2.4} key={key}>
-                  <Card sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      bgcolor: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                    }}
+                  >
                     <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                      <Typography variant="caption" color="text.secondary" fontWeight={600} textTransform="capitalize">
+                      <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </Typography>
-                      <Typography variant="h6" fontWeight={800} sx={{ mt: 0.5 }}>
+                      <Typography variant="h6" fontWeight={800} sx={{ mt: 0.5, color: '#0f172a' }}>
                         {typeof val === 'number' && key.toLowerCase().includes('rate')
                           ? `${val}%`
                           : typeof val === 'number' && key.toLowerCase().includes('percentage')
@@ -397,101 +468,82 @@ export const AdminReportsPage: React.FC = () => {
           {/* Report Data Table */}
           <TableContainer
             component={Paper}
+            elevation={0}
             sx={{
-              bgcolor: 'background.paper',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: 2,
+              bgcolor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
               mb: 3,
             }}
           >
             <Table size="small">
-              <TableHead sx={{ bgcolor: 'rgba(255, 255, 255, 0.04)' }}>
+              <TableHead sx={{ bgcolor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
                 {selectedReport === 'students' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Student Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Dept</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Class</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Completed</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Average %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Class</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Completed</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'assessments' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Assessment</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Candidate</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Dept</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Score %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Result</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Submitted At</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assessment</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Result</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Submitted At</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'departments' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Code</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Department Name</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Enrolled</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Attempts</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Passed</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Pass Rate</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Average %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Code</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Department Name</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Enrolled</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attempts</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Passed</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Pass Rate</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
                   </TableRow>
                 )}
 
-                {selectedReport === 'topics' && (
+                {selectedReport === 'gd' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Topic Name</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Questions</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Attempts</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Correct</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Accuracy %</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Proficiency</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GD Round</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Topic</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluator</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluated Date</TableCell>
                   </TableRow>
                 )}
 
-                {selectedReport === 'questions' && (
+                {selectedReport === 'interviews' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Question Text</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Topic</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Difficulty</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Appeared</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Answered</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Success %</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
-                  </TableRow>
-                )}
-
-                {selectedReport === 'coding' && (
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Candidate</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Assessment</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Challenge</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Lang</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Tests Passed</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Exec Time</TableCell>
-                  </TableRow>
-                )}
-
-                {selectedReport === 'funnel' && (
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Funnel Stage</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Candidate Count</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Stage %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700 }}>Drop-off %</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>Module Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interview Round</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Type</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interviewer</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Feedback / Strengths</TableCell>
                   </TableRow>
                 )}
               </TableHead>
@@ -500,25 +552,32 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 1. Students Table */}
                 {selectedReport === 'students' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.studentId} hover>
-                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{r.registerNumber}</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.studentName}</TableCell>
-                      <TableCell>{r.departmentCode}</TableCell>
-                      <TableCell>{r.className || r.sectionName || '-'}</TableCell>
-                      <TableCell align="center">{r.assessmentsCompleted}</TableCell>
-                      <TableCell align="right">
+                    <TableRow key={r.studentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.registerNumber}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.departmentCode}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.className || r.sectionName || '-'}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.assessmentsCompleted}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.totalMarksObtained} / {r.totalMarksPossible}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
                         {r.averagePercentage}%
                       </TableCell>
-                      <TableCell align="right">{r.averageAccuracy}%</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.averageAccuracy}%</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
                           label={r.overallPassed ? 'PASS' : 'FAIL'}
-                          color={r.overallPassed ? 'success' : 'error'}
-                          sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            borderRadius: '4px',
+                            bgcolor: r.overallPassed ? '#ecfdf5' : '#fef2f2',
+                            color: r.overallPassed ? '#047857' : '#b91c1c',
+                            border: '1px solid',
+                            borderColor: r.overallPassed ? '#a7f3d0' : '#fecaca',
+                          }}
                         />
                       </TableCell>
                     </TableRow>
@@ -527,27 +586,34 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 2. Assessments Table */}
                 {selectedReport === 'assessments' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.resultId} hover>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.assessmentTitle}</TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace' }}>{r.registerNumber}</TableCell>
-                      <TableCell>{r.studentName}</TableCell>
-                      <TableCell>{r.departmentCode}</TableCell>
-                      <TableCell align="right">
+                    <TableRow key={r.resultId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.assessmentTitle}</TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.departmentCode}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.obtainedMarks} / {r.totalMarks}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
                         {r.percentage}%
                       </TableCell>
-                      <TableCell align="right">{r.accuracy}%</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.accuracy}%</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
                           label={r.isPassed ? 'PASS' : 'FAIL'}
-                          color={r.isPassed ? 'success' : 'error'}
-                          sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            borderRadius: '4px',
+                            bgcolor: r.isPassed ? '#ecfdf5' : '#fef2f2',
+                            color: r.isPassed ? '#047857' : '#b91c1c',
+                            border: '1px solid',
+                            borderColor: r.isPassed ? '#a7f3d0' : '#fecaca',
+                          }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#64748b' }}>
                         {r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '-'}
                       </TableCell>
                     </TableRow>
@@ -556,125 +622,110 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 3. Departments Table */}
                 {selectedReport === 'departments' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.departmentId} hover>
-                      <TableCell sx={{ fontWeight: 700 }}>{r.departmentCode}</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.departmentName}</TableCell>
-                      <TableCell align="center">{r.enrolledStudents}</TableCell>
-                      <TableCell align="center">{r.totalAttemptsCompleted}</TableCell>
-                      <TableCell align="center">{r.totalPassed}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
+                    <TableRow key={r.departmentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>{r.departmentCode}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.departmentName}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.enrolledStudents}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.totalAttemptsCompleted}</TableCell>
+                      <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.totalPassed}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
                         {r.passRate}%
                       </TableCell>
-                      <TableCell align="right">{r.averagePercentage}%</TableCell>
-                      <TableCell align="right">{r.averageAccuracy}%</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.averagePercentage}%</TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.averageAccuracy}%</TableCell>
                     </TableRow>
                   ))}
 
-                {/* 4. Topics Table */}
-                {selectedReport === 'topics' &&
+                {/* 4. GD Table */}
+                {selectedReport === 'gd' &&
                   currentRows.map((r: any, idx: number) => (
-                    <TableRow key={idx} hover>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.category.replace(/_/g, ' ')}</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.topic}</TableCell>
-                      <TableCell align="center">{r.totalQuestions}</TableCell>
-                      <TableCell align="center">{r.totalAttempts}</TableCell>
-                      <TableCell align="center">{r.correctAnswers}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
-                        {r.accuracyPercentage}%
-                      </TableCell>
+                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.roundTitle}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem' }}>{r.topic}</TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.evaluatorName || '—'}</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
-                          label={r.proficiencyRating}
-                          color={
-                            r.proficiencyRating === 'Strong'
-                              ? 'success'
-                              : r.proficiencyRating === 'Moderate'
-                              ? 'warning'
-                              : 'error'
-                          }
-                          sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                          label={r.attendance}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            borderRadius: '4px',
+                            bgcolor: r.attendance === 'PRESENT' ? '#ecfdf5' : r.attendance === 'ABSENT' ? '#fef2f2' : '#fef3c7',
+                            color: r.attendance === 'PRESENT' ? '#047857' : r.attendance === 'ABSENT' ? '#b91c1c' : '#b45309',
+                            border: '1px solid',
+                            borderColor: r.attendance === 'PRESENT' ? '#a7f3d0' : r.attendance === 'ABSENT' ? '#fecaca' : '#fde68a',
+                          }}
                         />
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
+                        {r.totalScore !== null ? `${r.totalScore} / ${r.maxPossibleMarks}` : '—'}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                        {r.percentage !== null ? `${r.percentage}%` : 'Pending'}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        {r.evaluatedAt ? new Date(r.evaluatedAt).toLocaleDateString() : '—'}
                       </TableCell>
                     </TableRow>
                   ))}
 
-                {/* 5. Questions Table */}
-                {selectedReport === 'questions' &&
-                  currentRows.map((r: any) => (
-                    <TableRow key={r.questionId} hover>
-                      <TableCell sx={{ maxWidth: 280 }}>{r.questionSnippet}</TableCell>
-                      <TableCell>{r.category.replace(/_/g, ' ')}</TableCell>
-                      <TableCell>{r.topic}</TableCell>
+                {/* 5. Interviews Table */}
+                {selectedReport === 'interviews' &&
+                  currentRows.map((r: any, idx: number) => (
+                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.roundTitle}</TableCell>
                       <TableCell>
-                        <Chip size="small" label={r.difficulty} variant="outlined" sx={{ fontSize: '0.7rem' }} />
+                        <Chip
+                          size="small"
+                          label={r.interviewType}
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                            borderRadius: '4px',
+                            bgcolor: '#f1f5f9',
+                            color: '#334155',
+                            border: '1px solid #cbd5e1',
+                          }}
+                        />
                       </TableCell>
-                      <TableCell align="center">{r.timesAppeared}</TableCell>
-                      <TableCell align="center">{r.timesAnswered}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
-                        {r.successRatePercentage}%
-                      </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem' }}>{r.discriminationRating}</TableCell>
-                    </TableRow>
-                  ))}
-
-                {/* 6. Coding Table */}
-                {selectedReport === 'coding' &&
-                  currentRows.map((r: any) => (
-                    <TableRow key={r.submissionId} hover>
-                      <TableCell sx={{ fontWeight: 600 }}>{r.studentName}</TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace' }}>{r.registerNumber}</TableCell>
-                      <TableCell>{r.assessmentTitle}</TableCell>
-                      <TableCell>{r.questionTopic}</TableCell>
-                      <TableCell>
-                        <Chip size="small" label={r.language} sx={{ fontWeight: 700 }} />
-                      </TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.interviewerName || '—'}</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
-                          label={r.status}
-                          color={r.status === 'ACCEPTED' ? 'success' : 'error'}
-                          sx={{ fontWeight: 700, fontSize: '0.72rem' }}
+                          label={r.attendance}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            borderRadius: '4px',
+                            bgcolor: r.attendance === 'PRESENT' ? '#ecfdf5' : r.attendance === 'ABSENT' ? '#fef2f2' : '#fef3c7',
+                            color: r.attendance === 'PRESENT' ? '#047857' : r.attendance === 'ABSENT' ? '#b91c1c' : '#b45309',
+                            border: '1px solid',
+                            borderColor: r.attendance === 'PRESENT' ? '#a7f3d0' : r.attendance === 'ABSENT' ? '#fecaca' : '#fde68a',
+                          }}
                         />
                       </TableCell>
-                      <TableCell align="center">
-                        {r.passedTestCount} / {r.totalTestCount}
+                      <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
+                        {r.totalScore !== null ? `${r.totalScore} / ${r.maxPossibleMarks}` : '—'}
                       </TableCell>
-                      <TableCell align="right">
-                        {r.executionTime !== null ? `${r.executionTime}s` : '-'}
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                        {r.percentage !== null ? `${r.percentage}%` : 'Pending'}
                       </TableCell>
-                    </TableRow>
-                  ))}
-
-                {/* 7. Funnel Table */}
-                {selectedReport === 'funnel' &&
-                  currentStages.map((s: any) => (
-                    <TableRow key={s.stage} hover>
-                      <TableCell sx={{ fontWeight: 700 }}>{s.stage}</TableCell>
-                      <TableCell align="center" sx={{ fontSize: '1rem', fontWeight: 800 }}>
-                        {s.count}
-                      </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700 }}>
-                        {s.percentage}%
-                      </TableCell>
-                      <TableCell align="right">{s.dropOffRate}%</TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          size="small"
-                          label={s.isImplemented ? 'IMPLEMENTED' : 'NOT IMPLEMENTED (PHASE 9+)'}
-                          color={s.isImplemented ? 'success' : 'default'}
-                          variant="outlined"
-                          sx={{ fontSize: '0.72rem' }}
-                        />
+                      <TableCell sx={{ fontSize: '0.75rem', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>
+                        {r.strengths || r.overallFeedback || '—'}
                       </TableCell>
                     </TableRow>
                   ))}
 
                 {/* Empty State */}
-                {currentRows.length === 0 && currentStages.length === 0 && (
+                {currentRows.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: '#64748b' }}>
                         No report records found matching the specified parameters.
                       </Typography>
                     </TableCell>

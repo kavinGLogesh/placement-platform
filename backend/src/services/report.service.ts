@@ -16,6 +16,10 @@ import {
   CodingAssessmentReportDto,
   PlacementFunnelReportDto,
   StudentOwnPerformanceReportDto,
+  GdReportFilterQuery,
+  GdPerformanceReportDto,
+  InterviewReportFilterQuery,
+  InterviewPerformanceReportDto,
   ExportFormat,
   ExportDataPayload,
   ExportColumnDef,
@@ -83,6 +87,16 @@ export class ReportService {
       throw new AppError('Student ID is required', 400);
     }
     return this.repo.getStudentOwnReport(studentId, query);
+  }
+
+  // 9. GD Performance Report
+  async getGdPerformanceReport(query: GdReportFilterQuery): Promise<GdPerformanceReportDto> {
+    return this.repo.getGdPerformanceReport(query, false);
+  }
+
+  // 10. Interview Performance Report
+  async getInterviewPerformanceReport(query: InterviewReportFilterQuery): Promise<InterviewPerformanceReportDto> {
+    return this.repo.getInterviewPerformanceReport(query, false);
   }
 
   // ===========================================================================
@@ -326,6 +340,78 @@ export class ReportService {
             ...s,
             isImplemented: s.isImplemented ? 'IMPLEMENTED' : 'NOT IMPLEMENTED (PHASE 9+)',
           })),
+        };
+        break;
+      }
+
+      case 'gd':
+      case 'gd-performance': {
+        const report = await this.repo.getGdPerformanceReport(filters, true);
+        const columns: ExportColumnDef[] = [
+          { header: 'Round Title', key: 'title', width: 20 },
+          { header: 'Topic', key: 'topic', width: 22 },
+          { header: 'Date', key: 'scheduledDate', width: 14 },
+          { header: 'Student Name', key: 'studentName', width: 18 },
+          { header: 'Register No', key: 'registerNumber', width: 14 },
+          { header: 'Department', key: 'departmentName', width: 16 },
+          { header: 'Attendance', key: 'attendance', width: 12 },
+          { header: 'Score', key: 'totalScore', width: 10 },
+          { header: 'Max Marks', key: 'maxMarks', width: 10 },
+          { header: 'Percentage', key: 'percentage', width: 12 },
+          { header: 'Evaluator', key: 'evaluatorName', width: 16 },
+          { header: 'Improvement / Status', key: 'comparisonText', width: 24 },
+        ];
+        payload = {
+          institutionName: 'College Placement Assessment Platform',
+          reportTitle: 'Group Discussion (GD) Structured Evaluation Report',
+          reportDate: new Date().toLocaleString(),
+          generatedBy: userEmail,
+          appliedFilters: filters,
+          summaryMetrics: {
+            'Total GD Rounds': report.summary.totalRounds,
+            'Total Participants': report.summary.totalParticipants,
+            'Total Evaluated': report.summary.totalEvaluated,
+            'Average Score': `${report.summary.averageScorePercentage}%`,
+            'Attendance Rate': `${report.summary.attendanceRate}%`,
+          },
+          columns,
+          data: report.rows,
+        };
+        break;
+      }
+
+      case 'interviews':
+      case 'interview-performance': {
+        const report = await this.repo.getInterviewPerformanceReport(filters, true);
+        const columns: ExportColumnDef[] = [
+          { header: 'Round Title', key: 'title', width: 20 },
+          { header: 'Interview Type', key: 'interviewType', width: 16 },
+          { header: 'Date', key: 'scheduledDate', width: 14 },
+          { header: 'Student Name', key: 'studentName', width: 18 },
+          { header: 'Register No', key: 'registerNumber', width: 14 },
+          { header: 'Department', key: 'departmentName', width: 16 },
+          { header: 'Attendance', key: 'attendance', width: 12 },
+          { header: 'Score', key: 'totalScore', width: 10 },
+          { header: 'Max Marks', key: 'maxMarks', width: 10 },
+          { header: 'Percentage', key: 'percentage', width: 12 },
+          { header: 'Evaluator', key: 'evaluatorName', width: 16 },
+          { header: 'Improvement / Status', key: 'comparisonText', width: 24 },
+        ];
+        payload = {
+          institutionName: 'College Placement Assessment Platform',
+          reportTitle: 'Structured Interview Evaluation Report',
+          reportDate: new Date().toLocaleString(),
+          generatedBy: userEmail,
+          appliedFilters: filters,
+          summaryMetrics: {
+            'Total Interview Rounds': report.summary.totalRounds,
+            'Total Participants': report.summary.totalParticipants,
+            'Total Evaluated': report.summary.totalEvaluated,
+            'Average Score': `${report.summary.averageScorePercentage}%`,
+            'Attendance Rate': `${report.summary.attendanceRate}%`,
+          },
+          columns,
+          data: report.rows,
         };
         break;
       }

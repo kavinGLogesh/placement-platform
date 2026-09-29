@@ -33,12 +33,15 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { useParams, useNavigate } from 'react-router-dom';
 import { attemptService } from '../../services/attempt.service.js';
 import {
   AssessmentAttemptDto,
   SanitizedPaperQuestionDto,
   SaveAnswerDto,
+  AttemptViolationType,
 } from '../../types/attempt.types.js';
 import { MonacoCodingWorkspace } from '../../components/coding/MonacoCodingWorkspace.js';
 
@@ -58,6 +61,17 @@ export const StudentAttemptPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Anti-Cheating & Fullscreen Enforcement
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [violationWarningOpen, setViolationWarningOpen] = useState(false);
+  const [violationCount, setViolationCount] = useState(0);
+  const [lastViolationReason, setLastViolationReason] = useState<{ title: string; message: string; type?: AttemptViolationType }>({
+    title: 'Integrity Violation Detected',
+    message: 'An integrity violation has been recorded.',
+  });
+  const hasEnteredFullscreenRef = useRef(false);
+  const lastViolationTimeRef = useRef<{ type: AttemptViolationType; time: number } | null>(null);
+
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isAutoSubmittingRef = useRef(false);
 
@@ -74,6 +88,9 @@ export const StudentAttemptPage: React.FC = () => {
         if (!mounted) return;
 
         setAttempt(data);
+        if (typeof data.violationCount === 'number') {
+          setViolationCount(data.violationCount);
+        }
 
         // If already submitted/expired, redirect to results
         if (data.status !== 'IN_PROGRESS') {
@@ -180,6 +197,179 @@ export const StudentAttemptPage: React.FC = () => {
       window.removeEventListener('offline', handleOffline);
     };
   }, [attemptId]);
+
+  // 3b. Anti-Cheating: Authoritative Violation Reporter with Client Deduplication Shield
+  const triggerViolation = useCallback(
+    async (
+      type: AttemptViolationType,
+      title: string,
+      message: string,
+      details?: string
+    ) => {
+      if (!attemptId) return;
+
+      const now = Date.now();
+      const last = lastViolationTimeRef.current;
+
+      // 1. Cooldown deduplication: ignore exact same violation within 1500ms
+      if (last && last.type === type && now - last.time < 1500) {
+        return;
+      }
+
+      // 2. Tab-switch vs window-blur deduplication: Chromium fires blur when switching tabs
+      if (type === 'WINDOW_BLUR' && last && last.type === 'TAB_SWITCH' && now - last.time < 1500) {
+        return;
+      }
+
+      lastViolationTimeRef.current = { type, time: now };
+
+      // Update state for real-time modal warning
+      setLastViolationReason({ title, message, type });
+      setViolationWarningOpen(true);
+      setViolationCount((prev) => prev + 1);
+
+      // Asynchronously persist violation to authoritative backend
+      try {
+        const res = await attemptService.recordViolation(attemptId, {
+          violationType: type,
+          details,
+          clientTimestamp: new Date().toISOString(),
+        });
+        if (res && typeof res.violationCount === 'number') {
+          setViolationCount(res.violationCount);
+        }
+      } catch (err) {
+        console.warn('Failed to record violation on server:', err);
+      }
+    },
+    [attemptId]
+  );
+
+  // 3c. Fullscreen Lockdown Handler
+  const enterFullscreen = useCallback(async () => {
+    try {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        await (elem as any).webkitRequestFullscreen();
+      } else if ((elem as any).msRequestFullscreen) {
+        await (elem as any).msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+      setViolationWarningOpen(false);
+      hasEnteredFullscreenRef.current = true;
+    } catch {
+      // Browser permission or policy restriction
+      setViolationWarningOpen(false);
+    }
+  }, []);
+
+  // 3d. Fullscreen Change Listener
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const inFs = Boolean(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+      setIsFullscreen(inFs);
+
+      if (!inFs && hasEnteredFullscreenRef.current) {
+        triggerViolation(
+          'FULLSCREEN_EXIT',
+          'Full-Screen Mode Exited',
+          'You exited full-screen mode. Examinations must be taken in full-screen lockdown. Please re-enter full-screen immediately.',
+          'Candidate exited full-screen lockdown'
+        );
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [triggerViolation]);
+
+  // 3e. Page Visibility API Listener (Tab Switch Detection)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        triggerViolation(
+          'TAB_SWITCH',
+          'Tab Switch / Minimized Window Detected',
+          'You navigated away from the active examination tab. Tab switching is strictly prohibited and logged as an integrity violation.',
+          'Page Visibility API detected visibilityState: hidden'
+        );
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [triggerViolation]);
+
+  // 3f. Browser / Window Focus & Blur Detection
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      // If tab visibility is already hidden, TAB_SWITCH handler already caught it
+      if (document.visibilityState === 'hidden') return;
+
+      triggerViolation(
+        'WINDOW_BLUR',
+        'Window Focus Lost',
+        'Your examination window lost focus or an external application/overlay was activated. Please maintain focus strictly on this examination.',
+        'Window blur event detected'
+      );
+    };
+
+    window.addEventListener('blur', handleWindowBlur);
+    return () => {
+      window.removeEventListener('blur', handleWindowBlur);
+    };
+  }, [triggerViolation]);
+
+  // 3g. Screenshot & Print Shortcut Interception
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // PrintScreen key
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        triggerViolation(
+          'SCREENSHOT_ATTEMPT',
+          'Screenshot Command Intercepted',
+          'Screen capture shortcuts (PrintScreen) are prohibited during official examinations and have been recorded as an integrity violation.',
+          'PrintScreen keypress intercepted'
+        );
+        return;
+      }
+
+      // Print / PDF export key combos: Ctrl+P or Cmd+P
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        triggerViolation(
+          'SCREENSHOT_ATTEMPT',
+          'Print Command Intercepted',
+          'Print and PDF export shortcuts (Ctrl+P / Cmd+P) are prohibited during official examinations and have been recorded.',
+          'Ctrl+P / Cmd+P keypress intercepted'
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [triggerViolation]);
 
   // 4. Current Question & Options
   const questions = attempt?.questions || [];
@@ -321,16 +511,16 @@ export const StudentAttemptPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#0B0F19' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
       {/* 1. Distraction-Free Header Bar */}
       <Paper
         square
-        elevation={2}
+        elevation={0}
         sx={{
           py: 1.5,
           px: { xs: 2, md: 4 },
-          bgcolor: '#111827',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          bgcolor: '#ffffff',
+          borderBottom: '1px solid #e2e8f0',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -341,14 +531,14 @@ export const StudentAttemptPage: React.FC = () => {
       >
         {/* Assessment Name */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" fontWeight={800} color="text.primary">
+          <Typography variant="h6" fontWeight={800} sx={{ color: '#0f172a' }}>
             {attempt?.assessment?.name || 'Examination'}
           </Typography>
           <Chip
             size="small"
             label={`Section: ${currentQuestion?.category || 'General'}`}
             variant="outlined"
-            sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+            sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderColor: '#cbd5e1', color: '#475569', fontWeight: 600 }}
           />
         </Box>
 
@@ -359,17 +549,22 @@ export const StudentAttemptPage: React.FC = () => {
             size="small"
             icon={
               syncStatus === 'SAVED' ? (
-                <CloudDoneIcon sx={{ color: 'success.main !important' }} />
+                <CloudDoneIcon sx={{ color: '#059669 !important' }} />
               ) : syncStatus === 'SYNCING' ? (
-                <SyncIcon sx={{ color: 'info.main !important', animation: 'spin 1s linear infinite' }} />
+                <SyncIcon sx={{ color: '#2563eb !important', animation: 'spin 1s linear infinite' }} />
               ) : (
-                <CloudOffIcon sx={{ color: 'warning.main !important' }} />
+                <CloudOffIcon sx={{ color: '#d97706 !important' }} />
               )
             }
-            label={syncStatus}
-            variant="outlined"
-            color={syncStatus === 'SAVED' ? 'success' : syncStatus === 'SYNCING' ? 'info' : 'warning'}
-            sx={{ fontWeight: 700 }}
+            label={syncStatus === 'SAVED' ? 'Auto-Saved' : syncStatus === 'SYNCING' ? 'Saving...' : 'Offline'}
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              bgcolor: syncStatus === 'SAVED' ? '#ecfdf5' : syncStatus === 'SYNCING' ? '#eff6ff' : '#fef3c7',
+              color: syncStatus === 'SAVED' ? '#047857' : syncStatus === 'SYNCING' ? '#1d4ed8' : '#b45309',
+              border: '1px solid',
+              borderColor: syncStatus === 'SAVED' ? '#a7f3d0' : syncStatus === 'SYNCING' ? '#bfdbfe' : '#fde68a',
+            }}
           />
 
           {/* Countdown Timer */}
@@ -383,44 +578,74 @@ export const StudentAttemptPage: React.FC = () => {
               borderRadius: 2,
               bgcolor:
                 (timeLeftSeconds || 0) < 60
-                  ? 'rgba(239, 68, 68, 0.2)'
+                  ? '#fef2f2'
                   : (timeLeftSeconds || 0) < 300
-                  ? 'rgba(245, 158, 11, 0.2)'
-                  : 'rgba(255, 255, 255, 0.05)',
-              border:
+                  ? '#fffbeb'
+                  : '#f1f5f9',
+              border: '1px solid',
+              borderColor:
                 (timeLeftSeconds || 0) < 60
-                  ? '1px solid #EF4444'
+                  ? '#fca5a5'
                   : (timeLeftSeconds || 0) < 300
-                  ? '1px solid #F59E0B'
-                  : '1px solid rgba(255, 255, 255, 0.1)',
+                  ? '#fde68a'
+                  : '#cbd5e1',
             }}
           >
             <TimerIcon
               sx={{
+                fontSize: 18,
                 color:
                   (timeLeftSeconds || 0) < 60
-                    ? '#EF4444'
+                    ? '#dc2626'
                     : (timeLeftSeconds || 0) < 300
-                    ? '#F59E0B'
-                    : 'primary.light',
+                    ? '#d97706'
+                    : '#2563eb',
               }}
             />
             <Typography
-              variant="subtitle1"
+              variant="subtitle2"
               sx={{
                 fontFamily: 'monospace',
                 fontWeight: 800,
                 color:
                   (timeLeftSeconds || 0) < 60
-                    ? '#EF4444'
+                    ? '#dc2626'
                     : (timeLeftSeconds || 0) < 300
-                    ? '#F59E0B'
-                    : 'text.primary',
+                    ? '#d97706'
+                    : '#0f172a',
               }}
             >
               {formatTime(timeLeftSeconds)}
             </Typography>
           </Box>
+
+          {/* Real-time Violation Counter Badge */}
+          {violationCount > 0 && (
+            <Chip
+              size="small"
+              icon={<WarningAmberIcon style={{ color: '#b91c1c', fontSize: 16 }} />}
+              label={`${violationCount} Violation${violationCount > 1 ? 's' : ''}`}
+              sx={{
+                bgcolor: '#fee2e2',
+                color: '#b91c1c',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                border: '1px solid #fecaca',
+              }}
+            />
+          )}
+
+          {/* Full-Screen Lockdown Button */}
+          <Button
+            size="small"
+            variant={isFullscreen ? 'outlined' : 'contained'}
+            color={isFullscreen ? 'inherit' : 'warning'}
+            startIcon={isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            onClick={enterFullscreen}
+            sx={{ fontWeight: 700, fontSize: '0.75rem', px: 1.5 }}
+          >
+            {isFullscreen ? 'Full-Screen Active' : 'Enter Full-Screen'}
+          </Button>
 
           {/* Submit Test Button */}
           <Button
@@ -464,8 +689,8 @@ export const StudentAttemptPage: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  bgcolor: '#111827',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  bgcolor: '#ffffff',
+                  border: '1px solid #e2e8f0',
                   borderRadius: 2,
                 }}
               >
@@ -501,19 +726,27 @@ export const StudentAttemptPage: React.FC = () => {
             </Box>
           ) : currentQuestion ? (
             <Card
+              onContextMenu={(e) => e.preventDefault()}
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
               sx={{
                 flexGrow: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                bgcolor: '#111827',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: 2.5,
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
               }}
             >
               {/* Question Header */}
               <Box
                 sx={{
                   p: 2.5,
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderBottom: '1px solid #e2e8f0',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -521,7 +754,7 @@ export const StudentAttemptPage: React.FC = () => {
                   gap: 1.5,
                 }}
               >
-                <Typography variant="h6" fontWeight={800}>
+                <Typography variant="h6" fontWeight={800} color="#0f172a">
                   Question {currentIndex + 1} of {questions.length}
                 </Typography>
 
@@ -531,6 +764,7 @@ export const StudentAttemptPage: React.FC = () => {
                     label={`${currentQuestion.marks} Mark${currentQuestion.marks > 1 ? 's' : ''}`}
                     color="primary"
                     variant="outlined"
+                    sx={{ fontWeight: 600 }}
                   />
                   {attempt?.assessment?.negativeMarking && currentQuestion.negativeMarks > 0 && (
                     <Chip
@@ -538,15 +772,16 @@ export const StudentAttemptPage: React.FC = () => {
                       label={`-${currentQuestion.negativeMarks} Neg`}
                       color="warning"
                       variant="outlined"
+                      sx={{ fontWeight: 600 }}
                     />
                   )}
-                  <Chip size="small" label={currentQuestion.difficulty} variant="filled" />
+                  <Chip size="small" label={currentQuestion.difficulty} sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 600 }} />
                 </Box>
               </Box>
 
               {/* Question Content & Options */}
               <CardContent sx={{ flexGrow: 1, p: { xs: 2.5, md: 4 }, overflowY: 'auto' }}>
-                <Typography variant="body1" sx={{ fontSize: '1.15rem', fontWeight: 500, lineHeight: 1.6, mb: 4 }}>
+                <Typography variant="body1" sx={{ fontSize: '1.15rem', fontWeight: 500, lineHeight: 1.6, mb: 4, color: '#0f172a' }}>
                   {currentQuestion.questionText}
                 </Typography>
 
@@ -570,13 +805,12 @@ export const StudentAttemptPage: React.FC = () => {
                             px: 2,
                             borderRadius: 2,
                             cursor: 'pointer',
-                            bgcolor: isSelected ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                            borderColor: isSelected ? 'primary.main' : 'rgba(255, 255, 255, 0.08)',
+                            bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                            borderColor: isSelected ? '#2563eb' : '#e2e8f0',
                             transition: 'all 0.15s ease',
                             '&:hover': {
-                              bgcolor: isSelected
-                                ? 'rgba(59, 130, 246, 0.16)'
-                                : 'rgba(255, 255, 255, 0.04)',
+                              bgcolor: isSelected ? '#dbeafe' : '#f8fafc',
+                              borderColor: isSelected ? '#2563eb' : '#cbd5e1',
                             },
                           }}
                         >
@@ -584,7 +818,7 @@ export const StudentAttemptPage: React.FC = () => {
                             value={opt.id}
                             control={<Radio color="primary" />}
                             label={
-                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1 }}>
+                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#0f172a', fontWeight: isSelected ? 600 : 400 }}>
                                 {opt.optionText}
                               </Typography>
                             }
@@ -612,9 +846,13 @@ export const StudentAttemptPage: React.FC = () => {
                             px: 2,
                             borderRadius: 2,
                             cursor: 'pointer',
-                            bgcolor: isSelected ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                            borderColor: isSelected ? 'primary.main' : 'rgba(255, 255, 255, 0.08)',
-                            '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)' },
+                            bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                            borderColor: isSelected ? '#2563eb' : '#e2e8f0',
+                            transition: 'all 0.15s ease',
+                            '&:hover': {
+                              bgcolor: isSelected ? '#dbeafe' : '#f8fafc',
+                              borderColor: isSelected ? '#2563eb' : '#cbd5e1',
+                            },
                           }}
                         >
                           <FormControlLabel
@@ -626,7 +864,7 @@ export const StudentAttemptPage: React.FC = () => {
                               />
                             }
                             label={
-                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1 }}>
+                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#0f172a', fontWeight: isSelected ? 600 : 400 }}>
                                 {opt.optionText}
                               </Typography>
                             }
@@ -659,12 +897,13 @@ export const StudentAttemptPage: React.FC = () => {
                 sx={{
                   p: 2,
                   px: 3,
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderTop: '1px solid #e2e8f0',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: 1.5,
+                  bgcolor: '#f8fafc',
                 }}
               >
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -688,7 +927,7 @@ export const StudentAttemptPage: React.FC = () => {
                     size="small"
                     disabled={!currentAnswer?.selectedOptionIds?.length && !currentAnswer?.textAnswer}
                   >
-                    Clear
+                    Clear Choice
                   </Button>
                 </Box>
 
@@ -708,7 +947,7 @@ export const StudentAttemptPage: React.FC = () => {
                     disabled={currentIndex === questions.length - 1}
                     onClick={() => goToQuestion(currentIndex + 1)}
                   >
-                    Next
+                    Save & Next
                   </Button>
                 </Box>
               </Box>
@@ -722,12 +961,14 @@ export const StudentAttemptPage: React.FC = () => {
             width: { xs: 260, md: 320 },
             display: { xs: 'none', lg: 'flex' },
             flexDirection: 'column',
-            bgcolor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            bgcolor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 2.5,
+            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <Typography variant="subtitle2" fontWeight={800} letterSpacing={0.5}>
+          <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0' }}>
+            <Typography variant="subtitle2" fontWeight={800} letterSpacing={0.5} color="#0f172a">
               Question Palette
             </Typography>
           </Box>
@@ -743,18 +984,18 @@ export const StudentAttemptPage: React.FC = () => {
                 const isMarked = ans?.isMarkedForReview;
                 const isCurrent = idx === currentIndex;
 
-                let btnBg = 'rgba(255, 255, 255, 0.05)';
-                let btnColor = 'text.primary';
+                let btnBg = '#f1f5f9';
+                let btnColor = '#334155';
 
                 if (isAnswered && isMarked) {
-                  btnBg = '#D97706'; // Amber: Answered & Marked
-                  btnColor = '#FFF';
+                  btnBg = '#d97706'; // Amber: Answered & Marked
+                  btnColor = '#fff';
                 } else if (isMarked) {
-                  btnBg = '#8B5CF6'; // Purple: Marked for Review
-                  btnColor = '#FFF';
+                  btnBg = '#7c3aed'; // Purple: Marked for Review
+                  btnColor = '#fff';
                 } else if (isAnswered) {
-                  btnBg = '#10B981'; // Green: Answered
-                  btnColor = '#FFF';
+                  btnBg = '#059669'; // Green: Answered
+                  btnColor = '#fff';
                 }
 
                 return (
@@ -769,10 +1010,11 @@ export const StudentAttemptPage: React.FC = () => {
                       fontWeight: 800,
                       bgcolor: btnBg,
                       color: btnColor,
-                      border: isCurrent ? '2px solid #3B82F6' : '1px solid transparent',
+                      border: isCurrent ? '2px solid #2563eb' : '1px solid transparent',
+                      boxShadow: 'none',
                       '&:hover': {
                         bgcolor: btnBg,
-                        filter: 'brightness(1.15)',
+                        filter: 'brightness(0.95)',
                       },
                     }}
                   >
@@ -782,36 +1024,36 @@ export const StudentAttemptPage: React.FC = () => {
               })}
             </Box>
 
-            <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2, borderColor: '#e2e8f0' }} />
 
             {/* Legend & Stats */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#10B981' }} />
-                  <Typography variant="caption">Answered</Typography>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#059669' }} />
+                  <Typography variant="caption" color="text.secondary">Answered</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700}>
+                <Typography variant="caption" fontWeight={700} color="#0f172a">
                   {answeredCount}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#8B5CF6' }} />
-                  <Typography variant="caption">Marked for Review</Typography>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#7c3aed' }} />
+                  <Typography variant="caption" color="text.secondary">Marked for Review</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700}>
+                <Typography variant="caption" fontWeight={700} color="#0f172a">
                   {reviewCount}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.1)' }} />
-                  <Typography variant="caption">Unanswered</Typography>
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#cbd5e1' }} />
+                  <Typography variant="caption" color="text.secondary">Unanswered</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700}>
+                <Typography variant="caption" fontWeight={700} color="#0f172a">
                   {unansweredCount}
                 </Typography>
               </Box>
@@ -826,46 +1068,49 @@ export const StudentAttemptPage: React.FC = () => {
         onClose={() => !isSubmitting && setSubmitDialogOpen(false)}
         maxWidth="xs"
         fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2.5, bgcolor: '#ffffff' },
+        }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#0f172a', fontWeight: 800 }}>
           <WarningAmberIcon color="warning" /> Confirm Test Submission
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
+          <DialogContentText sx={{ mb: 2, color: 'text.secondary' }}>
             Are you sure you want to submit your assessment? You will not be able to modify your answers once submitted.
           </DialogContentText>
 
           {/* Submission Summary Table */}
-          <Paper variant="outlined" sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)' }}>
+          <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8fafc', borderColor: '#e2e8f0', borderRadius: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2" color="text.secondary">
                 Total Questions:
               </Typography>
-              <Typography variant="body2" fontWeight={700}>
+              <Typography variant="body2" fontWeight={700} color="#0f172a">
                 {questions.length}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="success.main">
+              <Typography variant="body2" sx={{ color: '#059669', fontWeight: 600 }}>
                 Answered:
               </Typography>
-              <Typography variant="body2" fontWeight={700} color="success.main">
+              <Typography variant="body2" fontWeight={700} sx={{ color: '#059669' }}>
                 {answeredCount}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="warning.main">
+              <Typography variant="body2" sx={{ color: '#d97706', fontWeight: 600 }}>
                 Unanswered:
               </Typography>
-              <Typography variant="body2" fontWeight={700} color="warning.main">
+              <Typography variant="body2" fontWeight={700} sx={{ color: '#d97706' }}>
                 {unansweredCount}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="body2" color="secondary.main">
+              <Typography variant="body2" sx={{ color: '#7c3aed', fontWeight: 600 }}>
                 Marked for Review:
               </Typography>
-              <Typography variant="body2" fontWeight={700} color="secondary.main">
+              <Typography variant="body2" fontWeight={700} sx={{ color: '#7c3aed' }}>
                 {reviewCount}
               </Typography>
             </Box>
@@ -880,9 +1125,63 @@ export const StudentAttemptPage: React.FC = () => {
             color="error"
             disabled={isSubmitting}
             onClick={handleConfirmSubmit}
-            startIcon={isSubmitting ? <CircularProgress size={16} /> : <CheckCircleOutlineIcon />}
+            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : <CheckCircleOutlineIcon />}
           >
             {isSubmitting ? 'Submitting...' : 'Yes, Submit Test'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Anti-Cheating: Security & Integrity Violation Warning Dialog */}
+      <Dialog
+        open={violationWarningOpen}
+        disableEscapeKeyDown
+        onClose={(_, reason) => {
+          if (reason === 'backdropClick') return;
+        }}
+        PaperProps={{
+          sx: {
+            p: 1.5,
+            borderRadius: 3,
+            border: '2px solid #ef4444',
+            maxWidth: 500,
+          },
+        }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: '#b91c1c', fontWeight: 800 }}>
+          <WarningAmberIcon sx={{ fontSize: 32 }} />
+          {lastViolationReason.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: '#0f172a', fontWeight: 500, mb: 2 }}>
+            {lastViolationReason.message}
+          </DialogContentText>
+          <Box sx={{ p: 2, bgcolor: '#fef2f2', borderRadius: 2, border: '1px solid #fecaca', mb: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#991b1b', fontWeight: 700 }}>
+                Total Recorded Violations:
+              </Typography>
+              <Chip
+                label={`${violationCount} Violation${violationCount === 1 ? '' : 's'}`}
+                size="small"
+                sx={{ bgcolor: '#dc2626', color: '#ffffff', fontWeight: 800, fontSize: '0.75rem' }}
+              />
+            </Box>
+            <Typography variant="caption" sx={{ color: '#7f1d1d', display: 'block', mt: 0.5 }}>
+              All integrity events are authoritatively logged on the server with timestamps for placement administration review.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
+            size="large"
+            onClick={enterFullscreen}
+            sx={{ fontWeight: 700 }}
+          >
+            {isFullscreen ? 'Acknowledge & Resume Assessment' : 'Re-enter Full-Screen & Resume'}
           </Button>
         </DialogActions>
       </Dialog>

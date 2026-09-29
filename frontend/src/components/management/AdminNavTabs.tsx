@@ -1,82 +1,69 @@
 import React from 'react';
-import { Box, Tabs, Tab } from '@mui/material';
+import { Box, Chip } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import BusinessIcon from '@mui/icons-material/Business';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import ClassIcon from '@mui/icons-material/Class';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import QuizIcon from '@mui/icons-material/Quiz';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import FactCheckIcon from '@mui/icons-material/FactCheck';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import DescriptionIcon from '@mui/icons-material/Description';
 
 export const AdminNavTabs: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navItems = [
-    { label: 'Overview', path: '/admin/dashboard', icon: <DashboardIcon fontSize="small" /> },
-    { label: 'Reports', path: '/admin/reports', icon: <DescriptionIcon fontSize="small" /> },
-    { label: 'Analytics', path: '/admin/analytics', icon: <BarChartIcon fontSize="small" /> },
-    { label: 'Results', path: '/admin/results', icon: <FactCheckIcon fontSize="small" /> },
-    { label: 'Assessments', path: '/admin/assessments', icon: <AssignmentIcon fontSize="small" /> },
-    { label: 'Questions', path: '/admin/questions', icon: <QuizIcon fontSize="small" /> },
-    { label: 'Students', path: '/admin/students', icon: <PeopleAltIcon fontSize="small" /> },
-    { label: 'College', path: '/admin/college', icon: <AccountBalanceIcon fontSize="small" /> },
-    { label: 'Departments', path: '/admin/departments', icon: <BusinessIcon fontSize="small" /> },
-    { label: 'Courses', path: '/admin/courses', icon: <MenuBookIcon fontSize="small" /> },
-    { label: 'Classes', path: '/admin/classes', icon: <ClassIcon fontSize="small" /> },
-    { label: 'Sections', path: '/admin/sections', icon: <ViewModuleIcon fontSize="small" /> },
+  // Secondary sub-navigation for Student & Institutional Structure
+  const structureSubNav = [
+    { label: 'Students Directory', path: '/admin/students' },
+    { label: 'Classes', path: '/admin/classes' },
+    { label: 'Sections', path: '/admin/sections' },
+    { label: 'Departments', path: '/admin/departments' },
+    { label: 'Courses', path: '/admin/courses' },
+    { label: 'College Profile', path: '/admin/college' },
   ];
 
-  const currentTab = navItems.findIndex((item) => location.pathname.startsWith(item.path));
+  const isStructureRoute = structureSubNav.some((item) => location.pathname.startsWith(item.path));
+
+  // Only render on institutional structure sub-routes to avoid duplicating the sidebar
+  if (!isStructureRoute) {
+    return null;
+  }
 
   return (
     <Box
       sx={{
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        mb: 4,
+        mb: 2.5,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        py: 0.5,
         overflowX: 'auto',
       }}
     >
-      <Tabs
-        value={currentTab !== -1 ? currentTab : 0}
-        variant="scrollable"
-        scrollButtons="auto"
-        textColor="primary"
-        indicatorColor="primary"
-        sx={{
-          '& .MuiTab-root': {
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-            minHeight: 48,
-            px: 2,
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 1,
-            alignItems: 'center',
-            color: 'text.secondary',
-            '&.Mui-selected': {
-              color: 'primary.light',
-            },
-          },
-        }}
-      >
-        {navItems.map((item) => (
-          <Tab
-            key={item.path}
-            icon={item.icon}
-            iconPosition="start"
-            label={item.label}
-            onClick={() => navigate(item.path)}
+      <Box sx={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, mr: 0.5, whiteSpace: 'nowrap' }}>
+        Organization:
+      </Box>
+      {structureSubNav.map((sub) => {
+        const isActive =
+          location.pathname === sub.path ||
+          (sub.path === '/admin/students' && location.pathname.startsWith('/admin/students'));
+        return (
+          <Chip
+            key={sub.path}
+            label={sub.label}
+            size="small"
+            clickable
+            onClick={() => navigate(sub.path)}
+            sx={{
+              fontWeight: isActive ? 600 : 500,
+              fontSize: '0.78rem',
+              backgroundColor: isActive ? '#0f3674' : '#ffffff',
+              color: isActive ? '#ffffff' : '#475569',
+              border: '1px solid',
+              borderColor: isActive ? '#0f3674' : '#cbd5e1',
+              borderRadius: '4px',
+              height: 26,
+              '&:hover': {
+                backgroundColor: isActive ? '#0a2550' : '#f1f5f9',
+              },
+            }}
           />
-        ))}
-      </Tabs>
+        );
+      })}
     </Box>
   );
 };

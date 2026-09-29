@@ -37,6 +37,7 @@ export const DepartmentsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [editingDept, setEditingDept] = useState<Department | null>(null);
   const [formData, setFormData] = useState({ collegeId: '', code: '', name: '' });
+  const [dialogError, setDialogError] = useState<string | null>(null);
 
   // Delete State
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
@@ -52,8 +53,8 @@ export const DepartmentsPage: React.FC = () => {
       ]);
       setDepartments(deptList);
       setColleges(collegeList);
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to load departments';
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to load departments';
       setError(msg);
     } finally {
       setLoading(false);
@@ -65,6 +66,7 @@ export const DepartmentsPage: React.FC = () => {
   }, []);
 
   const handleOpenDialog = (dept?: Department) => {
+    setDialogError(null);
     if (dept) {
       setEditingDept(dept);
       setFormData({
@@ -86,11 +88,13 @@ export const DepartmentsPage: React.FC = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingDept(null);
+    setDialogError(null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setDialogError(null);
     setError(null);
     try {
       if (editingDept) {
@@ -103,9 +107,9 @@ export const DepartmentsPage: React.FC = () => {
       }
       handleCloseDialog();
       fetchData();
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to save department';
-      setError(msg);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to save department';
+      setDialogError(msg);
     } finally {
       setSaving(false);
     }
@@ -114,13 +118,15 @@ export const DepartmentsPage: React.FC = () => {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
+    setError(null);
     try {
       await managementService.deleteDepartment(deleteTarget.id);
       setDeleteTarget(null);
       fetchData();
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to delete department';
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to delete department';
       setError(msg);
+      setDeleteTarget(null);
     } finally {
       setDeleting(false);
     }
@@ -281,18 +287,25 @@ export const DepartmentsPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: 2.5,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSave}>
-          <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700 }}>
+          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
             {editingDept ? 'Edit Department' : 'Create Academic Department'}
           </DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
-            {!editingDept && (
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2.5 }}>
+            {dialogError && (
+              <Alert severity="error" variant="outlined" onClose={() => setDialogError(null)}>
+                {dialogError}
+              </Alert>
+            )}
+
+            {!editingDept && colleges.length > 1 && (
               <TextField
                 select
                 label="Parent College"
@@ -310,22 +323,23 @@ export const DepartmentsPage: React.FC = () => {
             )}
 
             <TextField
-              label="Department Code"
-              required
-              fullWidth
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-              placeholder="e.g. CSE, ECE, MECH"
-              helperText="Unique code within the parent college"
-            />
-
-            <TextField
               label="Department Name"
               required
               fullWidth
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. Computer Science and Engineering"
+              placeholder="e.g. Computer Science, Commerce, Mathematics"
+              helperText="Full academic department name"
+            />
+
+            <TextField
+              label="Department Code"
+              required
+              fullWidth
+              value={formData.code}
+              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+              placeholder="e.g. CS, COM, MATH, ENG"
+              helperText="Unique abbreviation code for the department"
             />
           </DialogContent>
           <DialogActions sx={{ p: 2.5 }}>

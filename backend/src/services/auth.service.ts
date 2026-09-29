@@ -1,5 +1,5 @@
 import { UserRepository, userRepository } from '../repositories/user.repository.js';
-import { verifyPassword } from '../utils/password.util.js';
+import { verifyPassword, hashPassword } from '../utils/password.util.js';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -11,7 +11,10 @@ import {
   LogoutDto,
   AuthResponseData,
   CurrentUserDto,
+  ChangePasswordDto,
 } from '../types/auth.types.js';
+import { managementRepository } from '../repositories/management.repository.js';
+import { StudentStatus } from '@prisma/client';
 import { AppError } from '../middleware/errorHandler.js';
 
 export class AuthService {
@@ -21,7 +24,21 @@ export class AuthService {
    * Authenticates user credentials and issues Access + Refresh tokens
    */
   async login(dto: LoginDto): Promise<AuthResponseData> {
-    const user = await this.userRepo.findByEmail(dto.email);
+    const rawIdentifier = (dto as any).identifier || dto.email;
+    const identifier = typeof rawIdentifier === 'string' ? rawIdentifier.trim() : '';
+
+    let user = identifier.includes('@')
+      ? await this.userRepo.findByEmail(identifier)
+      : await this.userRepo.findByRegisterNumber(identifier);
+
+    // Fallback if not found initially
+    if (!user) {
+      if (identifier.includes('@')) {
+        user = await this.userRepo.findByRegisterNumber(identifier);
+      } else {
+        user = await this.userRepo.findByEmail(identifier);
+      }
+    }
 
     if (!user) {
       throw new AppError('Invalid email or password', 401);
@@ -36,11 +53,15 @@ export class AuthService {
       throw new AppError('Invalid email or password', 401);
     }
 
+    const userDto = this.userRepo.toDto(user);
+
     // Generate tokens
     const accessToken = generateAccessToken({
       sub: user.id,
       email: user.email,
       role: user.role,
+      studentId: user.student?.id,
+      mustChangePassword: userDto.mustChangePassword,
     });
 
     const refreshTokenString = generateRefreshToken();
@@ -49,7 +70,7 @@ export class AuthService {
     await this.userRepo.createRefreshToken(user.id, refreshTokenString, expiresAt);
 
     return {
-      user: this.userRepo.toDto(user),
+      user: userDto,
       accessToken,
       refreshToken: refreshTokenString,
     };
@@ -115,6 +136,43 @@ export class AuthService {
       throw new AppError('User not found', 404);
     }
     return this.userRepo.toDto(user);
+  }
+
+  /**
+   * Changes password for authenticated user and clears first-login required flag
+   */
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.userRepo.findById(userId);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const isCurrentValid = await verifyPassword(dto.currentPassword, user.passwordHash);
+    if (!isCurrentValid) {
+      throw new AppError('Incorrect current password', 400);
+    }
+
+    if (dto.newPassword === dto.currentPassword) {
+      throw new AppError('New password cannot be the same as current temporary password', 400);
+    }
+
+    // Password policy: min 8 chars, at least 1 uppercase, 1 lowercase, 1 digit, 1 special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!passwordRegex.test(dto.newPassword)) {
+      throw new AppError(
+        'Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters',
+        400
+      );
+    }
+
+    const newHash = await hashPassword(dto.newPassword);
+    await this.userRepo.updatePassword(userId, newHash);
+    await this.userRepo.setMustChangePassword(userId, false);
+
+    // If linked student exists and was INACTIVE, activate them
+    if (user.student?.id) {
+      await managementRepository.updateStudent(user.student.id, { status: StudentStatus.ACTIVE });
+    }
   }
 }
 

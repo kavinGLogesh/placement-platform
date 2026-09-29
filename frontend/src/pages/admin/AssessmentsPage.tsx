@@ -7,13 +7,17 @@ import {
   Tooltip,
   Chip,
   Grid,
-  Paper,
+  Card,
+  CardContent,
   Tabs,
   Tab,
   TextField,
   InputAdornment,
-  CircularProgress,
   Alert,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,18 +26,18 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import BusinessIcon from '@mui/icons-material/Business';
 import { DataTable, Column } from '../../components/management/DataTable.js';
 import { ConfirmDialog } from '../../components/management/ConfirmDialog.js';
 import { assessmentService } from '../../services/assessment.service.js';
+import { companyService } from '../../services/company.service.js';
 import {
   AssessmentDto,
   AssessmentStatus,
   AssessmentQueryFilters,
 } from '../../types/assessment.types.js';
+import { CompanyDto } from '../../types/company.types.js';
 
 export const AssessmentsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -49,8 +53,20 @@ export const AssessmentsPage: React.FC = () => {
   // Filters & Tabs
   const [search, setSearch] = useState('');
   const [statusTab, setStatusTab] = useState<AssessmentStatus | 'ALL'>('ALL');
+  const [companyFilter, setCompanyFilter] = useState<string>('ALL');
+  const [companies, setCompanies] = useState<CompanyDto[]>([]);
   const sortBy = 'createdAt';
   const sortOrder: 'asc' | 'desc' = 'desc';
+
+  // Load Companies for Filter
+  useEffect(() => {
+    companyService
+      .getCompanies({ limit: 100, isActive: true })
+      .then((res) => {
+        setCompanies(Array.isArray(res?.data) ? res.data : []);
+      })
+      .catch(() => setCompanies([]));
+  }, []);
 
   // Delete Dialog
   const [deleteTarget, setDeleteTarget] = useState<AssessmentDto | null>(null);
@@ -66,6 +82,12 @@ export const AssessmentsPage: React.FC = () => {
         limit: rowsPerPage,
         search: search.trim() || undefined,
         status: statusTab !== 'ALL' ? statusTab : undefined,
+        companyId:
+          companyFilter !== 'ALL' && companyFilter !== 'GENERAL'
+            ? companyFilter
+            : undefined,
+        isCompanyAssessment:
+          companyFilter === 'GENERAL' ? false : undefined,
         sortBy: sortBy as AssessmentQueryFilters['sortBy'],
         sortOrder,
       };
@@ -79,7 +101,7 @@ export const AssessmentsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, search, statusTab, sortBy, sortOrder]);
+  }, [page, rowsPerPage, search, statusTab, companyFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchAssessments();
@@ -106,40 +128,95 @@ export const AssessmentsPage: React.FC = () => {
   const scheduledCount = assessments.filter((a) => a.status === 'SCHEDULED').length;
   const draftCount = assessments.filter((a) => a.status === 'DRAFT').length;
 
-  const getStatusColor = (status: AssessmentStatus) => {
-    switch (status) {
-      case 'PUBLISHED':
-        return 'success';
-      case 'SCHEDULED':
-        return 'info';
-      case 'DRAFT':
-        return 'warning';
-      case 'ARCHIVED':
-        return 'default';
-      default:
-        return 'default';
+  const renderStatusChip = (status: AssessmentStatus) => {
+    let bg = '#f1f5f9';
+    let color = '#475569';
+    let border = '#cbd5e1';
+
+    if (status === 'PUBLISHED') {
+      bg = '#ecfdf5';
+      color = '#047857';
+      border = '#a7f3d0';
+    } else if (status === 'SCHEDULED') {
+      bg = '#eff6ff';
+      color = '#0369a1';
+      border = '#bfdbfe';
+    } else if (status === 'DRAFT') {
+      bg = '#fef3c7';
+      color = '#b45309';
+      border = '#fde68a';
     }
+
+    return (
+      <Chip
+        label={status}
+        size="small"
+        sx={{
+          fontWeight: 700,
+          fontSize: '0.7rem',
+          borderRadius: '4px',
+          backgroundColor: bg,
+          color,
+          border: `1px solid ${border}`,
+        }}
+      />
+    );
   };
 
   // Table Columns
   const columns: Column<AssessmentDto>[] = [
     {
       id: 'name',
-      label: 'Assessment',
+      label: 'Assessment Title',
+      minWidth: 260,
       render: (row) => (
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: '#f1f5f9' }}>
-            {row.name}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+              {row.name}
+            </Typography>
+            {row.company && (
+              <Chip
+                icon={<BusinessIcon sx={{ fontSize: '13px !important' }} />}
+                label={row.company.code}
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  backgroundColor: '#eff6ff',
+                  color: '#0f3674',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: '3px',
+                }}
+              />
+            )}
+            {row.isCompanyAssessment && !row.company && (
+              <Chip
+                icon={<BusinessIcon sx={{ fontSize: '13px !important' }} />}
+                label="Company Mock"
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  backgroundColor: '#eff6ff',
+                  color: '#0f3674',
+                  borderRadius: '3px',
+                }}
+              />
+            )}
+          </Box>
           {row.description && (
             <Typography
               variant="caption"
               sx={{
-                color: 'text.secondary',
+                color: '#64748b',
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
+                mt: 0.25,
               }}
             >
               {row.description}
@@ -151,22 +228,17 @@ export const AssessmentsPage: React.FC = () => {
     {
       id: 'status',
       label: 'Status',
-      render: (row) => (
-        <Chip
-          label={row.status}
-          size="small"
-          color={getStatusColor(row.status) as 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'}
-          sx={{ fontWeight: 700, fontSize: '0.72rem' }}
-        />
-      ),
+      minWidth: 120,
+      render: (row) => renderStatusChip(row.status),
     },
     {
       id: 'duration',
       label: 'Duration & Attempts',
+      minWidth: 140,
       render: (row) => (
         <Box>
-          <Typography variant="body2">{row.duration} mins</Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.duration} mins</Typography>
+          <Typography variant="caption" sx={{ color: '#64748b' }}>
             Max Attempts: {row.maximumAttempts}
           </Typography>
         </Box>
@@ -174,25 +246,34 @@ export const AssessmentsPage: React.FC = () => {
     },
     {
       id: 'numberOfPapers',
-      label: 'Papers / Sets',
+      label: 'Paper Sets',
+      minWidth: 110,
       render: (row) => (
         <Chip
-          label={`${row.numberOfPapers} ${row.numberOfPapers === 1 ? 'Paper' : 'Papers'}`}
+          label={`${row.numberOfPapers} ${row.numberOfPapers === 1 ? 'Paper Set' : 'Paper Sets'}`}
           size="small"
-          variant="outlined"
-          sx={{ color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.3)' }}
+          sx={{
+            fontSize: '0.72rem',
+            fontWeight: 600,
+            color: '#0369a1',
+            borderColor: '#bfdbfe',
+            backgroundColor: '#eff6ff',
+            borderRadius: '4px',
+            border: '1px solid #bfdbfe',
+          }}
         />
       ),
     },
     {
       id: 'totalQuestions',
-      label: 'Questions & Marks',
+      label: 'Questions & Pass Mark',
+      minWidth: 160,
       render: (row) => (
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
             {row.totalQuestions} Questions
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" sx={{ color: '#64748b' }}>
             Total: {row.totalMarks} Marks ({row.passingPercentage}% to pass)
           </Typography>
         </Box>
@@ -200,17 +281,18 @@ export const AssessmentsPage: React.FC = () => {
     },
     {
       id: 'schedule',
-      label: 'Schedule',
+      label: 'Schedule Window',
+      minWidth: 150,
       render: (row) => {
         if (!row.startDate && !row.endDate) {
-          return <Typography variant="caption" sx={{ color: 'text.secondary' }}>Unscheduled</Typography>;
+          return <Typography variant="caption" sx={{ color: '#94a3b8' }}>Unscheduled (Immediate)</Typography>;
         }
         return (
           <Box>
-            <Typography variant="caption" display="block">
+            <Typography variant="caption" display="block" sx={{ color: '#1e293b', fontWeight: 600 }}>
               {row.startDate ? new Date(row.startDate).toLocaleDateString() : 'Immediate'}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            <Typography variant="caption" sx={{ color: '#64748b' }}>
               to {row.endDate ? new Date(row.endDate).toLocaleDateString() : 'Indefinite'}
             </Typography>
           </Box>
@@ -221,15 +303,16 @@ export const AssessmentsPage: React.FC = () => {
       id: 'actions',
       label: 'Actions',
       align: 'right',
+      minWidth: 110,
       render: (row) => (
         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-          <Tooltip title="View & Manage Assessment">
+          <Tooltip title="View & Configure Assessment">
             <IconButton
               size="small"
               onClick={() => navigate(`/admin/assessments/${row.id}`)}
-              sx={{ color: 'primary.light' }}
+              sx={{ color: '#0f3674' }}
             >
-              <VisibilityIcon fontSize="small" />
+              <VisibilityIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete Assessment">
@@ -238,9 +321,9 @@ export const AssessmentsPage: React.FC = () => {
                 size="small"
                 onClick={() => setDeleteTarget(row)}
                 disabled={row.status === 'PUBLISHED'}
-                sx={{ color: 'error.main' }}
+                sx={{ color: '#dc2626' }}
               >
-                <DeleteOutlineIcon fontSize="small" />
+                <DeleteOutlineIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
           </Tooltip>
@@ -250,40 +333,31 @@ export const AssessmentsPage: React.FC = () => {
   ];
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
-      {/* Institutional Nav Tabs */}
-      <AdminNavTabs />
-
-      {/* Header Banner */}
+    <Box>
+      {/* Enterprise Header */}
       <Box
         sx={{
+          mb: 3,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
-          mb: 4,
         }}
       >
         <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Assessment Management & Engine
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
+            <AssignmentIcon sx={{ fontSize: 24, color: '#0f3674' }} />
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
+              Assessment Management & Engine
+            </Typography>
+          </Box>
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
             Configure multi-component placement evaluations, enforce monthly no-repeat rules, and generate deterministic test papers.
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', gap: 1.25 }}>
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
@@ -294,201 +368,188 @@ export const AssessmentsPage: React.FC = () => {
           </Button>
           <Button
             variant="contained"
+            color="primary"
             startIcon={<AddIcon />}
             onClick={() => navigate('/admin/assessments/create')}
-            sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)',
-            }}
           >
             Build Assessment
           </Button>
         </Box>
       </Box>
 
-      {/* Metric Cards */}
-      <Grid container spacing={2.5} sx={{ mb: 4 }}>
+      {/* Metric Summary Cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
+          <Card
+            elevation={0}
             sx={{
-              p: 2.5,
-              borderRadius: 2,
-              background: 'rgba(30, 41, 59, 0.6)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
+              p: 2,
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
             }}
           >
-            <Box
-              sx={{
-                p: 1.5,
-                borderRadius: 1.5,
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                color: '#38bdf8',
-              }}
-            >
-              <AssignmentIcon />
-            </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                Total Assessments
+            <CardContent sx={{ p: '0 !important' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                TOTAL ASSESSMENTS
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#f8fafc' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5, mb: 0.5 }}>
                 {totalCount}
               </Typography>
-            </Box>
-          </Paper>
+              <Typography variant="caption" sx={{ color: '#64748b' }}>
+                Configured across all tracks
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
+          <Card
+            elevation={0}
             sx={{
-              p: 2.5,
-              borderRadius: 2,
-              background: 'rgba(30, 41, 59, 0.6)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
+              p: 2,
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
             }}
           >
-            <Box
-              sx={{
-                p: 1.5,
-                borderRadius: 1.5,
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                color: '#22c55e',
-              }}
-            >
-              <CheckCircleIcon />
-            </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                Published Active
+            <CardContent sx={{ p: '0 !important' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                PUBLISHED & ACTIVE
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#f8fafc' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#047857', mt: 0.5, mb: 0.5 }}>
                 {publishedCount}
               </Typography>
-            </Box>
-          </Paper>
+              <Typography variant="caption" sx={{ color: '#047857', display: 'flex', alignItems: 'center' }}>
+                <CheckCircleOutlineIcon sx={{ fontSize: 13, mr: 0.5 }} /> Ready for student attempts
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
+          <Card
+            elevation={0}
             sx={{
-              p: 2.5,
-              borderRadius: 2,
-              background: 'rgba(30, 41, 59, 0.6)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
+              p: 2,
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
             }}
           >
-            <Box
-              sx={{
-                p: 1.5,
-                borderRadius: 1.5,
-                backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                color: '#0ea5e9',
-              }}
-            >
-              <ScheduleIcon />
-            </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                Scheduled
+            <CardContent sx={{ p: '0 !important' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                UPCOMING SCHEDULED
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#f8fafc' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#0369a1', mt: 0.5, mb: 0.5 }}>
                 {scheduledCount}
               </Typography>
-            </Box>
-          </Paper>
+              <Typography variant="caption" sx={{ color: '#64748b' }}>
+                Timed placement drives
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
+          <Card
+            elevation={0}
             sx={{
-              p: 2.5,
-              borderRadius: 2,
-              background: 'rgba(30, 41, 59, 0.6)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.07)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
+              p: 2,
+              borderRadius: '8px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff',
             }}
           >
-            <Box
-              sx={{
-                p: 1.5,
-                borderRadius: 1.5,
-                backgroundColor: 'rgba(234, 179, 8, 0.1)',
-                color: '#eab308',
-              }}
-            >
-              <EditNoteIcon />
-            </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                Draft In Progress
+            <CardContent sx={{ p: '0 !important' }}>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                DRAFTS IN PROGRESS
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#f8fafc' }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#b45309', mt: 0.5, mb: 0.5 }}>
                 {draftCount}
               </Typography>
-            </Box>
-          </Paper>
+              <Typography variant="caption" sx={{ color: '#64748b' }}>
+                Under section authoring
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
 
       {/* Error Alert */}
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mb: 2.5 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <Paper
+      <Box
         sx={{
           p: 2,
-          mb: 3,
-          borderRadius: 2,
-          background: 'rgba(30, 41, 59, 0.6)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.07)',
+          mb: 2.5,
+          borderRadius: '8px',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
         }}
       >
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={7}>
+          <Grid item xs={12} md={5}>
             <Tabs
               value={statusTab}
               onChange={(_, val) => {
                 setStatusTab(val);
                 setPage(0);
               }}
-              textColor="primary"
-              indicatorColor="primary"
               variant="scrollable"
               scrollButtons="auto"
+              sx={{
+                minHeight: 36,
+                '& .MuiTab-root': {
+                  minHeight: 36,
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  px: 1.5,
+                },
+              }}
             >
-              <Tab label="All Statuses" value="ALL" sx={{ textTransform: 'none', fontWeight: 600 }} />
-              <Tab label="Draft" value="DRAFT" sx={{ textTransform: 'none', fontWeight: 600 }} />
-              <Tab label="Scheduled" value="SCHEDULED" sx={{ textTransform: 'none', fontWeight: 600 }} />
-              <Tab label="Published" value="PUBLISHED" sx={{ textTransform: 'none', fontWeight: 600 }} />
-              <Tab label="Archived" value="ARCHIVED" sx={{ textTransform: 'none', fontWeight: 600 }} />
+              <Tab label="All Statuses" value="ALL" />
+              <Tab label="Draft" value="DRAFT" />
+              <Tab label="Scheduled" value="SCHEDULED" />
+              <Tab label="Published" value="PUBLISHED" />
+              <Tab label="Archived" value="ARCHIVED" />
             </Tabs>
           </Grid>
 
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} sm={6} md={3.5}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="company-filter-label">Recruiter Track</InputLabel>
+              <Select
+                labelId="company-filter-label"
+                value={companyFilter}
+                label="Recruiter Track"
+                onChange={(e) => {
+                  setCompanyFilter(e.target.value);
+                  setPage(0);
+                }}
+              >
+                <MenuItem value="ALL">All Tracks (General + Company)</MenuItem>
+                <MenuItem value="GENERAL">General Assessments Only</MenuItem>
+                {companies.map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.name} ({c.code})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={3.5}>
             <TextField
               fullWidth
               size="small"
-              placeholder="Search assessments by name..."
+              placeholder="Search assessments..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -497,45 +558,30 @@ export const AssessmentsPage: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+                    <SearchIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                   </InputAdornment>
                 ),
               }}
             />
           </Grid>
         </Grid>
-      </Paper>
+      </Box>
 
-      {/* Assessment Table */}
-      <Paper
-        sx={{
-          borderRadius: 2,
-          background: 'rgba(30, 41, 59, 0.6)',
-          backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.07)',
-          overflow: 'hidden',
+      {/* Assessment DataTable */}
+      <DataTable
+        columns={columns}
+        data={assessments}
+        totalCount={totalCount}
+        loading={loading}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(newPage) => setPage(newPage)}
+        onRowsPerPageChange={(newRows) => {
+          setRowsPerPage(newRows);
+          setPage(0);
         }}
-      >
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={assessments}
-            totalCount={totalCount}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(newPage) => setPage(newPage)}
-            onRowsPerPageChange={(newRows) => {
-              setRowsPerPage(newRows);
-              setPage(0);
-            }}
-            emptyMessage="No assessments found matching the configured criteria."
-          />
-        )}
-      </Paper>
+        emptyMessage="No assessments found matching the configured criteria."
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

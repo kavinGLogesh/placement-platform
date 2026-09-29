@@ -411,7 +411,15 @@ export class ManagementRepository {
 
   async findDepartmentById(id: string): Promise<DepartmentDto | null> {
     if (process.env.NODE_ENV === 'test') {
-      return this.mem.departments.get(id) || null;
+      const dept = this.mem.departments.get(id);
+      if (!dept) return null;
+      const coursesCount = Array.from(this.mem.courses.values()).filter((c) => c.departmentId === id).length;
+      const classesCount = Array.from(this.mem.classes.values()).filter((cl) => cl.departmentId === id).length;
+      const studentsCount = Array.from(this.mem.students.values()).filter((s) => s.departmentId === id).length;
+      return {
+        ...dept,
+        _count: { courses: coursesCount, classes: classesCount, students: studentsCount },
+      };
     }
 
     const item = await prisma.department.findUnique({
@@ -435,6 +443,25 @@ export class ManagementRepository {
 
     const item = await prisma.department.findFirst({
       where: { collegeId, code: upper },
+      include: {
+        college: { select: { id: true, code: true, name: true } },
+        _count: { select: { courses: true, classes: true, students: true } },
+      },
+    });
+    return (item as DepartmentDto) || null;
+  }
+
+  async findDepartmentByName(collegeId: string, name: string): Promise<DepartmentDto | null> {
+    const trimmed = name.trim().toLowerCase();
+    if (process.env.NODE_ENV === 'test') {
+      for (const d of this.mem.departments.values()) {
+        if (d.collegeId === collegeId && d.name.trim().toLowerCase() === trimmed) return d;
+      }
+      return null;
+    }
+
+    const item = await prisma.department.findFirst({
+      where: { collegeId, name: { equals: name.trim() } },
       include: {
         college: { select: { id: true, code: true, name: true } },
         _count: { select: { courses: true, classes: true, students: true } },
@@ -541,7 +568,14 @@ export class ManagementRepository {
 
   async findCourseById(id: string): Promise<CourseDto | null> {
     if (process.env.NODE_ENV === 'test') {
-      return this.mem.courses.get(id) || null;
+      const crs = this.mem.courses.get(id);
+      if (!crs) return null;
+      const classesCount = Array.from(this.mem.classes.values()).filter((cl) => cl.courseId === id).length;
+      const studentsCount = Array.from(this.mem.students.values()).filter((s) => s.courseId === id).length;
+      return {
+        ...crs,
+        _count: { classes: classesCount, students: studentsCount },
+      };
     }
 
     const item = await prisma.course.findUnique({
@@ -565,6 +599,25 @@ export class ManagementRepository {
 
     const item = await prisma.course.findFirst({
       where: { departmentId, code: upper },
+      include: {
+        department: { select: { id: true, code: true, name: true } },
+        _count: { select: { classes: true, students: true } },
+      },
+    });
+    return (item as CourseDto) || null;
+  }
+
+  async findCourseByName(departmentId: string, name: string): Promise<CourseDto | null> {
+    const trimmed = name.trim().toLowerCase();
+    if (process.env.NODE_ENV === 'test') {
+      for (const c of this.mem.courses.values()) {
+        if (c.departmentId === departmentId && c.name.trim().toLowerCase() === trimmed) return c;
+      }
+      return null;
+    }
+
+    const item = await prisma.course.findFirst({
+      where: { departmentId, name: { equals: name.trim() } },
       include: {
         department: { select: { id: true, code: true, name: true } },
         _count: { select: { classes: true, students: true } },
@@ -925,7 +978,7 @@ export class ManagementRepository {
 
     const record: StudentDto = {
       id,
-      userId: null,
+      userId: dto.userId || null,
       registerNumber: dto.registerNumber.trim().toUpperCase(),
       name: dto.name.trim(),
       collegeEmail: dto.collegeEmail.trim().toLowerCase(),
@@ -952,6 +1005,7 @@ export class ManagementRepository {
 
     const created = await prisma.student.create({
       data: {
+        userId: record.userId,
         registerNumber: record.registerNumber,
         name: record.name,
         collegeEmail: record.collegeEmail,
@@ -1232,6 +1286,7 @@ export class ManagementRepository {
       students.map((s) =>
         prisma.student.create({
           data: {
+            userId: s.userId || null,
             registerNumber: s.registerNumber.trim().toUpperCase(),
             name: s.name.trim(),
             collegeEmail: s.collegeEmail.trim().toLowerCase(),

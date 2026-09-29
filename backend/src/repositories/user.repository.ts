@@ -8,6 +8,7 @@ export interface UserRecord {
   passwordHash: string;
   role: Role;
   isActive: boolean;
+  mustChangePassword?: boolean;
   createdAt: Date;
   updatedAt: Date;
   student?: {
@@ -17,6 +18,7 @@ export interface UserRecord {
     department: string;
     batchYear: number;
     cgpa: number | null;
+    status?: string;
   } | null;
 }
 
@@ -49,6 +51,7 @@ class InMemoryUserStore {
       passwordHash: superAdminHash,
       role: Role.SUPER_ADMIN,
       isActive: true,
+      mustChangePassword: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -59,6 +62,7 @@ class InMemoryUserStore {
       passwordHash: placementAdminHash,
       role: Role.PLACEMENT_ADMIN,
       isActive: true,
+      mustChangePassword: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -69,6 +73,7 @@ class InMemoryUserStore {
       passwordHash: studentHash,
       role: Role.STUDENT,
       isActive: true,
+      mustChangePassword: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       student: {
@@ -78,12 +83,34 @@ class InMemoryUserStore {
         department: 'Computer Science & Engineering',
         batchYear: 2026,
         cgpa: 8.92,
+        status: 'ACTIVE',
+      },
+    };
+
+    const priyaUser: UserRecord = {
+      id: 'usr-student-002',
+      email: 'priya@placement.edu',
+      passwordHash: studentHash,
+      role: Role.STUDENT,
+      isActive: true,
+      mustChangePassword: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      student: {
+        id: 'stu-002',
+        userId: 'usr-student-002',
+        registerNumber: '2026CS102',
+        department: 'Computer Science & Engineering',
+        batchYear: 2026,
+        cgpa: 9.15,
+        status: 'ACTIVE',
       },
     };
 
     this.users.set(superAdmin.email.toLowerCase(), superAdmin);
     this.users.set(placementAdmin.email.toLowerCase(), placementAdmin);
     this.users.set(studentUser.email.toLowerCase(), studentUser);
+    this.users.set(priyaUser.email.toLowerCase(), priyaUser);
     this.initialized = true;
   }
 
@@ -91,11 +118,56 @@ class InMemoryUserStore {
     return this.users.get(email.toLowerCase()) || null;
   }
 
+  findByRegisterNumber(registerNumber: string): UserRecord | null {
+    const regUpper = registerNumber.trim().toUpperCase();
+    for (const u of this.users.values()) {
+      if (u.student?.registerNumber && u.student.registerNumber.toUpperCase() === regUpper) {
+        return u;
+      }
+    }
+    return null;
+  }
+
   findById(id: string): UserRecord | null {
     for (const u of this.users.values()) {
       if (u.id === id) return u;
     }
     return null;
+  }
+
+  createUser(user: UserRecord): void {
+    this.users.set(user.email.toLowerCase(), user);
+  }
+
+  updatePassword(userId: string, newPasswordHash: string): void {
+    for (const u of this.users.values()) {
+      if (u.id === userId) {
+        u.passwordHash = newPasswordHash;
+        u.mustChangePassword = false;
+        if (u.student) {
+          u.student.status = 'ACTIVE';
+        }
+        break;
+      }
+    }
+  }
+
+  setMustChangePassword(userId: string, mustChange: boolean): void {
+    for (const u of this.users.values()) {
+      if (u.id === userId) {
+        u.mustChangePassword = mustChange;
+        break;
+      }
+    }
+  }
+
+  deleteUser(userId: string): void {
+    for (const [email, u] of this.users.entries()) {
+      if (u.id === userId) {
+        this.users.delete(email);
+        break;
+      }
+    }
   }
 
   saveRefreshToken(record: RefreshTokenRecord): void {
@@ -115,7 +187,8 @@ class InMemoryUserStore {
 }
 
 export class UserRepository {
-  private memStore = new InMemoryUserStore();
+  public memStore = new InMemoryUserStore();
+  private mustChangeCache = new Map<string, boolean>();
 
   constructor() {
     // Proactively initialize memory store
@@ -131,7 +204,35 @@ export class UserRepository {
       where: { email: email.toLowerCase() },
       include: { student: true },
     });
-    return (user as unknown as UserRecord) || null;
+    if (!user) return null;
+    const record = user as unknown as UserRecord;
+    const isCached = this.mustChangeCache.get(user.id);
+    record.mustChangePassword = isCached !== undefined ? isCached : (record.student?.status === 'INACTIVE');
+    return record;
+  }
+
+  async findByRegisterNumber(registerNumber: string): Promise<UserRecord | null> {
+    if (process.env.NODE_ENV === 'test') {
+      await this.memStore.initialize();
+      return this.memStore.findByRegisterNumber(registerNumber);
+    }
+    const student = await prisma.student.findFirst({
+      where: {
+        registerNumber: {
+          equals: registerNumber.trim(),
+        },
+      },
+      include: {
+        user: {
+          include: { student: true },
+        },
+      },
+    });
+    if (!student || !student.user) return null;
+    const record = student.user as unknown as UserRecord;
+    const isCached = this.mustChangeCache.get(student.user.id);
+    record.mustChangePassword = isCached !== undefined ? isCached : (student.status === 'INACTIVE');
+    return record;
   }
 
   async findById(id: string): Promise<UserRecord | null> {
@@ -143,7 +244,83 @@ export class UserRepository {
       where: { id },
       include: { student: true },
     });
-    return (user as unknown as UserRecord) || null;
+    if (!user) return null;
+    const record = user as unknown as UserRecord;
+    const isCached = this.mustChangeCache.get(user.id);
+    record.mustChangePassword = isCached !== undefined ? isCached : (record.student?.status === 'INACTIVE');
+    return record;
+  }
+
+  async createUser(data: {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    role: Role;
+    isActive?: boolean;
+    mustChangePassword?: boolean;
+    student?: any;
+  }): Promise<UserRecord> {
+    const id = data.id || `usr-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const record: UserRecord = {
+      id,
+      email: data.email.toLowerCase(),
+      passwordHash: data.passwordHash,
+      role: data.role,
+      isActive: data.isActive ?? true,
+      mustChangePassword: data.mustChangePassword ?? (data.role === Role.STUDENT),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      student: data.student || null,
+    };
+
+    if (process.env.NODE_ENV === 'test') {
+      await this.memStore.initialize();
+      this.memStore.createUser(record);
+      return record;
+    }
+
+    const created = await prisma.user.create({
+      data: {
+        id: record.id,
+        email: record.email,
+        passwordHash: record.passwordHash,
+        role: record.role,
+        isActive: record.isActive,
+      },
+      include: { student: true },
+    });
+
+    this.mustChangeCache.set(created.id, record.mustChangePassword ?? true);
+    return { ...(created as unknown as UserRecord), mustChangePassword: record.mustChangePassword };
+  }
+
+  async updatePassword(userId: string, newPasswordHash: string): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      this.memStore.updatePassword(userId, newPasswordHash);
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newPasswordHash },
+    });
+    this.mustChangeCache.set(userId, false);
+  }
+
+  async setMustChangePassword(userId: string, mustChange: boolean): Promise<void> {
+    this.mustChangeCache.set(userId, mustChange);
+    if (process.env.NODE_ENV === 'test') {
+      this.memStore.setMustChangePassword(userId, mustChange);
+    }
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    this.mustChangeCache.delete(userId);
+    if (process.env.NODE_ENV === 'test') {
+      this.memStore.deleteUser(userId);
+      return;
+    }
+    await prisma.user.delete({ where: { id: userId } });
   }
 
   async createRefreshToken(userId: string, token: string, expiresAt: Date): Promise<RefreshTokenRecord> {
@@ -193,11 +370,13 @@ export class UserRepository {
   }
 
   toDto(user: UserRecord): CurrentUserDto {
+    const mustChange = user.mustChangePassword ?? (user.role === Role.STUDENT && user.student?.status === 'INACTIVE');
     return {
       id: user.id,
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      mustChangePassword: Boolean(mustChange),
       student: user.student
         ? {
             id: user.student.id,

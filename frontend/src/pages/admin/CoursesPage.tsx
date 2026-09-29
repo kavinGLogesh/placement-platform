@@ -40,7 +40,20 @@ export const CoursesPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [formData, setFormData] = useState({ departmentId: '', code: '', name: '', durationYears: 4 });
+  const [formData, setFormData] = useState<{
+    departmentId: string;
+    code: string;
+    name: string;
+    durationYears: number;
+    level: 'UG' | 'PG';
+  }>({
+    departmentId: '',
+    code: '',
+    name: '',
+    durationYears: 3,
+    level: 'UG',
+  });
+  const [dialogError, setDialogError] = useState<string | null>(null);
 
   // Delete State
   const [deleteTarget, setDeleteTarget] = useState<Course | null>(null);
@@ -56,8 +69,8 @@ export const CoursesPage: React.FC = () => {
       ]);
       setCourses(courseList);
       setDepartments(deptList);
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to load courses';
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to load courses';
       setError(msg);
     } finally {
       setLoading(false);
@@ -69,13 +82,16 @@ export const CoursesPage: React.FC = () => {
   }, [fetchData]);
 
   const handleOpenDialog = (course?: Course) => {
+    setDialogError(null);
     if (course) {
+      const isPG = course.durationYears <= 2 || course.name.toUpperCase().startsWith('M') || course.code.toUpperCase().startsWith('M');
       setEditingCourse(course);
       setFormData({
         departmentId: course.departmentId,
         code: course.code,
         name: course.name,
         durationYears: course.durationYears,
+        level: isPG ? 'PG' : 'UG',
       });
     } else {
       setEditingCourse(null);
@@ -83,7 +99,8 @@ export const CoursesPage: React.FC = () => {
         departmentId: selectedDeptFilter || departments[0]?.id || '',
         code: '',
         name: '',
-        durationYears: 4,
+        durationYears: 3,
+        level: 'UG',
       });
     }
     setDialogOpen(true);
@@ -92,11 +109,22 @@ export const CoursesPage: React.FC = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingCourse(null);
+    setDialogError(null);
+  };
+
+  const handleLevelChange = (newLevel: 'UG' | 'PG') => {
+    setFormData((prev) => ({
+      ...prev,
+      level: newLevel,
+      // Smart duration preset: UG defaults to 3 years, PG defaults to 2 years
+      durationYears: newLevel === 'UG' ? (prev.durationYears === 2 ? 3 : prev.durationYears) : (prev.durationYears === 3 ? 2 : prev.durationYears),
+    }));
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setDialogError(null);
     setError(null);
     try {
       if (editingCourse) {
@@ -107,15 +135,17 @@ export const CoursesPage: React.FC = () => {
         });
       } else {
         await managementService.createCourse({
-          ...formData,
+          departmentId: formData.departmentId,
+          code: formData.code,
+          name: formData.name,
           durationYears: Number(formData.durationYears),
         });
       }
       handleCloseDialog();
       fetchData();
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to save course';
-      setError(msg);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to save course';
+      setDialogError(msg);
     } finally {
       setSaving(false);
     }
@@ -124,13 +154,15 @@ export const CoursesPage: React.FC = () => {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
+    setError(null);
     try {
       await managementService.deleteCourse(deleteTarget.id);
       setDeleteTarget(null);
       fetchData();
-    } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Failed to delete course';
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to delete course';
       setError(msg);
+      setDeleteTarget(null);
     } finally {
       setDeleting(false);
     }
@@ -165,6 +197,23 @@ export const CoursesPage: React.FC = () => {
           {c.name}
         </Typography>
       ),
+    },
+    {
+      id: 'level',
+      label: 'Level',
+      minWidth: 90,
+      render: (c) => {
+        const isPG = c.durationYears <= 2 || c.name.toUpperCase().startsWith('M') || c.code.toUpperCase().startsWith('M');
+        return (
+          <Chip
+            label={isPG ? 'PG' : 'UG'}
+            size="small"
+            color={isPG ? 'secondary' : 'primary'}
+            variant="outlined"
+            sx={{ fontWeight: 700, borderRadius: 1.5 }}
+          />
+        );
+      },
     },
     {
       id: 'department',
@@ -301,25 +350,33 @@ export const CoursesPage: React.FC = () => {
         fullWidth
         PaperProps={{
           sx: {
-            backgroundColor: '#111827',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
             borderRadius: 2.5,
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSave}>
-          <DialogTitle sx={{ color: '#f9fafb', fontWeight: 700 }}>
+          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
             {editingCourse ? 'Edit Degree Course' : 'Add Degree Course'}
           </DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
-            {!editingCourse && (
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2.5 }}>
+            {dialogError && (
+              <Alert severity="error" variant="outlined" onClose={() => setDialogError(null)}>
+                {dialogError}
+              </Alert>
+            )}
+
+            {!editingCourse ? (
               <TextField
                 select
-                label="Parent Department"
+                label="Department"
                 required
                 fullWidth
                 value={formData.departmentId}
                 onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
+                helperText="Select the academic department this course belongs to"
               >
                 {departments.map((d) => (
                   <MenuItem key={d.id} value={d.id}>
@@ -327,17 +384,14 @@ export const CoursesPage: React.FC = () => {
                   </MenuItem>
                 ))}
               </TextField>
+            ) : (
+              <TextField
+                label="Department"
+                disabled
+                fullWidth
+                value={`${editingCourse.department?.code || ''} — ${editingCourse.department?.name || ''}`}
+              />
             )}
-
-            <TextField
-              label="Course Code"
-              required
-              fullWidth
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-              placeholder="e.g. BTECH-CSE, BE-ECE"
-              helperText="Unique code within the department"
-            />
 
             <TextField
               label="Course Name"
@@ -345,18 +399,49 @@ export const CoursesPage: React.FC = () => {
               fullWidth
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g. B.Tech Computer Science & Engineering"
+              placeholder="e.g. B.Sc Computer Science, M.Sc Computer Science, B.Com, BBA"
+              helperText="Full degree title (e.g., B.Sc Computer Science, M.Com)"
             />
 
             <TextField
-              label="Duration (Years)"
-              type="number"
+              label="Course Code"
               required
               fullWidth
-              inputProps={{ min: 1, max: 6 }}
-              value={formData.durationYears}
-              onChange={(e) => setFormData({ ...formData, durationYears: Number(e.target.value) })}
+              value={formData.code}
+              onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+              placeholder="e.g. BSC-CS, MSC-CS, BCOM, BBA"
+              helperText="Unique abbreviation code within the department"
             />
+
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <TextField
+                select
+                label="Course Level"
+                required
+                fullWidth
+                value={formData.level}
+                onChange={(e) => handleLevelChange(e.target.value as 'UG' | 'PG')}
+                helperText="Undergraduate (UG) or Postgraduate (PG)"
+              >
+                <MenuItem value="UG">UG (Undergraduate — 3 Years)</MenuItem>
+                <MenuItem value="PG">PG (Postgraduate — 2 Years)</MenuItem>
+              </TextField>
+
+              <TextField
+                label="Duration (Years)"
+                type="number"
+                required
+                fullWidth
+                inputProps={{ min: 1, max: 6 }}
+                value={formData.durationYears}
+                onChange={(e) => setFormData({ ...formData, durationYears: Number(e.target.value) })}
+                helperText="Standard degree duration in years"
+              />
+            </Box>
+
+            <Typography variant="caption" color="text.secondary">
+              Academic batch cohorts (e.g. 2026 Batch, Year 3) and class sections are organized under this degree course in the <b>Classes</b> tab.
+            </Typography>
           </DialogContent>
           <DialogActions sx={{ p: 2.5 }}>
             <Button onClick={handleCloseDialog} color="inherit">

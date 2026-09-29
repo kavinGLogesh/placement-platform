@@ -59,6 +59,25 @@ export class AuthController {
       next(error);
     }
   };
+
+  /**
+   * POST /api/auth/change-password
+   */
+  changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new AppError('Unauthorized', 401);
+      }
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        throw new AppError('Current password and new password are required', 400);
+      }
+      await this.service.changePassword(req.user.sub, { currentPassword, newPassword });
+      sendSuccess(res, 'Password changed successfully', null, 200);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export const authController = new AuthController();

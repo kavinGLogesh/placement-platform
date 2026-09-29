@@ -56,4 +56,15 @@ export const authService = {
     }
     return response.data.data.user;
   },
+
+  /**
+   * Changes password for authenticated user (required on first login)
+   */
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    await apiClient.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+  },
 };
+

@@ -14,12 +14,46 @@ export const createApp = (): Express => {
   app.use(helmet());
 
   // Cross-Origin Resource Sharing
+  const configuredOrigins = env.CORS_ORIGIN === '*'
+    ? '*'
+    : env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean);
+
+  const defaultAllowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+  ];
+
   app.use(
     cors({
-      origin: env.CORS_ORIGIN === '*' ? true : [env.CORS_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+      origin: (requestOrigin, callback) => {
+        // Allow requests with no origin (such as mobile apps, curl, server-to-server)
+        if (!requestOrigin) {
+          return callback(null, true);
+        }
+        if (configuredOrigins === '*') {
+          return callback(null, true);
+        }
+        if (Array.isArray(configuredOrigins) && configuredOrigins.includes(requestOrigin)) {
+          return callback(null, true);
+        }
+        if (defaultAllowedOrigins.includes(requestOrigin)) {
+          return callback(null, true);
+        }
+        // In non-production environments, allow any localhost/127.0.0.1 port (e.g., dynamic Vite ports)
+        if (env.NODE_ENV !== 'production') {
+          const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestOrigin);
+          if (isLocalhost) {
+            return callback(null, true);
+          }
+        }
+        return callback(null, false);
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Timestamp'],
+      exposedHeaders: ['Content-Disposition'],
     })
   );
 

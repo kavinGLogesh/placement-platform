@@ -5,6 +5,8 @@ import {
   AssessmentResultDto,
   AttemptStatus,
   SaveAnswerDto,
+  AttemptViolationDto,
+  AttemptViolationType,
 } from '../types/attempt.types.js';
 
 class InMemoryAttemptStore {
@@ -12,10 +14,12 @@ class InMemoryAttemptStore {
   public answers: Map<string, Map<string, AttemptAnswerDto>> = new Map(); // attemptId -> (questionId -> answer)
   public results: Map<string, AssessmentResultDto> = new Map(); // resultId -> result
   public attemptResults: Map<string, AssessmentResultDto> = new Map(); // attemptId -> result
+  public violations: Map<string, AttemptViolationDto[]> = new Map(); // attemptId -> violations list
 }
 
 export class AttemptRepository {
   public memStore = new InMemoryAttemptStore();
+  private violationsStore: Map<string, AttemptViolationDto[]> = new Map();
   private submitLocks = new Set<string>();
   private startLocks = new Set<string>();
 
@@ -145,13 +149,21 @@ export class AttemptRepository {
 
   async getAttemptById(attemptId: string): Promise<AssessmentAttemptDto | null> {
     if (process.env.NODE_ENV === 'test') {
-      return this.memStore.attempts.get(attemptId) || null;
+      const att = this.memStore.attempts.get(attemptId);
+      if (!att) return null;
+      const viols = this.memStore.violations.get(attemptId) || [];
+      return {
+        ...att,
+        violationCount: viols.length,
+        violations: viols,
+      };
     }
 
     const r = await prisma.assessmentAttempt.findUnique({
       where: { id: attemptId },
     });
     if (r) {
+      const viols = await this.getViolationsByAttempt(attemptId);
       return {
         id: r.id,
         studentId: r.studentId,
@@ -165,6 +177,8 @@ export class AttemptRepository {
         submittedAt: r.submittedAt,
         createdAt: r.createdAt,
         updatedAt: r.updatedAt,
+        violationCount: viols.length,
+        violations: viols,
       };
     }
     return null;
@@ -552,6 +566,56 @@ export class AttemptRepository {
       updatedAt: r.updatedAt,
     }));
   }
+
+  // ===========================================================================
+  // 6. ANTI-CHEATING INTEGRITY VIOLATIONS
+  // ===========================================================================
+  async recordViolation(
+    attemptId: string,
+    studentId: string,
+    violationType: AttemptViolationType,
+    details?: string
+  ): Promise<AttemptViolationDto> {
+    const store = process.env.NODE_ENV === 'test' ? this.memStore.violations : this.violationsStore;
+    const existing = store.get(attemptId) || [];
+
+    const now = new Date();
+    const nowTime = now.getTime();
+
+    // Deduplication / Anti-Spam:
+    // If the same violationType occurred within 1000ms, or any violation within 500ms, return existing
+    const recentDuplicate = existing.find((v) => {
+      const vTime = new Date(v.timestamp).getTime();
+      if (v.violationType === violationType && Math.abs(nowTime - vTime) < 1000) {
+        return true;
+      }
+      return false;
+    });
+
+    if (recentDuplicate) {
+      return recentDuplicate;
+    }
+
+    const violation: AttemptViolationDto = {
+      id: `viol-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      attemptId,
+      studentId,
+      violationType,
+      timestamp: now.toISOString(),
+      details: details ? details.substring(0, 255) : undefined,
+    };
+
+    existing.push(violation);
+    store.set(attemptId, existing);
+
+    return violation;
+  }
+
+  async getViolationsByAttempt(attemptId: string): Promise<AttemptViolationDto[]> {
+    const store = process.env.NODE_ENV === 'test' ? this.memStore.violations : this.violationsStore;
+    return store.get(attemptId) || [];
+  }
 }
 
 export const attemptRepository = new AttemptRepository();
+

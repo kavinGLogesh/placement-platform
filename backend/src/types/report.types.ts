@@ -363,3 +363,101 @@ export interface ExportDataPayload {
   columns: ExportColumnDef[];
   data: Record<string, any>[];
 }
+
+// -----------------------------------------------------------------------------
+// GD & INTERVIEW REPORT INTERFACES
+// -----------------------------------------------------------------------------
+
+export interface GdReportFilterQuery {
+  page?: number;
+  limit?: number;
+  departmentId?: string;
+  evaluatorId?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+}
+
+export interface GdReportRowDto {
+  roundId: string;
+  title: string;
+  topic: string;
+  scheduledDate: string;
+  studentName: string;
+  registerNumber: string;
+  departmentName: string;
+  attendance: string;
+  totalScore: number;
+  maxMarks: number;
+  percentage: number;
+  evaluatorName: string;
+  evaluatedAt: string;
+  comparisonText: string;
+}
+
+export interface GdPerformanceReportDto {
+  totalRounds: number;
+  totalParticipants: number;
+  totalEvaluated: number;
+  averageScorePercentage: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  summary: {
+    totalRounds: number;
+    totalParticipants: number;
+    totalEvaluated: number;
+    averageScorePercentage: number;
+    attendanceRate: number;
+  };
+  rows: GdReportRowDto[];
+}
+
+export interface InterviewReportFilterQuery {
+  page?: number;
+  limit?: number;
+  departmentId?: string;
+  interviewType?: string;
+  evaluatorId?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+}
+
+export interface InterviewReportRowDto {
+  roundId: string;
+  title: string;
+  interviewType: string;
+  scheduledDate: string;
+  studentName: string;
+  registerNumber: string;
+  departmentName: string;
+  attendance: string;
+  totalScore: number;
+  maxMarks: number;
+  percentage: number;
+  evaluatorName: string;
+  evaluatedAt: string;
+  comparisonText: string;
+}
+
+export interface InterviewPerformanceReportDto {
+  totalRounds: number;
+  totalParticipants: number;
+  totalEvaluated: number;
+  averageScorePercentage: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  summary: {
+    totalRounds: number;
+    totalParticipants: number;
+    totalEvaluated: number;
+    averageScorePercentage: number;
+    attendanceRate: number;
+  };
+  rows: InterviewReportRowDto[];
+}
+

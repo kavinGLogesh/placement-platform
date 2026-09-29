@@ -23,12 +23,19 @@ import {
   PlacementFunnelReportDto,
   StudentOwnPerformanceReportDto,
   ProficiencyRating,
+  GdReportFilterQuery,
+  GdReportRowDto,
+  GdPerformanceReportDto,
+  InterviewReportFilterQuery,
+  InterviewReportRowDto,
+  InterviewPerformanceReportDto,
 } from '../types/report.types.js';
 import { attemptRepository } from './attempt.repository.js';
 import { managementRepository } from './management.repository.js';
 import { assessmentRepository } from './assessment.repository.js';
 import { questionRepository } from './question.repository.js';
 import { codingRepository } from './coding.repository.js';
+import { evaluationRepository } from './evaluation.repository.js';
 
 export class ReportRepository {
   // ===========================================================================
@@ -1502,6 +1509,182 @@ export class ReportRepository {
           proficiencyRating: 'Strong',
         },
       ],
+    };
+  }
+
+  // ===========================================================================
+  // 8. GD PERFORMANCE REPORT
+  // ===========================================================================
+  async getGdPerformanceReport(
+    query: GdReportFilterQuery,
+    isExport: boolean = false
+  ): Promise<GdPerformanceReportDto> {
+    const rounds = await evaluationRepository.getGdRounds();
+    const allRows: GdReportRowDto[] = [];
+
+    for (const round of rounds) {
+      if (query.departmentId && round.departmentId !== query.departmentId) continue;
+      if (query.evaluatorId && round.evaluatorId !== query.evaluatorId) continue;
+      if (query.status && round.status !== query.status) continue;
+      if (query.startDate && new Date(round.scheduledDate) < new Date(query.startDate)) continue;
+      if (query.endDate && new Date(round.scheduledDate) > new Date(query.endDate)) continue;
+
+      for (const p of round.participants || []) {
+        if (query.search) {
+          const s = query.search.toLowerCase();
+          const match =
+            p.studentName.toLowerCase().includes(s) ||
+            p.registerNumber.toLowerCase().includes(s) ||
+            round.title.toLowerCase().includes(s) ||
+            round.topic.toLowerCase().includes(s);
+          if (!match) continue;
+        }
+
+        allRows.push({
+          roundId: round.id,
+          title: round.title,
+          topic: round.topic,
+          scheduledDate: new Date(round.scheduledDate).toLocaleDateString(),
+          studentName: p.studentName,
+          registerNumber: p.registerNumber,
+          departmentName: p.departmentName || round.departmentName || 'General',
+          attendance: p.attendance,
+          totalScore: p.evaluation?.totalScore || 0,
+          maxMarks: p.evaluation?.maxPossibleMarks || 100,
+          percentage: p.evaluation?.percentage || 0,
+          evaluatorName: p.evaluation?.evaluatorName || round.evaluatorName || 'Unassigned',
+          evaluatedAt: p.evaluation?.evaluatedAt
+            ? new Date(p.evaluation.evaluatedAt).toLocaleDateString()
+            : 'Pending',
+          comparisonText: p.evaluation?.comparison?.displayText || (p.evaluation ? 'Current Score: ' + p.evaluation.percentage + '%' : 'Pending Evaluation'),
+        });
+      }
+    }
+
+    const totalParticipants = allRows.length;
+    const evaluatedRows = allRows.filter((r) => r.attendance === 'PRESENT' && r.evaluatedAt !== 'Pending');
+    const totalEvaluated = evaluatedRows.length;
+    const avgScore =
+      totalEvaluated > 0
+        ? Math.round(
+            (evaluatedRows.reduce((sum, r) => sum + r.percentage, 0) / totalEvaluated) * 100
+          ) / 100
+        : 0;
+    const presentCount = allRows.filter((r) => r.attendance === 'PRESENT').length;
+    const attendanceRate =
+      totalParticipants > 0 ? Math.round((presentCount / totalParticipants) * 100 * 100) / 100 : 0;
+
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = isExport
+      ? Math.min(5000, Number(query.limit) || 1000)
+      : Math.min(100, Number(query.limit) || 10);
+    const totalPages = Math.ceil(totalParticipants / limit) || 1;
+    const paginated = isExport ? allRows : allRows.slice((page - 1) * limit, page * limit);
+
+    return {
+      totalRounds: rounds.length,
+      totalParticipants,
+      totalEvaluated,
+      averageScorePercentage: avgScore,
+      page,
+      limit,
+      totalPages,
+      summary: {
+        totalRounds: rounds.length,
+        totalParticipants,
+        totalEvaluated,
+        averageScorePercentage: avgScore,
+        attendanceRate,
+      },
+      rows: paginated,
+    };
+  }
+
+  // ===========================================================================
+  // 9. INTERVIEW PERFORMANCE REPORT
+  // ===========================================================================
+  async getInterviewPerformanceReport(
+    query: InterviewReportFilterQuery,
+    isExport: boolean = false
+  ): Promise<InterviewPerformanceReportDto> {
+    const rounds = await evaluationRepository.getInterviewRounds();
+    const allRows: InterviewReportRowDto[] = [];
+
+    for (const round of rounds) {
+      if (query.departmentId && round.departmentId !== query.departmentId) continue;
+      if (query.interviewType && round.interviewType !== query.interviewType) continue;
+      if (query.evaluatorId && round.evaluatorId !== query.evaluatorId) continue;
+      if (query.status && round.status !== query.status) continue;
+      if (query.startDate && new Date(round.scheduledDate) < new Date(query.startDate)) continue;
+      if (query.endDate && new Date(round.scheduledDate) > new Date(query.endDate)) continue;
+
+      for (const p of round.participants || []) {
+        if (query.search) {
+          const s = query.search.toLowerCase();
+          const match =
+            p.studentName.toLowerCase().includes(s) ||
+            p.registerNumber.toLowerCase().includes(s) ||
+            round.title.toLowerCase().includes(s);
+          if (!match) continue;
+        }
+
+        allRows.push({
+          roundId: round.id,
+          title: round.title,
+          interviewType: round.interviewType,
+          scheduledDate: new Date(round.scheduledDate).toLocaleDateString(),
+          studentName: p.studentName,
+          registerNumber: p.registerNumber,
+          departmentName: p.departmentName || round.departmentName || 'General',
+          attendance: p.attendance,
+          totalScore: p.evaluation?.totalScore || 0,
+          maxMarks: p.evaluation?.maxPossibleMarks || 100,
+          percentage: p.evaluation?.percentage || 0,
+          evaluatorName: p.evaluation?.evaluatorName || round.evaluatorName || 'Unassigned',
+          evaluatedAt: p.evaluation?.evaluatedAt
+            ? new Date(p.evaluation.evaluatedAt).toLocaleDateString()
+            : 'Pending',
+          comparisonText: p.evaluation?.comparison?.displayText || (p.evaluation ? 'Current Score: ' + p.evaluation.percentage + '%' : 'Pending Evaluation'),
+        });
+      }
+    }
+
+    const totalParticipants = allRows.length;
+    const evaluatedRows = allRows.filter((r) => r.attendance === 'PRESENT' && r.evaluatedAt !== 'Pending');
+    const totalEvaluated = evaluatedRows.length;
+    const avgScore =
+      totalEvaluated > 0
+        ? Math.round(
+            (evaluatedRows.reduce((sum, r) => sum + r.percentage, 0) / totalEvaluated) * 100
+          ) / 100
+        : 0;
+    const presentCount = allRows.filter((r) => r.attendance === 'PRESENT').length;
+    const attendanceRate =
+      totalParticipants > 0 ? Math.round((presentCount / totalParticipants) * 100 * 100) / 100 : 0;
+
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = isExport
+      ? Math.min(5000, Number(query.limit) || 1000)
+      : Math.min(100, Number(query.limit) || 10);
+    const totalPages = Math.ceil(totalParticipants / limit) || 1;
+    const paginated = isExport ? allRows : allRows.slice((page - 1) * limit, page * limit);
+
+    return {
+      totalRounds: rounds.length,
+      totalParticipants,
+      totalEvaluated,
+      averageScorePercentage: avgScore,
+      page,
+      limit,
+      totalPages,
+      summary: {
+        totalRounds: rounds.length,
+        totalParticipants,
+        totalEvaluated,
+        averageScorePercentage: avgScore,
+        attendanceRate,
+      },
+      rows: paginated,
     };
   }
 }

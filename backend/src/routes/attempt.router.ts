@@ -11,4 +11,6 @@ attemptRouter.use(requireRole(Role.STUDENT));
 
 attemptRouter.get('/:attemptId', attemptController.getAttempt);
 attemptRouter.post('/:attemptId/answers', attemptController.saveAnswer);
+attemptRouter.post('/:attemptId/violations', attemptController.recordViolation);
+attemptRouter.get('/:attemptId/violations', attemptController.getViolations);
 attemptRouter.post('/:attemptId/submit', attemptController.submitAttempt);

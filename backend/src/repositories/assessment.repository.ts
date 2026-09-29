@@ -14,6 +14,7 @@ import {
 import { PaginatedResult } from '../types/management.types.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { questionRepository } from './question.repository.js';
+import { companyRepository } from './company.repository.js';
 
 // =============================================================================
 // In-Memory Fallback Store (for 100% test & offline repeatability)
@@ -35,6 +36,7 @@ export class AssessmentRepository {
   public memStore = new InMemoryAssessmentStore();
   // In-process generation mutex to protect concurrent generation for same assessment
   private generationLocks = new Set<string>();
+  private assessmentTargetMap = new Map<string, { departmentTargeting: 'ALL' | 'SPECIFIC'; departmentIds: string[] }>();
 
   constructor() {
     if (process.env.NODE_ENV === 'test') {
@@ -84,8 +86,33 @@ export class AssessmentRepository {
       updatedAt: now,
     }));
 
+    const targeting = payload.departmentTargeting || 'ALL';
+    const deptIds = payload.departmentIds || [];
+
+    if (targeting === 'SPECIFIC' && deptIds.length > 0 && process.env.NODE_ENV !== 'test') {
+      const foundCount = await prisma.department.count({
+        where: { id: { in: deptIds } },
+      });
+      if (foundCount !== deptIds.length) {
+        throw new AppError('One or more selected departments do not exist', 400);
+      }
+    }
+
+    this.assessmentTargetMap.set(id, { departmentTargeting: targeting, departmentIds: deptIds });
+
+    const isCompany = payload.isCompanyAssessment !== undefined ? Boolean(payload.isCompanyAssessment) : Boolean(payload.companyId);
+    let compInfo: { id: string; name: string; code: string; logoUrl?: string | null } | null = null;
+    if (payload.companyId) {
+      const c = await companyRepository.getCompanyById(payload.companyId);
+      if (c) {
+        compInfo = { id: c.id, name: c.name, code: c.code, logoUrl: c.logoUrl || null };
+      }
+    }
+
     const memoryItem: AssessmentDto = {
       id,
+      companyId: payload.companyId || null,
+      isCompanyAssessment: isCompany,
       name: payload.name,
       description: payload.description || null,
       duration: payload.duration,
@@ -103,9 +130,12 @@ export class AssessmentRepository {
       createdById: createdById || null,
       createdAt: now,
       updatedAt: now,
+      company: compInfo,
       sections: sectionsDto,
       papersCount: 0,
       assignmentsCount: 0,
+      departmentTargeting: targeting,
+      departmentIds: deptIds,
     };
 
     if (process.env.NODE_ENV === 'test') {
@@ -118,6 +148,8 @@ export class AssessmentRepository {
     const created = await prisma.assessment.create({
       data: {
         id,
+        companyId: payload.companyId || undefined,
+        isCompanyAssessment: isCompany,
         name: payload.name,
         description: payload.description || null,
         duration: payload.duration,
@@ -151,11 +183,14 @@ export class AssessmentRepository {
       },
       include: {
         sections: { orderBy: { sectionOrder: 'asc' } },
+        company: { select: { id: true, name: true, code: true, logoUrl: true } },
       },
     });
 
     const result: AssessmentDto = {
       id: created.id,
+      companyId: created.companyId,
+      isCompanyAssessment: created.isCompanyAssessment,
       name: created.name,
       description: created.description,
       duration: created.duration,
@@ -173,6 +208,7 @@ export class AssessmentRepository {
       createdById: created.createdById,
       createdAt: created.createdAt,
       updatedAt: created.updatedAt,
+      company: created.company,
       sections: created.sections.map((s) => ({
         id: s.id,
         assessmentId: s.assessmentId,
@@ -208,6 +244,12 @@ export class AssessmentRepository {
       await this.memStore.initialize();
       let list = Array.from(this.memStore.assessments.values());
 
+      if (filters.companyId) {
+        list = list.filter((a) => a.companyId === filters.companyId);
+      }
+      if (filters.isCompanyAssessment !== undefined) {
+        list = list.filter((a) => Boolean(a.isCompanyAssessment) === filters.isCompanyAssessment);
+      }
       if (filters.status) {
         list = list.filter((a) => a.status === filters.status);
       }
@@ -255,6 +297,8 @@ export class AssessmentRepository {
     }
 
     const whereClause: Record<string, unknown> = {};
+    if (filters.companyId) whereClause.companyId = filters.companyId;
+    if (filters.isCompanyAssessment !== undefined) whereClause.isCompanyAssessment = filters.isCompanyAssessment;
     if (filters.status) whereClause.status = filters.status;
     if (filters.search) {
       whereClause.name = { contains: filters.search };
@@ -273,6 +317,7 @@ export class AssessmentRepository {
         orderBy,
         include: {
           sections: { orderBy: { sectionOrder: 'asc' } },
+          company: { select: { id: true, name: true, code: true, logoUrl: true } },
           _count: { select: { papers: true, assignments: true } },
         },
       }),
@@ -280,8 +325,10 @@ export class AssessmentRepository {
 
     const totalPages = Math.ceil(totalCount / limit) || 1;
 
-    const data: AssessmentDto[] = items.map((a) => ({
+    const data: AssessmentDto[] = items.map((a: any) => ({
       id: a.id,
+      companyId: a.companyId,
+      isCompanyAssessment: a.isCompanyAssessment,
       name: a.name,
       description: a.description,
       duration: a.duration,
@@ -299,7 +346,8 @@ export class AssessmentRepository {
       createdById: a.createdById,
       createdAt: a.createdAt,
       updatedAt: a.updatedAt,
-      sections: a.sections.map((s) => ({
+      company: a.company,
+      sections: a.sections.map((s: any) => ({
         id: s.id,
         assessmentId: s.assessmentId,
         component: s.component,
@@ -345,6 +393,7 @@ export class AssessmentRepository {
       where: { id },
       include: {
         sections: { orderBy: { sectionOrder: 'asc' } },
+        company: { select: { id: true, name: true, code: true, logoUrl: true } },
         _count: { select: { papers: true, assignments: true } },
       },
     });
@@ -355,6 +404,8 @@ export class AssessmentRepository {
 
     const result: AssessmentDto = {
       id: a.id,
+      companyId: a.companyId,
+      isCompanyAssessment: a.isCompanyAssessment,
       name: a.name,
       description: a.description,
       duration: a.duration,
@@ -372,6 +423,7 @@ export class AssessmentRepository {
       createdById: a.createdById,
       createdAt: a.createdAt,
       updatedAt: a.updatedAt,
+      company: a.company,
       sections: a.sections.map((s) => ({
         id: s.id,
         assessmentId: s.assessmentId,
@@ -392,6 +444,12 @@ export class AssessmentRepository {
       assignmentsCount: a._count.assignments,
     };
 
+    const targetInfo = this.assessmentTargetMap.get(id);
+    if (targetInfo) {
+      result.departmentTargeting = targetInfo.departmentTargeting;
+      result.departmentIds = targetInfo.departmentIds;
+    }
+
     return result;
   }
 
@@ -410,6 +468,8 @@ export class AssessmentRepository {
 
     const updatedData: Partial<AssessmentDto> = {
       ...existing,
+      companyId: payload.companyId !== undefined ? payload.companyId : existing.companyId,
+      isCompanyAssessment: payload.isCompanyAssessment !== undefined ? payload.isCompanyAssessment : (payload.companyId ? true : existing.isCompanyAssessment),
       name: payload.name ?? existing.name,
       description: payload.description !== undefined ? payload.description : existing.description,
       duration: payload.duration ?? existing.duration,
@@ -458,6 +518,8 @@ export class AssessmentRepository {
     }
 
     const updatePayload: Record<string, unknown> = {
+      companyId: payload.companyId !== undefined ? payload.companyId : undefined,
+      isCompanyAssessment: payload.isCompanyAssessment !== undefined ? payload.isCompanyAssessment : (payload.companyId ? true : undefined),
       name: updatedData.name,
       description: updatedData.description,
       duration: updatedData.duration,

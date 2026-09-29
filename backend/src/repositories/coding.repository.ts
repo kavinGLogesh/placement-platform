@@ -266,6 +266,53 @@ export class CodingRepository {
     return row || null;
   }
 
+  public async getLatestSubmissionsForAttempt(
+    attemptId: string
+  ): Promise<Map<string, CodingSubmission>> {
+    const map = new Map<string, CodingSubmission>();
+    if (process.env.NODE_ENV === 'test') {
+      for (const [aqKey, subIds] of this.memStore.attemptQuestionSubmissions.entries()) {
+        if (aqKey.startsWith(`${attemptId}:`) && subIds.length > 0) {
+          const questionId = aqKey.substring(attemptId.length + 1);
+          // Look for SUBMIT first
+          let chosenSub: CodingSubmission | null = null;
+          for (const sid of subIds) {
+            const sub = this.memStore.submissions.get(sid);
+            if (sub && sub.submissionType === 'SUBMIT') {
+              chosenSub = sub;
+              break;
+            }
+          }
+          if (!chosenSub && subIds.length > 0) {
+            chosenSub = this.memStore.submissions.get(subIds[0]) || null;
+          }
+          if (chosenSub) {
+            map.set(questionId, chosenSub);
+          }
+        }
+      }
+      return map;
+    }
+
+    const rows = await prisma.codingSubmission.findMany({
+      where: { attemptId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    for (const r of rows) {
+      // Prioritize SUBMIT if available
+      if (!map.has(r.questionId)) {
+        map.set(r.questionId, r);
+      } else {
+        const existing = map.get(r.questionId)!;
+        if (existing.submissionType !== 'SUBMIT' && r.submissionType === 'SUBMIT') {
+          map.set(r.questionId, r);
+        }
+      }
+    }
+    return map;
+  }
+
   public async getSubmissionById(
     submissionId: string
   ): Promise<{ submission: CodingSubmission; results: CodingExecutionResult[] } | null> {
