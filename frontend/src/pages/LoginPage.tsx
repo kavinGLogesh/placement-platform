@@ -117,13 +117,13 @@ export const LoginPage: React.FC = () => {
               width: 48,
               height: 48,
               borderRadius: 2,
-              bgcolor: '#0f3674',
+              bgcolor: '#0F2744',
               color: '#ffffff',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               mb: 1.5,
-              boxShadow: '0 2px 4px rgba(15, 54, 116, 0.2)',
+              boxShadow: '0 2px 4px rgba(15, 39, 68, 0.2)',
             }}
           >
             <SchoolIcon sx={{ fontSize: 26 }} />
@@ -155,7 +155,7 @@ export const LoginPage: React.FC = () => {
           }}
         >
           {/* Card Top Border Accent */}
-          <Box sx={{ height: 3, bgcolor: '#0f3674', width: '100%' }} />
+          <Box sx={{ height: 3, bgcolor: '#0F2744', width: '100%' }} />
 
           <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Box sx={{ mb: 3 }}>
@@ -190,11 +190,11 @@ export const LoginPage: React.FC = () => {
                   fontWeight: activeRole === 'STUDENT' ? 700 : 500,
                   fontSize: '0.8rem',
                   py: 0.75,
-                  bgcolor: activeRole === 'STUDENT' ? '#0f3674' : 'transparent',
+                  bgcolor: activeRole === 'STUDENT' ? '#0F2744' : 'transparent',
                   color: activeRole === 'STUDENT' ? '#ffffff' : '#475569',
                   boxShadow: 'none',
                   '&:hover': {
-                    bgcolor: activeRole === 'STUDENT' ? '#0a2550' : '#e2e8f0',
+                    bgcolor: activeRole === 'STUDENT' ? '#0A1C30' : '#e2e8f0',
                   },
                 }}
               >
@@ -211,11 +211,11 @@ export const LoginPage: React.FC = () => {
                   fontWeight: activeRole === 'PLACEMENT_ADMIN' ? 700 : 500,
                   fontSize: '0.8rem',
                   py: 0.75,
-                  bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0f3674' : 'transparent',
+                  bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0F2744' : 'transparent',
                   color: activeRole === 'PLACEMENT_ADMIN' ? '#ffffff' : '#475569',
                   boxShadow: 'none',
                   '&:hover': {
-                    bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0a2550' : '#e2e8f0',
+                    bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0A1C30' : '#e2e8f0',
                   },
                 }}
               >
@@ -232,11 +232,11 @@ export const LoginPage: React.FC = () => {
                   fontWeight: activeRole === 'SUPER_ADMIN' ? 700 : 500,
                   fontSize: '0.8rem',
                   py: 0.75,
-                  bgcolor: activeRole === 'SUPER_ADMIN' ? '#0f3674' : 'transparent',
+                  bgcolor: activeRole === 'SUPER_ADMIN' ? '#0F2744' : 'transparent',
                   color: activeRole === 'SUPER_ADMIN' ? '#ffffff' : '#475569',
                   boxShadow: 'none',
                   '&:hover': {
-                    bgcolor: activeRole === 'SUPER_ADMIN' ? '#0a2550' : '#e2e8f0',
+                    bgcolor: activeRole === 'SUPER_ADMIN' ? '#0A1C30' : '#e2e8f0',
                   },
                 }}
               >
@@ -330,7 +330,7 @@ export const LoginPage: React.FC = () => {
                       minWidth: 'auto',
                       fontSize: '0.75rem',
                       fontWeight: 500,
-                      color: '#0f3674',
+                      color: '#0F2744',
                       textTransform: 'none',
                     }}
                   >
@@ -391,7 +391,7 @@ export const LoginPage: React.FC = () => {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                       size="small"
-                      sx={{ color: '#94a3b8', '&.Mui-checked': { color: '#0f3674' } }}
+                      sx={{ color: '#94a3b8', '&.Mui-checked': { color: '#0F2744' } }}
                     />
                   }
                   label={
@@ -409,11 +409,11 @@ export const LoginPage: React.FC = () => {
                 disabled={isSubmitting}
                 sx={{
                   height: 42,
-                  bgcolor: '#0f3674',
+                  bgcolor: '#0F2744',
                   fontWeight: 600,
                   fontSize: '0.875rem',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: '#0a2550' },
+                  '&:hover': { bgcolor: '#0A1C30' },
                 }}
               >
                 {isSubmitting ? (

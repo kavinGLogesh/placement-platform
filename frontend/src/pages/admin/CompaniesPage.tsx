@@ -332,9 +332,9 @@ export const CompaniesPage: React.FC = () => {
             size="small"
             sx={{
               fontWeight: 700,
-              backgroundColor: '#eff6ff',
-              color: '#0f3674',
-              border: '1px solid #bfdbfe',
+              backgroundColor: '#F0F4F9',
+              color: '#0F2744',
+              border: '1px solid #CBD5E1',
               borderRadius: '4px',
               fontSize: '0.78rem',
               letterSpacing: '0.04em',
@@ -566,7 +566,7 @@ export const CompaniesPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
-            <BusinessIcon sx={{ fontSize: 24, color: '#0f3674' }} />
+            <BusinessIcon sx={{ fontSize: 24, color: '#0F2744' }} />
             <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
               Company Question Intelligence & Assessment Tracks
             </Typography>
@@ -593,8 +593,8 @@ export const CompaniesPage: React.FC = () => {
             onClick={() => handleOpenDialog()}
             sx={{
               fontWeight: 600,
-              backgroundColor: '#0f3674',
-              '&:hover': { backgroundColor: '#0c2b5e' },
+              backgroundColor: '#0F2744',
+              '&:hover': { backgroundColor: '#0A1C30' },
             }}
           >
             Add Company
@@ -620,20 +620,19 @@ export const CompaniesPage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 2,
+              p: 2.25,
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: 2,
-              borderLeft: '4px solid #0f3674',
+              borderRadius: '8px',
             }}
           >
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
               REGISTERED RECRUITERS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
               {totalCount}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+            <Typography variant="caption" sx={{ color: '#15803D', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
               <CheckCircleOutlineIcon sx={{ fontSize: 13 }} />
               {activeCompaniesCount} active corporate tracks
             </Typography>
@@ -644,17 +643,16 @@ export const CompaniesPage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 2,
+              p: 2.25,
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: 2,
-              borderLeft: '4px solid #0284c7',
+              borderRadius: '8px',
             }}
           >
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
               ACTIVE PREPARATION TRACKS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F2744', mt: 0.5 }}>
               {activeCompaniesCount}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
@@ -667,17 +665,16 @@ export const CompaniesPage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 2,
+              p: 2.25,
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: 2,
-              borderLeft: '4px solid #10b981',
+              borderRadius: '8px',
             }}
           >
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
               CONFIGURED ASSESSMENTS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
               {totalAssessments}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
@@ -690,17 +687,16 @@ export const CompaniesPage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 2,
+              p: 2.25,
               backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
-              borderRadius: 2,
-              borderLeft: '4px solid #8b5cf6',
+              borderRadius: '8px',
             }}
           >
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
               QUESTION BANK ITEMS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
               {totalQuestions}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
@@ -722,9 +718,9 @@ export const CompaniesPage: React.FC = () => {
               fontSize: '0.88rem',
               color: '#64748b',
               minHeight: 44,
-              '&.Mui-selected': { color: '#0f3674' },
+              '&.Mui-selected': { color: '#0F2744' },
             },
-            '& .MuiTabs-indicator': { backgroundColor: '#0f3674', height: 2 },
+            '& .MuiTabs-indicator': { backgroundColor: '#0F2744', height: 2 },
           }}
         >
           <Tab
@@ -776,12 +772,12 @@ export const CompaniesPage: React.FC = () => {
                     size="small"
                     sx={{
                       fontWeight: 600,
-                      borderColor: alreadyExists ? '#e2e8f0' : '#bfdbfe',
-                      color: alreadyExists ? '#94a3b8' : '#0f3674',
-                      backgroundColor: alreadyExists ? '#f8fafc' : '#eff6ff',
+                      borderColor: alreadyExists ? '#e2e8f0' : '#CBD5E1',
+                      color: alreadyExists ? '#94a3b8' : '#0F2744',
+                      backgroundColor: alreadyExists ? '#f8fafc' : '#F0F4F9',
                       cursor: alreadyExists ? 'default' : 'pointer',
                       '&:hover': {
-                        backgroundColor: alreadyExists ? '#f8fafc' : '#dbeafe',
+                        backgroundColor: alreadyExists ? '#f8fafc' : '#E2EAF4',
                       },
                     }}
                   />
@@ -905,7 +901,7 @@ export const CompaniesPage: React.FC = () => {
                       width: 28,
                       height: 28,
                       borderRadius: '50%',
-                      backgroundColor: '#0f3674',
+                      backgroundColor: '#0F2744',
                       color: '#ffffff',
                       display: 'flex',
                       alignItems: 'center',
@@ -933,11 +929,20 @@ export const CompaniesPage: React.FC = () => {
 
       {/* Add / Edit Company Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ backgroundColor: '#0f172a', color: '#ffffff', py: 2 }}>
-          <Typography variant="h6" fontWeight={700}>
+        <DialogTitle
+          sx={{
+            color: '#0f172a',
+            fontWeight: 700,
+            borderBottom: '1px solid #e2e8f0',
+            py: 2,
+            px: 3,
+            bgcolor: '#ffffff',
+          }}
+        >
+          <Typography variant="h6" fontWeight={700} color="#0f172a">
             {editingCompany ? `Edit Company — ${editingCompany.name}` : 'Add New Placement Recruiter'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+          <Typography variant="caption" color="text.secondary">
             {editingCompany ? 'Modify corporate track details' : 'Configure dynamic recruiter entity'}
           </Typography>
         </DialogTitle>
@@ -1014,7 +1019,7 @@ export const CompaniesPage: React.FC = () => {
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc' }}>
+        <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
           <Button variant="outlined" onClick={() => setDialogOpen(false)} disabled={saving}>
             Cancel
           </Button>

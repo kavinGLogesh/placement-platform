@@ -142,7 +142,7 @@ export const AdminAnalyticsPage: React.FC = () => {
         }}
       >
         <div>
-          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
             INSTITUTIONAL INTELLIGENCE & BENCHMARKS
           </Typography>
           <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
@@ -166,7 +166,7 @@ export const AdminAnalyticsPage: React.FC = () => {
       {/* Filter Toolbar */}
       <Card elevation={0} sx={{ mb: 3, p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterAltIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <FilterAltIcon sx={{ color: '#0F2744', fontSize: 18 }} />
           <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
             Authoritative Filters
           </Typography>
@@ -249,7 +249,7 @@ export const AdminAnalyticsPage: React.FC = () => {
       {/* 1. Placement Funnel Visualizer */}
       <Card elevation={0} sx={{ mb: 3.5, p: 2.5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-          <LayersIcon sx={{ color: '#0f3674', fontSize: 20 }} />
+          <LayersIcon sx={{ color: '#0F2744', fontSize: 20 }} />
           <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
             End-to-End Placement Pipeline Funnel
           </Typography>
@@ -266,9 +266,9 @@ export const AdminAnalyticsPage: React.FC = () => {
           <Grid container spacing={1.5}>
             {funnel.stages.map((st, index) => {
               const colors = [
-                '#0f3674',
+                '#0F2744',
                 '#0284c7',
-                '#047857',
+                '#15803D',
                 '#059669',
                 '#64748b',
                 '#94a3b8',
@@ -300,7 +300,7 @@ export const AdminAnalyticsPage: React.FC = () => {
                         {!st.isImplemented ? (
                           <Chip label="Future" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#f1f5f9', color: '#94a3b8', borderRadius: '3px' }} />
                         ) : (
-                          <Chip label="Active" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#eff6ff', color: '#0f3674', borderRadius: '3px' }} />
+                          <Chip label="Active" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#F0F4F9', color: '#0F2744', borderRadius: '3px' }} />
                         )}
                       </Box>
                       <Typography variant="h5" fontWeight={700} sx={{ color, my: 0.5 }}>
@@ -345,7 +345,7 @@ export const AdminAnalyticsPage: React.FC = () => {
         <Grid item xs={12} lg={6}>
           <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <SchoolIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+              <SchoolIcon sx={{ color: '#0F2744', fontSize: 18 }} />
               <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
                 Department Performance Comparison
               </Typography>
@@ -370,8 +370,8 @@ export const AdminAnalyticsPage: React.FC = () => {
                       formatter={(val: any) => [`${val}%`]}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0f3674" radius={[3, 3, 0, 0]} />
-                    <Bar dataKey="passRate" name="Pass Rate %" fill="#047857" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0F2744" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="passRate" name="Pass Rate %" fill="#15803D" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="participation" name="Participation %" fill="#0284c7" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -386,7 +386,7 @@ export const AdminAnalyticsPage: React.FC = () => {
         <Grid item xs={12} lg={6}>
           <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <CategoryIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+              <CategoryIcon sx={{ color: '#0F2744', fontSize: 18 }} />
               <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
                 Assessment Component Accuracy
               </Typography>
@@ -412,7 +412,7 @@ export const AdminAnalyticsPage: React.FC = () => {
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     <Bar dataKey="accuracy" name="Accuracy %" fill="#b45309" radius={[0, 3, 3, 0]} />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0f3674" radius={[0, 3, 3, 0]} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0F2744" radius={[0, 3, 3, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>

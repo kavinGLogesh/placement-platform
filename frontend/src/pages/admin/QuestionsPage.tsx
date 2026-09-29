@@ -453,7 +453,7 @@ export const QuestionsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
             ASSESSMENT AUTHORING ENGINE
           </Typography>
           <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
@@ -523,7 +523,7 @@ export const QuestionsPage: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterListIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <FilterListIcon sx={{ color: '#0F2744', fontSize: 18 }} />
           <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
             Multi-Parameter Question Filter
           </Typography>

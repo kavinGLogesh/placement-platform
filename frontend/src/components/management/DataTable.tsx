@@ -155,8 +155,8 @@ export function DataTable<T extends { id: string | number }>({
                       direction={sortBy === col.id ? sortOrder : 'asc'}
                       onClick={() => onSortChange(col.id)}
                       sx={{
-                        '&.Mui-active': { color: '#0f3674' },
-                        '& .MuiTableSortLabel-icon': { color: '#0f3674 !important' },
+                        '&.Mui-active': { color: '#0f2744' },
+                        '& .MuiTableSortLabel-icon': { color: '#0f2744 !important' },
                       }}
                     >
                       {col.label}

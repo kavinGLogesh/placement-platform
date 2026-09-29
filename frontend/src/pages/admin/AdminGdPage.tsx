@@ -370,7 +370,7 @@ export const AdminGdPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
             QUALITATIVE EVALUATION SUITE
           </Typography>
           <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
@@ -388,13 +388,13 @@ export const AdminGdPage: React.FC = () => {
             onClick={() => fetchRounds()}
             disabled={loading}
             sx={{
-              color: '#0f3674',
+              color: '#0F2744',
               borderColor: '#cbd5e1',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
             }}
           >
             Refresh
@@ -406,13 +406,13 @@ export const AdminGdPage: React.FC = () => {
               startIcon={<AddIcon fontSize="small" />}
               onClick={handleOpenCreate}
               sx={{
-                bgcolor: '#0f3674',
+                bgcolor: '#0F2744',
                 color: '#ffffff',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { bgcolor: '#0c2b5e' },
+                '&:hover': { bgcolor: '#0A1C30' },
               }}
             >
               Create GD Round
@@ -464,7 +464,7 @@ export const AdminGdPage: React.FC = () => {
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
               AVG GD PERFORMANCE
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0f3674' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0F2744' }}>
               {(() => {
                 const evaluatedRounds = rounds.filter((r) => r.averageScore !== null);
                 if (evaluatedRounds.length === 0) return '—';
@@ -493,7 +493,7 @@ export const AdminGdPage: React.FC = () => {
               py: 1.5,
               minHeight: 48,
               color: '#64748b',
-              '&.Mui-selected': { color: '#0f3674', fontWeight: 700 },
+              '&.Mui-selected': { color: '#0F2744', fontWeight: 700 },
             },
           }}
         >

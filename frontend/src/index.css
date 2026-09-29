@@ -23,7 +23,7 @@ body {
 
 /* Accessible focus ring for keyboard users */
 :focus-visible {
-  outline: 2px solid #0f3674;
+  outline: 2px solid #0f2744;
   outline-offset: 2px;
 }
 
@@ -48,8 +48,8 @@ body {
 
 /* Professional text selection */
 ::selection {
-  background-color: #e3ecf8;
-  color: #0f3674;
+  background-color: #e2eaf4;
+  color: #0f2744;
 }
 
 code, kbd, samp, pre {

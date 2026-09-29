@@ -120,7 +120,7 @@ export const StudentTestsPage: React.FC = () => {
       {/* Top Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
             CAMPUS PLACEMENT EXAMINATIONS
           </Typography>
           <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
@@ -172,10 +172,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'ALL' ? '#0f3674' : '#ffffff',
+            backgroundColor: trackFilter === 'ALL' ? '#0F2744' : '#ffffff',
             color: trackFilter === 'ALL' ? '#ffffff' : '#475569',
             border: '1px solid',
-            borderColor: trackFilter === 'ALL' ? '#0f3674' : '#cbd5e1',
+            borderColor: trackFilter === 'ALL' ? '#0F2744' : '#cbd5e1',
           }}
         />
         <Chip
@@ -189,10 +189,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'GENERAL' ? '#0f3674' : '#ffffff',
+            backgroundColor: trackFilter === 'GENERAL' ? '#0F2744' : '#ffffff',
             color: trackFilter === 'GENERAL' ? '#ffffff' : '#475569',
             border: '1px solid',
-            borderColor: trackFilter === 'GENERAL' ? '#0f3674' : '#cbd5e1',
+            borderColor: trackFilter === 'GENERAL' ? '#0F2744' : '#cbd5e1',
           }}
         />
         <Chip
@@ -204,10 +204,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'COMPANY' ? '#0f3674' : '#ffffff',
+            backgroundColor: trackFilter === 'COMPANY' ? '#0F2744' : '#ffffff',
             color: trackFilter === 'COMPANY' ? '#ffffff' : '#475569',
             border: '1px solid',
-            borderColor: trackFilter === 'COMPANY' ? '#0f3674' : '#cbd5e1',
+            borderColor: trackFilter === 'COMPANY' ? '#0F2744' : '#cbd5e1',
           }}
         />
 
@@ -227,7 +227,7 @@ export const StudentTestsPage: React.FC = () => {
                 fontWeight: 600,
                 fontSize: '0.72rem',
                 borderRadius: '4px',
-                backgroundColor: selectedCompanyCode === 'ALL' ? '#0f3674' : '#f8fafc',
+                backgroundColor: selectedCompanyCode === 'ALL' ? '#0F2744' : '#f8fafc',
                 color: selectedCompanyCode === 'ALL' ? '#ffffff' : '#475569',
                 border: '1px solid #cbd5e1',
               }}
@@ -243,7 +243,7 @@ export const StudentTestsPage: React.FC = () => {
                   fontWeight: 600,
                   fontSize: '0.72rem',
                   borderRadius: '4px',
-                  backgroundColor: selectedCompanyCode === code ? '#0f3674' : '#ffffff',
+                  backgroundColor: selectedCompanyCode === code ? '#0F2744' : '#ffffff',
                   color: selectedCompanyCode === code ? '#ffffff' : '#475569',
                   border: '1px solid #cbd5e1',
                 }}
@@ -257,7 +257,7 @@ export const StudentTestsPage: React.FC = () => {
       {(trackFilter === 'COMPANY' || filteredTests.some((t) => t.isCompanyAssessment)) && (
         <Alert
           severity="info"
-          icon={<BusinessIcon sx={{ color: '#0f3674' }} />}
+          icon={<BusinessIcon sx={{ color: '#0F2744' }} />}
           sx={{
             mb: 2.5,
             backgroundColor: '#f8fafc',
@@ -333,11 +333,11 @@ export const StudentTestsPage: React.FC = () => {
                     flexDirection: 'column',
                     position: 'relative',
                     bgcolor: '#ffffff',
-                    border: hasActiveAttempt ? '2px solid #0f3674' : '1px solid #e2e8f0',
+                    border: hasActiveAttempt ? '2px solid #0F2744' : '1px solid #e2e8f0',
                     borderRadius: '8px',
                     transition: 'border-color 0.15s ease',
                     '&:hover': {
-                      borderColor: hasActiveAttempt ? '#0f3674' : '#94a3b8',
+                      borderColor: hasActiveAttempt ? '#0F2744' : '#94a3b8',
                     },
                   }}
                 >
@@ -353,9 +353,9 @@ export const StudentTestsPage: React.FC = () => {
                               mb: 0.75,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: '#eff6ff',
-                              color: '#0f3674',
-                              border: '1px solid #bfdbfe',
+                              backgroundColor: '#F0F4F9',
+                              color: '#0F2744',
+                              border: '1px solid #CBD5E1',
                               borderRadius: '4px',
                             }}
                           />
@@ -369,8 +369,8 @@ export const StudentTestsPage: React.FC = () => {
                               mb: 0.75,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: '#eff6ff',
-                              color: '#0f3674',
+                              backgroundColor: '#F0F4F9',
+                              color: '#0F2744',
                               borderRadius: '4px',
                             }}
                           />

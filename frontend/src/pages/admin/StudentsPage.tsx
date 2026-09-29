@@ -533,7 +533,7 @@ export const StudentsPage: React.FC = () => {
       {/* Page Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <div>
-          <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
             CANDIDATE DIRECTORY & ENROLLMENT
           </Typography>
           <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
@@ -555,13 +555,13 @@ export const StudentsPage: React.FC = () => {
               setImportDialogOpen(true);
             }}
             sx={{
-              color: '#0f3674',
+              color: '#0F2744',
               borderColor: '#cbd5e1',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
             }}
           >
             Bulk Excel Import
@@ -573,13 +573,13 @@ export const StudentsPage: React.FC = () => {
             onClick={() => handleOpenStudentDialog()}
             disabled={departments.length === 0 || sections.length === 0}
             sx={{
-              bgcolor: '#0f3674',
+              bgcolor: '#0F2744',
               color: '#ffffff',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { bgcolor: '#0c2b5e' },
+              '&:hover': { bgcolor: '#0A1C30' },
             }}
           >
             Register Student

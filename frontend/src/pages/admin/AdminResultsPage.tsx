@@ -171,7 +171,7 @@ export const AdminResultsPage: React.FC = () => {
         }}
       >
         <div>
-          <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
             EXAMINATION EVALUATION REGISTRY
           </Typography>
           <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
@@ -240,7 +240,7 @@ export const AdminResultsPage: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterAltIcon sx={{ color: '#0f3674', fontSize: 18 }} />
+          <FilterAltIcon sx={{ color: '#0F2744', fontSize: 18 }} />
           <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
             Search, Filter & Sort Records
           </Typography>

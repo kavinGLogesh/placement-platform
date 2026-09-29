@@ -198,19 +198,19 @@ export const StudentDetailPage: React.FC = () => {
             startIcon={<ArrowBackIcon fontSize="small" />}
             onClick={() => navigate('/admin/students')}
             sx={{
-              color: '#0f3674',
+              color: '#0F2744',
               borderColor: '#cbd5e1',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
             }}
           >
             All Students
           </Button>
           <div>
-            <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+            <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
               CANDIDATE DOSSIER
             </Typography>
             <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#0f172a' }}>
@@ -227,13 +227,13 @@ export const StudentDetailPage: React.FC = () => {
               startIcon={<LaunchIcon fontSize="small" />}
               onClick={() => navigate(`/admin/students/${student.id}/performance`)}
               sx={{
-                color: '#0f3674',
+                color: '#0F2744',
                 borderColor: '#cbd5e1',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+                '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
               }}
             >
               Full Analytics Drilldown
@@ -246,13 +246,13 @@ export const StudentDetailPage: React.FC = () => {
               startIcon={<EditIcon fontSize="small" />}
               onClick={() => setEditDialogOpen(true)}
               sx={{
-                bgcolor: '#0f3674',
+                bgcolor: '#0F2744',
                 color: '#ffffff',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { bgcolor: '#0c2b5e' },
+                '&:hover': { bgcolor: '#0A1C30' },
               }}
             >
               Edit Profile
@@ -269,7 +269,7 @@ export const StudentDetailPage: React.FC = () => {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} sx={{ color: '#0f3674' }} />
+          <CircularProgress size={32} sx={{ color: '#0F2744' }} />
         </Box>
       ) : student ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -285,7 +285,7 @@ export const StudentDetailPage: React.FC = () => {
                         width: 52,
                         height: 52,
                         borderRadius: '8px',
-                        bgcolor: '#0f3674',
+                        bgcolor: '#0F2744',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

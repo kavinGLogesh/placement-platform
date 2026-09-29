@@ -214,7 +214,7 @@ export const RootLayout: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
-          borderBottom: '1px solid #f1f5f9',
+          borderBottom: '1px solid #e2e8f0',
           minHeight: 64,
         }}
       >
@@ -223,7 +223,7 @@ export const RootLayout: React.FC = () => {
             width: 36,
             height: 36,
             borderRadius: 1.5,
-            bgcolor: '#0f3674',
+            bgcolor: '#0f2744',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
@@ -266,7 +266,7 @@ export const RootLayout: React.FC = () => {
 
       {/* Role Pill Banner */}
       {(!sidebarCollapsed || isMobile) && user && (
-        <Box sx={{ px: 2, py: 1.25, bgcolor: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+        <Box sx={{ px: 2, py: 1.25, bgcolor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Chip
               label={
@@ -281,25 +281,26 @@ export const RootLayout: React.FC = () => {
                 height: 22,
                 fontSize: '0.7rem',
                 fontWeight: 600,
+                borderRadius: '4px',
                 bgcolor:
                   user.role === 'SUPER_ADMIN'
-                    ? '#f5f3ff'
+                    ? '#f8fafc'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#eff6ff'
-                    : '#ecfdf5',
+                    ? '#f0f4f9'
+                    : '#f0fdf4',
                 color:
                   user.role === 'SUPER_ADMIN'
-                    ? '#6d28d9'
+                    ? '#0f2744'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#0f3674'
-                    : '#047857',
+                    ? '#0f2744'
+                    : '#15803d',
                 border: '1px solid',
                 borderColor:
                   user.role === 'SUPER_ADMIN'
-                    ? '#ddd6fe'
+                    ? '#cbd5e1'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#bfdbfe'
-                    : '#a7f3d0',
+                    ? '#cbd5e1'
+                    : '#bbf7d0',
               }}
             />
             <Tooltip
@@ -313,7 +314,7 @@ export const RootLayout: React.FC = () => {
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    bgcolor: isHealthLoading ? '#f59e0b' : isHealthError ? '#dc2626' : '#10b981',
+                    bgcolor: isHealthLoading ? '#b45309' : isHealthError ? '#b91c1c' : '#15803d',
                   }}
                 />
               </Box>
@@ -362,12 +363,12 @@ export const RootLayout: React.FC = () => {
                           py: 0.85,
                           px: sidebarCollapsed && !isMobile ? 1.5 : 1.75,
                           justifyContent: sidebarCollapsed && !isMobile ? 'center' : 'flex-start',
-                          bgcolor: isActive ? '#f0f4fa' : 'transparent',
-                          color: isActive ? '#0f3674' : '#475569',
+                          bgcolor: isActive ? '#f0f4f9' : 'transparent',
+                          color: isActive ? '#0f2744' : '#475569',
                           fontWeight: isActive ? 600 : 500,
-                          borderLeft: isActive ? '3px solid #0f3674' : '3px solid transparent',
+                          borderLeft: isActive ? '3px solid #0f2744' : '3px solid transparent',
                           '&:hover': {
-                            bgcolor: isActive ? '#e5edf7' : '#f8fafc',
+                            bgcolor: isActive ? '#e7eef6' : '#f8fafc',
                             color: '#0f172a',
                           },
                         }}
@@ -375,7 +376,7 @@ export const RootLayout: React.FC = () => {
                         <ListItemIcon
                           sx={{
                             minWidth: sidebarCollapsed && !isMobile ? 'auto' : 32,
-                            color: isActive ? '#0f3674' : '#64748b',
+                            color: isActive ? '#0f2744' : '#64748b',
                             justifyContent: 'center',
                           }}
                         >
@@ -399,13 +400,13 @@ export const RootLayout: React.FC = () => {
                 );
               })}
             </List>
-            {sIdx < navSections.length - 1 && <Divider sx={{ my: 1.5, borderColor: '#f1f5f9' }} />}
+            {sIdx < navSections.length - 1 && <Divider sx={{ my: 1.5, borderColor: '#e2e8f0' }} />}
           </Box>
         ))}
       </Box>
 
       {/* User Footer Profile & Sign Out */}
-      <Box sx={{ p: 1.5, borderTop: '1px solid #f1f5f9', bgcolor: '#ffffff' }}>
+      <Box sx={{ p: 1.5, borderTop: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
         {(!sidebarCollapsed || isMobile) ? (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
             <Box
@@ -425,7 +426,7 @@ export const RootLayout: React.FC = () => {
                 sx={{
                   width: 32,
                   height: 32,
-                  bgcolor: '#0f3674',
+                  bgcolor: '#0f2744',
                   fontSize: '0.8rem',
                   fontWeight: 600,
                 }}
@@ -600,10 +601,10 @@ export const RootLayout: React.FC = () => {
 
             <Tooltip title="Placement Platform Connected">
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <CheckCircleIcon sx={{ fontSize: 16, color: '#059669' }} />
+                <CheckCircleIcon sx={{ fontSize: 16, color: '#15803d' }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: '#059669', fontWeight: 600, display: { xs: 'none', lg: 'inline' } }}
+                  sx={{ color: '#15803d', fontWeight: 600, display: { xs: 'none', lg: 'inline' } }}
                 >
                   Secure
                 </Typography>

@@ -147,7 +147,7 @@ npm run prisma:generate
 
 ### Step 2: Install Frontend Dependencies
 ```bash
-cd ../frontend
+cd frontend
 npm install
 ```
 

@@ -59,18 +59,18 @@ export const StudentReportsPage: React.FC = () => {
             onClick={() => navigate('/student/dashboard')}
             sx={{
               mb: 1.5,
-              color: '#0f3674',
+              color: '#0F2744',
               borderColor: '#cbd5e1',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0f3674', bgcolor: 'rgba(15, 54, 116, 0.04)' },
+              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
             }}
           >
             Back to Dashboard
           </Button>
-          <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
             INSTITUTIONAL TRANSCRIPT & EVALUATION
           </Typography>
           <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#0f172a' }}>
@@ -100,7 +100,7 @@ export const StudentReportsPage: React.FC = () => {
       {/* Loading State */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} sx={{ color: '#0f3674' }} />
+          <CircularProgress size={32} sx={{ color: '#0F2744' }} />
         </Box>
       ) : (
         report && (
@@ -182,7 +182,7 @@ export const StudentReportsPage: React.FC = () => {
                     <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                       Average Score
                     </Typography>
-                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0f3674' }}>
+                    <Typography variant="h5" fontWeight={800} sx={{ mt: 0.5, color: '#0F2744' }}>
                       {report.summary.averageScore}
                     </Typography>
                   </CardContent>

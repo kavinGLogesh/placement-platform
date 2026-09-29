@@ -86,31 +86,33 @@ export const DuplicateReviewDialog: React.FC<DuplicateReviewDialogProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#0f172a',
-          color: '#ffffff',
+          backgroundColor: '#ffffff',
+          color: '#0f172a',
+          borderBottom: '1px solid #e2e8f0',
           py: 2,
+          px: 2.5,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <WarningAmberIcon sx={{ color: '#f59e0b' }} />
+          <WarningAmberIcon sx={{ color: '#b45309', fontSize: 22 }} />
           <Box>
-            <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+            <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, color: '#0f172a', fontSize: '1.05rem' }}>
               Review Possible Duplicates — {company.name}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.74rem' }}>
               Semantic similarity matches flagged for Admin review
             </Typography>
           </Box>
         </Box>
-        <IconButton size="small" onClick={onClose} sx={{ color: '#94a3b8', '&:hover': { color: '#ffffff' } }}>
+        <IconButton size="small" onClick={onClose} sx={{ color: '#64748b', '&:hover': { color: '#0f172a' } }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers sx={{ p: 3, backgroundColor: '#f8fafc' }}>
+      <DialogContent dividers sx={{ p: 2.5, backgroundColor: '#f8fafc' }}>
         {loading ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6 }}>
-            <CircularProgress size={32} />
+            <CircularProgress size={32} sx={{ color: '#0f2744' }} />
             <Typography variant="body2" sx={{ mt: 2, color: '#64748b' }}>
               Loading pending duplicate comparisons...
             </Typography>
@@ -121,7 +123,7 @@ export const DuplicateReviewDialog: React.FC<DuplicateReviewDialogProps> = ({
           </Alert>
         ) : candidates.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 6 }}>
-            <CheckCircleIcon sx={{ fontSize: 48, color: '#10b981', mb: 1.5 }} />
+            <CheckCircleIcon sx={{ fontSize: 44, color: '#15803d', mb: 1.5 }} />
             <Typography variant="h6" fontWeight={700} color="#0f172a">
               No Pending Duplicate Reviews
             </Typography>
@@ -130,21 +132,21 @@ export const DuplicateReviewDialog: React.FC<DuplicateReviewDialogProps> = ({
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            <Alert severity="info" sx={{ fontSize: '0.85rem' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Alert severity="info" sx={{ fontSize: '0.84rem' }}>
               The system detected potential semantic matches with existing questions. Review both questions below and select whether to confirm as a duplicate or keep as distinct questions.
             </Alert>
 
             {candidates.map((cand) => (
-              <Card key={cand.id} variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 2 }}>
-                <CardContent sx={{ p: 2.5 }}>
+              <Card key={cand.id} variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 1.5, borderColor: '#e2e8f0' }}>
+                <CardContent sx={{ p: 2.25 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Chip
                         label={`${Math.round(cand.similarityScore * 100)}% Similarity`}
                         size="small"
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           backgroundColor: '#fffbeb',
                           color: '#b45309',
                           border: '1px solid #fde68a',
@@ -158,38 +160,38 @@ export const DuplicateReviewDialog: React.FC<DuplicateReviewDialogProps> = ({
 
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
                     {/* Uploaded Question */}
-                    <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1.5, border: '1px solid #e2e8f0' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', display: 'block', mb: 0.5 }}>
+                    <Box sx={{ p: 2, backgroundColor: '#f8fafc', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: '#64748b', display: 'block', mb: 0.5, letterSpacing: '0.04em' }}>
                         UPLOADED QUESTION
                       </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#0f172a' }}>
                         {cand.candidateText}
                       </Typography>
                     </Box>
 
                     {/* Matched Original Question */}
-                    <Box sx={{ p: 2, backgroundColor: '#eff6ff', borderRadius: 1.5, border: '1px solid #bfdbfe' }}>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#1e40af', display: 'block', mb: 0.5 }}>
+                    <Box sx={{ p: 2, backgroundColor: '#f0f4f9', borderRadius: 1, border: '1px solid #cbd5e1' }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: '#0f2744', display: 'block', mb: 0.5, letterSpacing: '0.04em' }}>
                         EXISTING QUESTION IN DATABASE
                       </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e3a8a' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#0f172a' }}>
                         {cand.originalQuestion?.questionText || 'Existing question record'}
                       </Typography>
                       {cand.originalQuestion && (
-                        <Typography variant="caption" sx={{ color: '#60a5fa', display: 'block', mt: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: '#475569', display: 'block', mt: 0.5 }}>
                           Topic: {cand.originalQuestion.topic}
                         </Typography>
                       )}
                     </Box>
                   </Box>
 
-                  <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 2, borderColor: '#f1f5f9' }} />
 
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.25 }}>
                     <Button
                       size="small"
                       variant="outlined"
-                      color="inherit"
+                      color="secondary"
                       disabled={actionLoading === cand.id}
                       startIcon={<BlockIcon />}
                       onClick={() => handleResolve(cand.id, 'REJECTED')}
@@ -214,8 +216,8 @@ export const DuplicateReviewDialog: React.FC<DuplicateReviewDialogProps> = ({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, backgroundColor: '#ffffff' }}>
-        <Button variant="outlined" onClick={onClose}>
+      <DialogActions sx={{ p: 2, backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+        <Button variant="outlined" color="secondary" onClick={onClose}>
           Close
         </Button>
       </DialogActions>

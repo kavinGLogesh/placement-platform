@@ -695,7 +695,7 @@ export const AssessmentBuilderPage: React.FC = () => {
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                <TuneIcon sx={{ color: '#0f3674' }} />
+                <TuneIcon sx={{ color: '#0F2744' }} />
                 <Typography variant="h6" fontWeight={700} color="#0f172a">
                   Assessment Blueprint
                 </Typography>

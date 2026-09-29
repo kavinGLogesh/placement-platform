@@ -51,14 +51,14 @@ export const AdminNavTabs: React.FC = () => {
             sx={{
               fontWeight: isActive ? 600 : 500,
               fontSize: '0.78rem',
-              backgroundColor: isActive ? '#0f3674' : '#ffffff',
+              backgroundColor: isActive ? '#0f2744' : '#ffffff',
               color: isActive ? '#ffffff' : '#475569',
               border: '1px solid',
-              borderColor: isActive ? '#0f3674' : '#cbd5e1',
+              borderColor: isActive ? '#0f2744' : '#cbd5e1',
               borderRadius: '4px',
               height: 26,
               '&:hover': {
-                backgroundColor: isActive ? '#0a2550' : '#f1f5f9',
+                backgroundColor: isActive ? '#0a1c30' : '#f1f5f9',
               },
             }}
           />

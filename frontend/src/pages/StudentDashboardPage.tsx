@@ -75,8 +75,8 @@ export const StudentDashboardPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <SchoolIcon sx={{ fontSize: 18, color: '#0f3674' }} />
-            <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <SchoolIcon sx={{ fontSize: 18, color: '#0F2744' }} />
+            <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
               CANDIDATE EXAMINATION PORTAL
             </Typography>
             <Chip
@@ -87,9 +87,9 @@ export const StudentDashboardPage: React.FC = () => {
                 fontSize: '0.7rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                bgcolor: '#eff6ff',
-                color: '#0f3674',
-                border: '1px solid #bfdbfe',
+                bgcolor: '#F0F4F9',
+                color: '#0F2744',
+                border: '1px solid #CBD5E1',
               }}
             />
           </Box>
@@ -154,7 +154,7 @@ export const StudentDashboardPage: React.FC = () => {
               <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
                 AVAILABLE ASSESSMENTS
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0f3674', my: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.5 }}>
                 {summary.availableAssessments}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -286,7 +286,7 @@ export const StudentDashboardPage: React.FC = () => {
                       gap: 1.5,
                       transition: 'border-color 0.15s ease',
                       '&:hover': {
-                        borderColor: '#0f3674',
+                        borderColor: '#0F2744',
                         bgcolor: '#ffffff',
                       },
                     }}

@@ -4,50 +4,50 @@ let theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#0f3674', // Authoritative deep institutional navy
-      light: '#1e5bb8',
-      dark: '#0a2550',
+      main: '#0f2744', // Authoritative Deep Navy / Professional Blue
+      light: '#1e3a8a', // Restrained Corporate Blue
+      dark: '#0a1c30',  // Deep Midnight Navy
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#475569', // Subtle slate accent
+      main: '#475569', // Professional Slate 600
       light: '#64748b',
       dark: '#334155',
       contrastText: '#ffffff',
     },
     success: {
-      main: '#047857', // Crisp emerald 700
-      light: '#10b981',
-      dark: '#065f46',
+      main: '#15803d', // Restrained Professional Green (Emerald 700)
+      light: '#16a34a',
+      dark: '#14532d',
       contrastText: '#ffffff',
     },
     error: {
-      main: '#b91c1c', // Controlled crimson 700
-      light: '#ef4444',
-      dark: '#991b1b',
+      main: '#b91c1c', // Controlled Crimson Red (Red 700)
+      light: '#dc2626',
+      dark: '#7f1d1d',
       contrastText: '#ffffff',
     },
     warning: {
-      main: '#b45309', // Warm ochre 700
-      light: '#f59e0b',
-      dark: '#92400e',
+      main: '#b45309', // Muted Amber (Amber 700)
+      light: '#d97706',
+      dark: '#78350f',
       contrastText: '#ffffff',
     },
     info: {
-      main: '#0369a1', // Sky blue 700
-      light: '#38bdf8',
-      dark: '#075985',
+      main: '#1d4ed8', // Restrained Information Blue
+      light: '#2563eb',
+      dark: '#1e3a8a',
       contrastText: '#ffffff',
     },
     background: {
-      default: '#f8fafc', // Ultra clean slate-50 canvas
-      paper: '#ffffff',   // Crisp pure white surfaces
+      default: '#f8fafc', // Clean off-white canvas (Slate 50)
+      paper: '#ffffff',   // Crisp Pure White dominant surface
     },
     text: {
-      primary: '#0f172a',   // Deep readable Slate 900
-      secondary: '#475569', // Clear secondary Slate 600
+      primary: '#0f172a',   // Dark Charcoal / Slate 900
+      secondary: '#475569', // Readable Subdued Slate 600
     },
-    divider: '#e2e8f0', // Crisp Slate 200 border
+    divider: '#e2e8f0', // Soft neutral gray border (Slate 200)
   },
   typography: {
     fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
@@ -70,41 +70,41 @@ let theme = createTheme({
       fontWeight: 700,
       letterSpacing: '-0.02em',
       color: '#0f172a',
-      fontSize: '1.5rem',
+      fontSize: '1.45rem',
       lineHeight: 1.25,
     },
     h5: {
       fontWeight: 600,
       letterSpacing: '-0.015em',
       color: '#0f172a',
-      fontSize: '1.25rem',
+      fontSize: '1.2rem',
       lineHeight: 1.3,
     },
     h6: {
       fontWeight: 600,
       letterSpacing: '-0.01em',
       color: '#0f172a',
-      fontSize: '1.05rem',
+      fontSize: '1rem',
       lineHeight: 1.35,
     },
     subtitle1: {
       fontWeight: 600,
       color: '#1e293b',
-      fontSize: '0.9375rem',
+      fontSize: '0.9rem',
     },
     subtitle2: {
       fontWeight: 600,
       color: '#475569',
-      fontSize: '0.85rem',
+      fontSize: '0.825rem',
     },
     body1: {
       color: '#1e293b',
-      fontSize: '0.9rem',
+      fontSize: '0.875rem',
       lineHeight: 1.55,
     },
     body2: {
       color: '#475569',
-      fontSize: '0.84rem',
+      fontSize: '0.825rem',
       lineHeight: 1.5,
     },
     caption: {
@@ -135,13 +135,12 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: '#ffffff',
-          borderRadius: 8,
+          borderRadius: 6,
           border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.02)',
           transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
           '&:hover': {
             borderColor: '#cbd5e1',
-            boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.04)',
           },
         },
       },
@@ -151,33 +150,46 @@ let theme = createTheme({
         root: {
           backgroundImage: 'none',
         },
+        elevation0: {
+          border: '1px solid #e2e8f0',
+        },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 6,
-          padding: '7px 16px',
+          padding: '6px 16px',
           boxShadow: 'none',
           fontWeight: 600,
-          fontSize: '0.85rem',
+          fontSize: '0.84rem',
           transition: 'all 0.15s ease-in-out',
           '&:hover': {
             boxShadow: 'none',
           },
         },
         containedPrimary: {
-          backgroundColor: '#0f3674',
+          backgroundColor: '#0f2744',
           color: '#ffffff',
           '&:hover': {
-            backgroundColor: '#0a2550',
+            backgroundColor: '#0a1c30',
           },
         },
         outlinedPrimary: {
           borderColor: '#cbd5e1',
-          color: '#0f3674',
+          color: '#0f2744',
+          backgroundColor: '#ffffff',
           '&:hover': {
-            borderColor: '#0f3674',
+            borderColor: '#0f2744',
+            backgroundColor: '#f8fafc',
+          },
+        },
+        outlinedSecondary: {
+          borderColor: '#cbd5e1',
+          color: '#475569',
+          backgroundColor: '#ffffff',
+          '&:hover': {
+            borderColor: '#94a3b8',
             backgroundColor: '#f8fafc',
           },
         },
@@ -188,8 +200,11 @@ let theme = createTheme({
         root: {
           fontWeight: 600,
           borderRadius: 4,
-          fontSize: '0.75rem',
+          fontSize: '0.74rem',
           height: 24,
+        },
+        outlined: {
+          borderColor: '#cbd5e1',
         },
       },
     },
@@ -199,7 +214,7 @@ let theme = createTheme({
           backgroundColor: '#ffffff',
           color: '#0f172a',
           borderBottom: '1px solid #e2e8f0',
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.02)',
+          boxShadow: 'none',
         },
       },
     },
@@ -211,7 +226,7 @@ let theme = createTheme({
             backgroundColor: '#f8fafc',
             color: '#475569',
             fontWeight: 600,
-            fontSize: '0.75rem',
+            fontSize: '0.74rem',
             borderBottom: '1px solid #e2e8f0',
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
@@ -225,8 +240,17 @@ let theme = createTheme({
         root: {
           borderBottom: '1px solid #f1f5f9',
           color: '#1e293b',
-          fontSize: '0.85rem',
+          fontSize: '0.84rem',
           padding: '11px 16px',
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: '#f8fafc',
+          },
         },
       },
     },
@@ -234,18 +258,19 @@ let theme = createTheme({
       styleOverrides: {
         paper: {
           backgroundColor: '#ffffff',
-          borderRadius: 8,
+          borderRadius: 6,
           border: '1px solid #e2e8f0',
-          boxShadow: '0 12px 24px -6px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04)',
+          boxShadow: '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03)',
         },
       },
     },
     MuiDialogTitle: {
       styleOverrides: {
         root: {
+          backgroundColor: '#ffffff',
           color: '#0f172a',
           fontWeight: 600,
-          fontSize: '1.15rem',
+          fontSize: '1.05rem',
           borderBottom: '1px solid #e2e8f0',
           padding: '16px 20px',
         },
@@ -275,7 +300,7 @@ let theme = createTheme({
           fontWeight: 500,
           fontSize: '0.85rem',
           '&.Mui-focused': {
-            color: '#0f3674',
+            color: '#0f2744',
             fontWeight: 600,
           },
           '&.Mui-error': {
@@ -284,8 +309,8 @@ let theme = createTheme({
           },
           '&.MuiInputLabel-shrink': {
             backgroundColor: '#ffffff',
-            padding: '0 5px',
-            borderRadius: '3px',
+            padding: '0 4px',
+            borderRadius: '2px',
             fontWeight: 600,
             zIndex: 2,
           },
@@ -298,7 +323,7 @@ let theme = createTheme({
           borderRadius: 6,
           backgroundColor: '#ffffff',
           color: '#0f172a',
-          fontSize: '0.875rem',
+          fontSize: '0.85rem',
           fontWeight: 400,
           '& fieldset': {
             borderColor: '#cbd5e1',
@@ -307,7 +332,7 @@ let theme = createTheme({
             borderColor: '#94a3b8',
           },
           '&.Mui-focused fieldset': {
-            borderColor: '#0f3674',
+            borderColor: '#0f2744',
             borderWidth: '1.5px',
           },
           '&.Mui-error fieldset': {
@@ -324,7 +349,7 @@ let theme = createTheme({
         },
         input: {
           color: '#0f172a',
-          padding: '10px 14px',
+          padding: '9px 13px',
           '&::placeholder': {
             color: '#94a3b8',
             opacity: 1,
@@ -336,8 +361,7 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           color: '#64748b',
-          fontSize: '0.75rem',
-          fontWeight: 400,
+          fontSize: '0.74rem',
           marginTop: '3px',
           '&.Mui-error': {
             color: '#b91c1c',
@@ -346,27 +370,46 @@ let theme = createTheme({
         },
       },
     },
-    MuiSelect: {
+    MuiTabs: {
       styleOverrides: {
         root: {
-          color: '#0f172a',
-          fontWeight: 400,
+          minHeight: 40,
+        },
+        indicator: {
+          backgroundColor: '#0f2744',
+          height: 2,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 500,
+          fontSize: '0.85rem',
+          minHeight: 40,
+          padding: '6px 16px',
+          color: '#64748b',
+          '&.Mui-selected': {
+            color: '#0f2744',
+            fontWeight: 600,
+          },
         },
       },
     },
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          fontSize: '0.85rem',
+          fontSize: '0.84rem',
           color: '#1e293b',
           fontWeight: 400,
           padding: '8px 14px',
           '&.Mui-selected': {
-            backgroundColor: '#f0f4fa',
-            color: '#0f3674',
+            backgroundColor: '#f0f4f9',
+            color: '#0f2744',
             fontWeight: 600,
             '&:hover': {
-              backgroundColor: '#e3ecf8',
+              backgroundColor: '#e5ecf5',
             },
           },
           '&:hover': {
@@ -375,23 +418,36 @@ let theme = createTheme({
         },
       },
     },
-    MuiTextField: {
+    MuiAlert: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 6,
-            backgroundColor: '#ffffff',
-            '& fieldset': {
-              borderColor: '#cbd5e1',
-            },
-            '&:hover fieldset': {
-              borderColor: '#94a3b8',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: '#0f3674',
-              borderWidth: '1.5px',
-            },
-          },
+          borderRadius: 6,
+          fontSize: '0.84rem',
+          border: '1px solid',
+        },
+        standardSuccess: {
+          backgroundColor: '#f0fdf4',
+          color: '#14532d',
+          borderColor: '#bbf7d0',
+          '& .MuiAlert-icon': { color: '#15803d' },
+        },
+        standardError: {
+          backgroundColor: '#fef2f2',
+          color: '#7f1d1d',
+          borderColor: '#fecaca',
+          '& .MuiAlert-icon': { color: '#b91c1c' },
+        },
+        standardWarning: {
+          backgroundColor: '#fffbeb',
+          color: '#78350f',
+          borderColor: '#fde68a',
+          '& .MuiAlert-icon': { color: '#b45309' },
+        },
+        standardInfo: {
+          backgroundColor: '#eff6ff',
+          color: '#1e3a8a',
+          borderColor: '#bfdbfe',
+          '& .MuiAlert-icon': { color: '#1d4ed8' },
         },
       },
     },

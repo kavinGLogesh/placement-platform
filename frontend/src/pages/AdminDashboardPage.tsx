@@ -71,7 +71,7 @@ export const AdminDashboardPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="overline" sx={{ color: '#0f3674', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
               CAMPUS PLACEMENT SYSTEM
             </Typography>
             <Chip
@@ -82,8 +82,8 @@ export const AdminDashboardPage: React.FC = () => {
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                bgcolor: isSuperAdmin ? '#f8fafc' : '#eff6ff',
-                color: isSuperAdmin ? '#0f3674' : '#0f3674',
+                bgcolor: isSuperAdmin ? '#f8fafc' : '#F0F4F9',
+                color: '#0F2744',
                 border: '1px solid #cbd5e1',
               }}
             />
@@ -231,7 +231,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
                   ASSESSMENT ATTENDANCE
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f3674', my: 0.5 }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.5 }}>
                   {overview?.activeStudents || 0} <Typography component="span" variant="body2" sx={{ color: '#64748b' }}>/ {overview?.totalStudents || 0}</Typography>
                 </Typography>
                 <Typography variant="caption" color="text.secondary">

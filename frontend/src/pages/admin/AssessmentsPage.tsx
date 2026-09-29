@@ -184,9 +184,9 @@ export const AssessmentsPage: React.FC = () => {
                   height: 20,
                   fontSize: '0.68rem',
                   fontWeight: 700,
-                  backgroundColor: '#eff6ff',
-                  color: '#0f3674',
-                  border: '1px solid #bfdbfe',
+                  backgroundColor: '#F0F4F9',
+                  color: '#0F2744',
+                  border: '1px solid #CBD5E1',
                   borderRadius: '3px',
                 }}
               />
@@ -200,8 +200,8 @@ export const AssessmentsPage: React.FC = () => {
                   height: 20,
                   fontSize: '0.68rem',
                   fontWeight: 700,
-                  backgroundColor: '#eff6ff',
-                  color: '#0f3674',
+                  backgroundColor: '#F0F4F9',
+                  color: '#0F2744',
                   borderRadius: '3px',
                 }}
               />
@@ -310,7 +310,7 @@ export const AssessmentsPage: React.FC = () => {
             <IconButton
               size="small"
               onClick={() => navigate(`/admin/assessments/${row.id}`)}
-              sx={{ color: '#0f3674' }}
+              sx={{ color: '#0F2744' }}
             >
               <VisibilityIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -347,7 +347,7 @@ export const AssessmentsPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
-            <AssignmentIcon sx={{ fontSize: 24, color: '#0f3674' }} />
+            <AssignmentIcon sx={{ fontSize: 24, color: '#0F2744' }} />
             <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
               Assessment Management & Engine
             </Typography>

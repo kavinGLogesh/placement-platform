@@ -157,7 +157,7 @@ export const AdminReportsPage: React.FC = () => {
     <Box>
       {/* Header Banner */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="overline" color="#0f3674" fontWeight={700} letterSpacing={1.2}>
+        <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
           INSTITUTIONAL AUDIT & EXPORT REPOSITORY
         </Typography>
         <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
@@ -200,7 +200,7 @@ export const AdminReportsPage: React.FC = () => {
               gap: 1,
               color: '#64748b',
               '&.Mui-selected': {
-                color: '#0f3674',
+                color: '#0F2744',
                 fontWeight: 700,
               },
             },
@@ -247,7 +247,7 @@ export const AdminReportsPage: React.FC = () => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FilterAltIcon sx={{ color: '#0f3674' }} fontSize="small" />
+              <FilterAltIcon sx={{ color: '#0F2744' }} fontSize="small" />
               <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#0f172a' }}>
                 Report Filters & Export Tools
               </Typography>
@@ -318,12 +318,12 @@ export const AdminReportsPage: React.FC = () => {
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('html')}
                 sx={{
-                  bgcolor: '#0f3674',
+                  bgcolor: '#0F2744',
                   textTransform: 'none',
                   fontWeight: 600,
                   fontSize: '0.8rem',
                   borderRadius: '6px',
-                  '&:hover': { bgcolor: '#0c2b5e' },
+                  '&:hover': { bgcolor: '#0A1C30' },
                 }}
               >
                 Print Preview
@@ -411,7 +411,7 @@ export const AdminReportsPage: React.FC = () => {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Refresh Data">
-                <IconButton size="small" onClick={() => refetch()} sx={{ color: '#0f3674' }}>
+                <IconButton size="small" onClick={() => refetch()} sx={{ color: '#0F2744' }}>
                   <RefreshIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -430,7 +430,7 @@ export const AdminReportsPage: React.FC = () => {
       {/* Loading State */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} sx={{ color: '#0f3674' }} />
+          <CircularProgress size={32} sx={{ color: '#0F2744' }} />
         </Box>
       ) : (
         <>
