@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { reportService } from '../../services/report.service.js';
+import { attendanceService } from '../../services/attendance.service.js';
 
 export const StudentReportsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,12 @@ export const StudentReportsPage: React.FC = () => {
   } = useQuery({
     queryKey: ['studentOwnReport'],
     queryFn: () => reportService.getStudentOwnReport(),
+    staleTime: 30000,
+  });
+
+  const { data: attendanceHistory = [] } = useQuery({
+    queryKey: ['studentOwnAttendance'],
+    queryFn: () => attendanceService.getStudentOwnAttendance(),
     staleTime: 30000,
   });
 
@@ -299,6 +306,96 @@ export const StudentReportsPage: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* Assessment Attendance & Participation History */}
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1.5, color: '#0f172a' }}>
+              Assessment Attendance &amp; Participation History
+            </Typography>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              sx={{
+                bgcolor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                mb: 4,
+              }}
+            >
+              <Table size="small">
+                <TableHead sx={{ bgcolor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assessment Title</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Scheduled Window</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attempts Taken</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {attendanceHistory.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                        <Typography variant="body2" sx={{ color: '#64748b' }}>
+                          No assigned placement examinations found.
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    attendanceHistory.map((rec) => {
+                      const isNotAttended = rec.attendanceStatus === 'NOT_ATTENDED';
+                      const isCompleted = rec.attendanceStatus === 'COMPLETED';
+                      const isAttended = rec.attendanceStatus === 'ATTENDED';
+
+                      return (
+                        <TableRow key={rec.assessmentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
+                          <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>
+                            {rec.assessmentName}
+                          </TableCell>
+                          <TableCell sx={{ fontSize: '0.78rem', color: '#64748b' }}>
+                            {rec.assessmentDate || 'Flexible Window'}
+                          </TableCell>
+                          <TableCell align="center" sx={{ fontSize: '0.82rem', fontWeight: 600 }}>
+                            {rec.attemptCount}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip
+                              size="small"
+                              label={rec.attendanceStatus.replace(/_/g, ' ')}
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: '0.7rem',
+                                borderRadius: '4px',
+                                bgcolor: isNotAttended
+                                  ? '#fef2f2'
+                                  : isCompleted
+                                  ? '#ecfdf5'
+                                  : isAttended
+                                  ? '#eff6ff'
+                                  : '#f8fafc',
+                                color: isNotAttended
+                                  ? '#b91c1c'
+                                  : isCompleted
+                                  ? '#047857'
+                                  : isAttended
+                                  ? '#0369a1'
+                                  : '#64748b',
+                                border: '1px solid',
+                                borderColor: isNotAttended
+                                  ? '#fecaca'
+                                  : isCompleted
+                                  ? '#a7f3d0'
+                                  : isAttended
+                                  ? '#bfdbfe'
+                                  : '#cbd5e1',
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>

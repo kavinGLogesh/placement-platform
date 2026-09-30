@@ -25,6 +25,7 @@ import {
   evaluationsAdminRouter,
 } from './evaluation.router.js';
 import { companyRouter } from './company.router.js';
+import { attendanceRouter } from './attendance.router.js';
 
 export const apiRouter = Router();
 
@@ -73,4 +74,8 @@ apiRouter.use('/gd', gdAdminRouter);
 apiRouter.use('/interviews', interviewAdminRouter);
 apiRouter.use('/student/evaluations', studentEvaluationRouter);
 apiRouter.use('/evaluations', evaluationsAdminRouter);
+
+// Phase 11 Assessment Attendance & Follow-up Automation routes
+apiRouter.use('/attendance', attendanceRouter);
+
 

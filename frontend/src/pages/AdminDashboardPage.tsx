@@ -26,8 +26,14 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import AddIcon from '@mui/icons-material/Add';
 import BusinessIcon from '@mui/icons-material/Business';
 import QuizIcon from '@mui/icons-material/Quiz';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import SendIcon from '@mui/icons-material/Send';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import Snackbar from '@mui/material/Snackbar';
 import { useAuth } from '../hooks/useAuth.js';
 import { analyticsService } from '../services/analytics.service.js';
+import { attendanceService } from '../services/attendance.service.js';
 
 export const AdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -51,6 +57,40 @@ export const AdminDashboardPage: React.FC = () => {
     queryFn: () => analyticsService.getPlacementFunnel(),
     staleTime: 60000,
   });
+
+  const { data: activeAlerts = [], refetch: refetchAlerts } = useQuery({
+    queryKey: ['adminAttendanceAlerts'],
+    queryFn: () => attendanceService.getActiveAlerts(),
+    staleTime: 15000,
+  });
+
+  const [toastMessage, setToastMessage] = React.useState<string>('');
+  const [toastOpen, setToastOpen] = React.useState<boolean>(false);
+
+  const handleExportAlertExcel = async (assessmentId: string, title: string) => {
+    try {
+      setToastMessage(`Downloading not-attended list for ${title}...`);
+      setToastOpen(true);
+      await attendanceService.exportNotAttendedExcel(assessmentId, title);
+    } catch {
+      setToastMessage('Failed to download Excel report.');
+      setToastOpen(true);
+    }
+  };
+
+  const handleSendAlertReminder = async (assessmentId: string, title: string) => {
+    try {
+      setToastMessage(`Dispatching reminders for ${title}...`);
+      setToastOpen(true);
+      const res = await attendanceService.sendReminders(assessmentId);
+      setToastMessage(`Sent ${res.sentCount} follow-up reminder(s). (${res.skippedCount} previously notified skipped)`);
+      setToastOpen(true);
+      refetchAlerts();
+    } catch {
+      setToastMessage('Failed to send reminder emails.');
+      setToastOpen(true);
+    }
+  };
 
   return (
     <Box>
@@ -136,6 +176,13 @@ export const AdminDashboardPage: React.FC = () => {
               </Button>
               <Button
                 variant="outlined"
+                startIcon={<HowToRegIcon />}
+                onClick={() => navigate('/admin/attendance')}
+              >
+                Attendance Hub
+              </Button>
+              <Button
+                variant="outlined"
                 startIcon={<QuizIcon />}
                 onClick={() => navigate('/admin/questions')}
               >
@@ -145,6 +192,108 @@ export const AdminDashboardPage: React.FC = () => {
           )}
         </Box>
       </Box>
+
+      {/* Attention Required Section (Closed Assessments with Non-Attended Candidates) */}
+      {activeAlerts.length > 0 && (
+        <Card
+          elevation={0}
+          sx={{
+            mb: 3,
+            p: 2.5,
+            bgcolor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderLeft: '4px solid #0F2744',
+            borderRadius: '8px',
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
+                <WarningAmberIcon sx={{ color: '#b91c1c', fontSize: 20 }} />
+                <Typography variant="overline" sx={{ color: '#b91c1c', fontWeight: 700, letterSpacing: '0.06em' }}>
+                  ATTENTION REQUIRED
+                </Typography>
+                <Chip
+                  label={`${activeAlerts.length} Assessments Closed with Absences`}
+                  size="small"
+                  sx={{ height: 20, fontSize: '0.7rem', fontWeight: 700, bgcolor: '#fef2f2', color: '#b91c1c', borderRadius: '4px' }}
+                />
+              </Box>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a' }}>
+                Concluded Placement Drives Requiring Attendance Follow-up
+              </Typography>
+            </Box>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => navigate('/admin/attendance')}
+              sx={{ fontWeight: 600, fontSize: '0.8rem', color: '#0F2744', borderColor: '#cbd5e1' }}
+            >
+              Open Attendance Console
+            </Button>
+          </Box>
+
+          <Grid container spacing={1.5}>
+            {activeAlerts.map((alert) => (
+              <Grid item xs={12} key={alert.id}>
+                <Box
+                  sx={{
+                    p: 2,
+                    bgcolor: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: 1.5,
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                      {alert.notAttendedCount} students did not attend the {alert.assessmentTitle}.
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      Allocated Candidates: {alert.assignedCount} | Missed Without Attempt: {alert.notAttendedCount}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => navigate(`/admin/attendance?assessmentId=${alert.assessmentId}`)}
+                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#0F2744', borderColor: '#cbd5e1' }}
+                    >
+                      View Students
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<FileDownloadIcon sx={{ fontSize: '15px !important' }} />}
+                      onClick={() => handleExportAlertExcel(alert.assessmentId, alert.assessmentTitle)}
+                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#0F2744', borderColor: '#cbd5e1' }}
+                    >
+                      Export Excel
+                    </Button>
+                    {!isSuperAdmin && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        startIcon={<SendIcon sx={{ fontSize: '14px !important' }} />}
+                        onClick={() => handleSendAlertReminder(alert.assessmentId, alert.assessmentTitle)}
+                        sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#0F2744', '&:hover': { bgcolor: '#0A1C30' } }}
+                      >
+                        Send Reminder
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Card>
+      )}
 
       {isError && (
         <Alert
@@ -480,6 +629,14 @@ export const AdminDashboardPage: React.FC = () => {
           </Box>
         )}
       </Card>
+
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={() => setToastOpen(false)}
+        message={toastMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      />
     </Box>
   );
 };

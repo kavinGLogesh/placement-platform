@@ -198,6 +198,7 @@ model Student {
   codingSubmissions CodingSubmission[]
   gdParticipations        GdParticipant[]
   interviewParticipations InterviewParticipant[]
+  attendanceEmailLogs     AttendanceEmailLog[]
 
   @@index([departmentId])
   @@index([courseId])
@@ -444,6 +445,9 @@ model Assessment {
   usages              QuestionUsage[]
   attempts            AssessmentAttempt[]
   results             AssessmentResult[]
+  attendanceAlert     AttendanceNotification?
+  attendanceEmailLogs AttendanceEmailLog[]
+  attendanceConfig    AttendanceAutomationConfig?
 
   @@index([companyId])
   @@index([isCompanyAssessment])
@@ -954,5 +958,70 @@ model InterviewCriterionScore {
   @@index([criterionId])
   @@map("interview_criterion_scores")
 }
+
+// =============================================================================
+// PHASE 11: ASSESSMENT ATTENDANCE & FOLLOW-UP AUTOMATION
+// =============================================================================
+
+model AttendanceNotification {
+  id                String      @id @default(uuid())
+  assessmentId      String      @unique
+  assessmentTitle   String
+  notAttendedCount  Int
+  assignedCount     Int
+  alertMessage      String      @db.Text
+  isResolved        Boolean     @default(false)
+  reminderSentCount Int         @default(0)
+  lastReminderAt    DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  assessment        Assessment  @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([isResolved])
+  @@index([createdAt])
+  @@map("attendance_notifications")
+}
+
+model AttendanceEmailLog {
+  id             String      @id @default(uuid())
+  assessmentId   String
+  studentId      String
+  recipientEmail String
+  emailType      String      // "REMINDER" | "FOLLOWUP" | "CLOSING_SOON" | "START_REMINDER"
+  status         String      @default("SENT") // "SENT" | "FAILED"
+  subject        String
+  messageBody    String      @db.Text
+  errorMessage   String?     @db.Text
+  sentAt         DateTime    @default(now())
+
+  assessment     Assessment  @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  student        Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, studentId, emailType])
+  @@index([assessmentId])
+  @@index([studentId])
+  @@index([emailType])
+  @@index([sentAt])
+  @@map("attendance_email_logs")
+}
+
+model AttendanceAutomationConfig {
+  id                      String      @id @default(uuid())
+  assessmentId            String      @unique
+  isEmailReminderEnabled  Boolean     @default(true)
+  autoClosureReminder     Boolean     @default(false)
+  sendClosingSoonReminder Boolean     @default(false)
+  closingSoonHours        Int         @default(2)
+  reminderSubjectTemplate String?
+  reminderBodyTemplate    String?     @db.Text
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+
+  assessment              Assessment  @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@map("attendance_automation_configs")
+}
+
 
 

@@ -39,6 +39,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import SchoolIcon from '@mui/icons-material/School';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { useHealthCheck } from '../hooks/useHealthCheck.js';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -105,6 +106,7 @@ export const RootLayout: React.FC = () => {
             { label: 'GD Rounds', path: '/admin/gd', icon: <GroupsIcon fontSize="small" /> },
             { label: 'Interviews', path: '/admin/interviews', icon: <WorkOutlineIcon fontSize="small" /> },
             { label: 'Scoring & Results', path: '/admin/results', icon: <FactCheckIcon fontSize="small" /> },
+            { label: 'Attendance Oversight', path: '/admin/attendance', icon: <HowToRegIcon fontSize="small" /> },
           ],
         },
       ];
@@ -127,6 +129,7 @@ export const RootLayout: React.FC = () => {
             { label: 'GD Rounds', path: '/admin/gd', icon: <GroupsIcon fontSize="small" /> },
             { label: 'Technical Interviews', path: '/admin/interviews', icon: <WorkOutlineIcon fontSize="small" /> },
             { label: 'Results & Scoring', path: '/admin/results', icon: <FactCheckIcon fontSize="small" /> },
+            { label: 'Attendance & Follow-up', path: '/admin/attendance', icon: <HowToRegIcon fontSize="small" /> },
           ],
         },
         {

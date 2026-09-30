@@ -31,6 +31,8 @@ import {
   generateHtmlPrint,
 } from '../utils/export.util.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { attendanceRepository } from '../repositories/attendance.repository.js';
+import { assessmentRepository } from '../repositories/assessment.repository.js';
 
 export interface ExportResult {
   content: Buffer | string;
@@ -412,6 +414,42 @@ export class ReportService {
           },
           columns,
           data: report.rows,
+        };
+        break;
+      }
+
+      case 'not-attended':
+      case 'not-attended-students': {
+        const assessmentId = filters.assessmentId;
+        if (!assessmentId) {
+          throw new AppError('assessmentId is required for not-attended export', 400);
+        }
+        const notAttendedList = await attendanceRepository.getNotAttendedStudents(assessmentId);
+        const asmt = await assessmentRepository.getAssessmentById(assessmentId);
+        const columns: ExportColumnDef[] = [
+          { header: 'Student Name', key: 'studentName', width: 22 },
+          { header: 'Register Number', key: 'registerNumber', width: 16 },
+          { header: 'Department', key: 'departmentCode', width: 12 },
+          { header: 'Course', key: 'courseCode', width: 12 },
+          { header: 'Class', key: 'className', width: 16 },
+          { header: 'Section', key: 'sectionName', width: 10 },
+          { header: 'Email', key: 'collegeEmail', width: 26 },
+          { header: 'Assessment', key: 'assessmentName', width: 26 },
+          { header: 'Assessment Date', key: 'assessmentDate', width: 24 },
+          { header: 'Attendance Status', key: 'attendanceStatus', width: 18 },
+        ];
+        payload = {
+          institutionName: 'College Placement Assessment Platform',
+          reportTitle: `Non-Attended Students Report - ${asmt?.name || 'Assessment'}`,
+          reportDate: new Date().toLocaleString(),
+          generatedBy: userEmail,
+          appliedFilters: filters,
+          summaryMetrics: {
+            'Assessment Name': asmt?.name || 'Assessment',
+            'Total Not Attended': notAttendedList.length,
+          },
+          columns,
+          data: notAttendedList,
         };
         break;
       }

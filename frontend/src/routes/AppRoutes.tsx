@@ -17,6 +17,7 @@ import { QuestionsPage } from '../pages/admin/QuestionsPage.js';
 import { AssessmentsPage } from '../pages/admin/AssessmentsPage.js';
 import { AssessmentBuilderPage } from '../pages/admin/AssessmentBuilderPage.js';
 import { AssessmentDetailPage } from '../pages/admin/AssessmentDetailPage.js';
+import { AdminAttendancePage } from '../pages/admin/AdminAttendancePage.js';
 import { StudentTestsPage } from '../pages/student/StudentTestsPage.js';
 import { StudentAttemptPage } from '../pages/student/StudentAttemptPage.js';
 import { StudentResultsPage } from '../pages/student/StudentResultsPage.js';
@@ -165,6 +166,14 @@ export const AppRoutes: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={['PLACEMENT_ADMIN']}>
                 <AssessmentDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="admin/attendance"
+            element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'PLACEMENT_ADMIN']}>
+                <AdminAttendancePage />
               </ProtectedRoute>
             }
           />
