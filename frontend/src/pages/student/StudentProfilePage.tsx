@@ -176,9 +176,9 @@ export const StudentProfilePage: React.FC = () => {
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/student/dashboard')}
           sx={{
-            borderColor: '#cbd5e1',
-            color: '#475569',
-            '&:hover': { borderColor: '#94a3b8', bgcolor: '#f1f5f9' },
+            borderColor: '#D1DEF0',
+            color: '#526584',
+            '&:hover': { borderColor: '#8293B0', bgcolor: '#E7EEFA' },
           }}
         >
           Back to Dashboard
@@ -199,8 +199,8 @@ export const StudentProfilePage: React.FC = () => {
           p: { xs: 2.5, md: 3.5 },
           borderRadius: 3,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+          border: '1px solid #DCE6F5',
+          boxShadow: '0 4px 16px rgba(20, 38, 75, 0.04)',
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, alignItems: { xs: 'flex-start', md: 'center' } }}>
@@ -211,7 +211,7 @@ export const StudentProfilePage: React.FC = () => {
               height: 72,
               borderRadius: 3,
               bgcolor: '#eff6ff',
-              color: '#2563eb',
+              color: '#318992',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -225,7 +225,7 @@ export const StudentProfilePage: React.FC = () => {
           {/* Student Info */}
           <Box sx={{ flexGrow: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', mb: 0.5 }}>
-              <Typography variant="h4" fontWeight={800} sx={{ color: '#0f172a', letterSpacing: '-0.02em' }}>
+              <Typography variant="h4" fontWeight={800} sx={{ color: '#14264B', letterSpacing: '-0.02em' }}>
                 {profile.name}
               </Typography>
               <Chip
@@ -238,33 +238,33 @@ export const StudentProfilePage: React.FC = () => {
               <Chip
                 label="Candidate / Student"
                 size="small"
-                sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', fontWeight: 600, height: 24 }}
+                sx={{ bgcolor: '#eff6ff', color: '#267D86', border: '1px solid #bfdbfe', fontWeight: 600, height: 24 }}
               />
             </Box>
 
-            <Typography variant="body1" sx={{ color: '#475569', fontWeight: 500, mb: 1.5 }}>
+            <Typography variant="body1" sx={{ color: '#526584', fontWeight: 500, mb: 1.5 }}>
               {profile.department?.name || 'Engineering & Technology'} • Batch of {profile.class?.batchYear || profile.year}
             </Typography>
 
             {/* Quick Contact Metadata */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2.5, alignItems: 'center', color: '#64748b', fontSize: '0.875rem' }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2.5, alignItems: 'center', color: '#7182A0', fontSize: '0.875rem' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                <BadgeIcon sx={{ fontSize: 18, color: '#2563eb' }} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
+                <BadgeIcon sx={{ fontSize: 18, color: '#318992' }} />
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#33466A' }}>
                   Roll No: {profile.registerNumber}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                <EmailIcon sx={{ fontSize: 18, color: '#64748b' }} />
-                <Typography variant="body2" sx={{ color: '#334155' }}>
+                <EmailIcon sx={{ fontSize: 18, color: '#7182A0' }} />
+                <Typography variant="body2" sx={{ color: '#405678' }}>
                   {profile.collegeEmail}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                <PhoneIcon sx={{ fontSize: 18, color: '#64748b' }} />
-                <Typography variant="body2" sx={{ color: '#334155' }}>
+                <PhoneIcon sx={{ fontSize: 18, color: '#7182A0' }} />
+                <Typography variant="body2" sx={{ color: '#405678' }}>
                   {profile.phone || 'No phone registered'}
                 </Typography>
                 <Tooltip title="Update phone number">
@@ -274,7 +274,7 @@ export const StudentProfilePage: React.FC = () => {
                       setPhoneNumber(profile.phone || '');
                       setEditPhoneOpen(true);
                     }}
-                    sx={{ p: 0.3, color: '#94a3b8', '&:hover': { color: '#2563eb' } }}
+                    sx={{ p: 0.3, color: '#8293B0', '&:hover': { color: '#318992' } }}
                   >
                     <EditIcon sx={{ fontSize: 14 }} />
                   </IconButton>
@@ -295,66 +295,66 @@ export const StudentProfilePage: React.FC = () => {
               height: '100%',
               borderRadius: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               p: 3,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SchoolIcon sx={{ color: '#2563eb', fontSize: 20 }} /> Academic Curriculum & Class Enrollment
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SchoolIcon sx={{ color: '#318992', fontSize: 20 }} /> Academic Curriculum & Class Enrollment
             </Typography>
-            <Divider sx={{ mb: 2.5, borderColor: '#f1f5f9' }} />
+            <Divider sx={{ mb: 2.5, borderColor: '#E7EEFA' }} />
 
             <Grid container spacing={2.5}>
               <Grid item xs={12} sm={6}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Department / School
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   {profile.department?.name} ({profile.department?.code})
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Degree Program / Course
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   {profile.course?.name || profile.course?.code || 'B.Tech / B.E.'}
                 </Typography>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Current Year
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   Year {profile.class?.currentYear || profile.year}
                 </Typography>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Graduation Batch
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   Class of {profile.class?.batchYear || 2026}
                 </Typography>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Section
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   Section {profile.section?.name || 'A'}
                 </Typography>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Class Cohort
                 </Typography>
-                <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mt: 0.3 }}>
+                <Typography variant="body1" fontWeight={600} sx={{ color: '#14264B', mt: 0.3 }}>
                   {profile.class?.name || 'CSE 2022-2026'}
                 </Typography>
               </Grid>
@@ -370,7 +370,7 @@ export const StudentProfilePage: React.FC = () => {
               height: '100%',
               borderRadius: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               p: 3,
               display: 'flex',
               flexDirection: 'column',
@@ -378,7 +378,7 @@ export const StudentProfilePage: React.FC = () => {
             }}
           >
             <Box>
-              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <WorkspacePremiumIcon sx={{ color: '#d97706', fontSize: 20 }} /> Cumulative Grade Point
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -389,7 +389,7 @@ export const StudentProfilePage: React.FC = () => {
                 <Typography variant="h3" fontWeight={800} sx={{ color: '#059669', lineHeight: 1 }}>
                   {cgpaValue.toFixed(2)}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
                   Scale: 10.00
                 </Typography>
               </Box>
@@ -401,7 +401,7 @@ export const StudentProfilePage: React.FC = () => {
                   height: 8,
                   borderRadius: 4,
                   my: 1.5,
-                  bgcolor: '#f1f5f9',
+                  bgcolor: '#E7EEFA',
                   '& .MuiLinearProgress-bar': { bgcolor: '#059669', borderRadius: 4 },
                 }}
               />
@@ -429,14 +429,14 @@ export const StudentProfilePage: React.FC = () => {
               height: '100%',
               borderRadius: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               p: 3,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <WorkspacePremiumIcon sx={{ color: '#2563eb', fontSize: 20 }} /> Verified Professional Certifications
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <WorkspacePremiumIcon sx={{ color: '#318992', fontSize: 20 }} /> Verified Professional Certifications
             </Typography>
-            <Divider sx={{ mb: 2.5, borderColor: '#f1f5f9' }} />
+            <Divider sx={{ mb: 2.5, borderColor: '#E7EEFA' }} />
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {(profile.certifications || []).map((cert) => (
@@ -446,18 +446,18 @@ export const StudentProfilePage: React.FC = () => {
                   sx={{
                     p: 2,
                     borderRadius: 2,
-                    bgcolor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    bgcolor: '#EDF2FF',
+                    border: '1px solid #DCE6F5',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
                   <Box>
-                    <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                    <Typography variant="body2" fontWeight={700} sx={{ color: '#14264B' }}>
                       {cert.title}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       {cert.issuer} • Issued: {cert.issueDate}
                     </Typography>
                   </Box>
@@ -485,32 +485,32 @@ export const StudentProfilePage: React.FC = () => {
               height: '100%',
               borderRadius: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               p: 3,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <DescriptionIcon sx={{ color: '#2563eb', fontSize: 20 }} /> Verified Placement Resume
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <DescriptionIcon sx={{ color: '#318992', fontSize: 20 }} /> Verified Placement Resume
             </Typography>
-            <Divider sx={{ mb: 2.5, borderColor: '#f1f5f9' }} />
+            <Divider sx={{ mb: 2.5, borderColor: '#E7EEFA' }} />
 
             <Paper
               elevation={0}
               sx={{
                 p: 2.5,
                 borderRadius: 2,
-                bgcolor: '#f8fafc',
-                border: '1px solid #e2e8f0',
+                bgcolor: '#EDF2FF',
+                border: '1px solid #DCE6F5',
                 mb: 2.5,
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                 <DescriptionIcon sx={{ color: '#dc2626', fontSize: 28 }} />
                 <Box>
-                  <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                  <Typography variant="body2" fontWeight={700} sx={{ color: '#14264B' }}>
                     {profile.resume?.fileName || `${profile.registerNumber}_Resume.pdf`}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#64748b' }}>
+                  <Typography variant="caption" sx={{ color: '#7182A0' }}>
                     {profile.resume?.fileSize || '245 KB'} • Verified for Placement Drives
                   </Typography>
                 </Box>
@@ -575,14 +575,14 @@ export const StudentProfilePage: React.FC = () => {
               height: '100%',
               borderRadius: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               p: 3,
             }}
           >
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
               <LightbulbIcon sx={{ color: '#d97706', fontSize: 20 }} /> Placement Recommendations & Guidance
             </Typography>
-            <Divider sx={{ mb: 2.5, borderColor: '#f1f5f9' }} />
+            <Divider sx={{ mb: 2.5, borderColor: '#E7EEFA' }} />
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {(profile.recommendations || []).map((rec) => (
@@ -592,8 +592,8 @@ export const StudentProfilePage: React.FC = () => {
                   sx={{
                     p: 2,
                     borderRadius: 2,
-                    bgcolor: rec.priority === 'HIGH' ? '#fffbeb' : '#f8fafc',
-                    border: `1px solid ${rec.priority === 'HIGH' ? '#fde68a' : '#e2e8f0'}`,
+                    bgcolor: rec.priority === 'HIGH' ? '#fffbeb' : '#EDF2FF',
+                    border: `1px solid ${rec.priority === 'HIGH' ? '#fde68a' : '#DCE6F5'}`,
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -603,11 +603,11 @@ export const StudentProfilePage: React.FC = () => {
                       color={rec.priority === 'HIGH' ? 'warning' : 'default'}
                       sx={{ height: 20, fontSize: '0.68rem', fontWeight: 700 }}
                     />
-                    <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                    <Typography variant="body2" fontWeight={700} sx={{ color: '#14264B' }}>
                       {rec.title}
                     </Typography>
                   </Box>
-                  <Typography variant="caption" sx={{ color: '#475569', display: 'block' }}>
+                  <Typography variant="caption" sx={{ color: '#526584', display: 'block' }}>
                     {rec.description}
                   </Typography>
                 </Paper>

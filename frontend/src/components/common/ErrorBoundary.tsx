@@ -89,11 +89,11 @@ export class ErrorBoundary extends Component<Props, State> {
               <ErrorOutlineIcon sx={{ fontSize: 36 }} />
             </Box>
 
-            <Typography variant="h5" fontWeight={700} color="#0f172a" gutterBottom>
+            <Typography variant="h5" fontWeight={700} color="#14264B" gutterBottom>
               Something Went Wrong
             </Typography>
 
-            <Typography variant="body2" color="#64748b" sx={{ mb: 3 }}>
+            <Typography variant="body2" color="#7182A0" sx={{ mb: 3 }}>
               An unexpected error occurred while rendering this component. The system caught this
               error gracefully to prevent a blank screen.
             </Typography>
@@ -139,8 +139,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 sx={{
                   textTransform: 'none',
                   fontWeight: 600,
-                  bgcolor: '#2563eb',
-                  '&:hover': { bgcolor: '#1d4ed8' },
+                  bgcolor: '#318992',
+                  '&:hover': { bgcolor: '#267D86' },
                 }}
               >
                 Go to Dashboard

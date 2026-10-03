@@ -306,7 +306,7 @@ export const StudentPerformancePage: React.FC = () => {
                         ? '#34d399'
                         : changeStatus === 'DECREASED'
                         ? '#f87171'
-                        : '#94a3b8',
+                        : '#8293B0',
                   }}
                 >
                   {changeStatus === 'IMPROVED' ? (
@@ -327,7 +327,7 @@ export const StudentPerformancePage: React.FC = () => {
                           ? '#34d399'
                           : changeStatus === 'DECREASED'
                           ? '#f87171'
-                          : '#cbd5e1',
+                          : '#D1DEF0',
                     }}
                   >
                     {changeStatus === 'IMPROVED'
@@ -360,7 +360,7 @@ export const StudentPerformancePage: React.FC = () => {
                           ? '#34d399'
                           : changeStatus === 'DECREASED'
                           ? '#f87171'
-                          : '#94a3b8',
+                          : '#8293B0',
                     }}
                   >
                     {pointsDiff > 0 ? `+${pointsDiff}` : `${pointsDiff}`} points
@@ -380,7 +380,7 @@ export const StudentPerformancePage: React.FC = () => {
                           ? '#34d399'
                           : changeStatus === 'DECREASED'
                           ? '#f87171'
-                          : '#94a3b8',
+                          : '#8293B0',
                     }}
                   >
                     {changeStatus === 'IMPROVED'
@@ -515,10 +515,10 @@ export const StudentPerformancePage: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryChartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                    <XAxis dataKey="name" stroke="#94a3b8" />
-                    <YAxis unit="%" domain={[0, 100]} stroke="#94a3b8" />
+                    <XAxis dataKey="name" stroke="#8293B0" />
+                    <YAxis unit="%" domain={[0, 100]} stroke="#8293B0" />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#33466A', borderColor: '#405678', borderRadius: 8 }}
                       formatter={(val: any) => [`${val}%`]}
                     />
                     <Legend />
@@ -646,7 +646,7 @@ export const StudentPerformancePage: React.FC = () => {
         <Typography variant="overline" sx={{ fontWeight: 800, color: '#16a34a', letterSpacing: 1.5 }}>
           Human Evaluation: Structured GD & Interviews
         </Typography>
-        <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#0f172a' }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#14264B' }}>
           Qualitative & Evaluator Assessment Progress
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -681,7 +681,7 @@ export const StudentPerformancePage: React.FC = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="caption" color="text.secondary">LATEST SCORE</Typography>
-                <Typography variant="h5" fontWeight={800} color="#0f172a">
+                <Typography variant="h5" fontWeight={800} color="#14264B">
                   {humanEvalSummary?.gd.latestPercentage ? `${humanEvalSummary.gd.latestPercentage}%` : '—'}
                 </Typography>
               </Grid>
@@ -702,13 +702,13 @@ export const StudentPerformancePage: React.FC = () => {
                       p: 1.5,
                       borderRadius: 1.5,
                       bgcolor: 'rgba(241, 245, 249, 0.6)',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid #DCE6F5',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
                   >
-                    <Typography variant="body2" fontWeight={600} color="#0f172a">
+                    <Typography variant="body2" fontWeight={600} color="#14264B">
                       {p.displayText}
                     </Typography>
                     {p.difference !== null && (
@@ -742,7 +742,7 @@ export const StudentPerformancePage: React.FC = () => {
           <Card sx={{ p: 3, border: '1px solid rgba(37, 99, 235, 0.2)', bgcolor: 'background.paper', height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <WorkOutlineIcon sx={{ color: '#2563eb' }} />
+                <WorkOutlineIcon sx={{ color: '#318992' }} />
                 <Typography variant="h6" fontWeight={700}>
                   Structured Interviews
                 </Typography>
@@ -757,13 +757,13 @@ export const StudentPerformancePage: React.FC = () => {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={6}>
                 <Typography variant="caption" color="text.secondary">AVERAGE SCORE</Typography>
-                <Typography variant="h5" fontWeight={800} color="#2563eb">
+                <Typography variant="h5" fontWeight={800} color="#318992">
                   {humanEvalSummary?.interview.averagePercentage ? `${humanEvalSummary.interview.averagePercentage}%` : '—'}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="caption" color="text.secondary">LATEST SCORE</Typography>
-                <Typography variant="h5" fontWeight={800} color="#0f172a">
+                <Typography variant="h5" fontWeight={800} color="#14264B">
                   {humanEvalSummary?.interview.latestPercentage ? `${humanEvalSummary.interview.latestPercentage}%` : '—'}
                 </Typography>
               </Grid>
@@ -784,13 +784,13 @@ export const StudentPerformancePage: React.FC = () => {
                       p: 1.5,
                       borderRadius: 1.5,
                       bgcolor: 'rgba(241, 245, 249, 0.6)',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid #DCE6F5',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}
                   >
-                    <Typography variant="body2" fontWeight={600} color="#0f172a">
+                    <Typography variant="body2" fontWeight={600} color="#14264B">
                       {p.displayText}
                     </Typography>
                     {p.difference !== null && (

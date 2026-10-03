@@ -351,14 +351,14 @@ export const CoursesPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 2.5,
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSave}>
-          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
+          <DialogTitle sx={{ color: '#14264B', fontWeight: 700, borderBottom: '1px solid #DCE6F5', pb: 2 }}>
             {editingCourse ? 'Edit Degree Course' : 'Add Degree Course'}
           </DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2.5 }}>

@@ -533,13 +533,13 @@ export const StudentsPage: React.FC = () => {
       {/* Page Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <div>
-          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
             CANDIDATE DIRECTORY & ENROLLMENT
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
+          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#14264B' }}>
             Student Placement Registry
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             Manage eligible candidate profiles, department affiliations, academic standing (CGPA), and credential provisioning.
           </Typography>
         </div>
@@ -555,13 +555,13 @@ export const StudentsPage: React.FC = () => {
               setImportDialogOpen(true);
             }}
             sx={{
-              color: '#0F2744',
-              borderColor: '#cbd5e1',
+              color: '#1765B5',
+              borderColor: '#D1DEF0',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
+              '&:hover': { borderColor: '#1765B5', bgcolor: 'rgba(23, 101, 181, 0.04)' },
             }}
           >
             Bulk Excel Import
@@ -573,13 +573,13 @@ export const StudentsPage: React.FC = () => {
             onClick={() => handleOpenStudentDialog()}
             disabled={departments.length === 0 || sections.length === 0}
             sx={{
-              bgcolor: '#0F2744',
+              bgcolor: '#1765B5',
               color: '#ffffff',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { bgcolor: '#0A1C30' },
+              '&:hover': { bgcolor: '#104B91' },
             }}
           >
             Register Student
@@ -600,7 +600,7 @@ export const StudentsPage: React.FC = () => {
           p: 2.5,
           mb: 3,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: 2.5,
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
         }}
@@ -759,14 +759,14 @@ export const StudentsPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 2.5,
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSaveStudent}>
-          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
+          <DialogTitle sx={{ color: '#14264B', fontWeight: 700, borderBottom: '1px solid #DCE6F5', pb: 2 }}>
             {editingStudent ? 'Edit Student Details' : 'Register New Student'}
           </DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
@@ -981,13 +981,13 @@ export const StudentsPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 2.5,
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
-        <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', pb: 2 }}>
+        <DialogTitle sx={{ color: '#14264B', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #DCE6F5', pb: 2 }}>
           <span>Bulk Student Excel Import</span>
           <Button
             size="small"
@@ -1010,12 +1010,12 @@ export const StudentsPage: React.FC = () => {
               p: 4,
               border: '2px dashed rgba(99, 102, 241, 0.4)',
               borderRadius: 2.5,
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#EDF2FF',
               textAlign: 'center',
               cursor: 'pointer',
               '&:hover': {
                 borderColor: 'primary.main',
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#E7EEFA',
               },
             }}
             onClick={() => document.getElementById('excel-file-input')?.click()}
@@ -1115,14 +1115,14 @@ export const StudentsPage: React.FC = () => {
                     </Button>
                   </Box>
 
-                  <TableContainer component={Paper} sx={{ maxHeight: 240, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 2 }}>
+                  <TableContainer component={Paper} sx={{ maxHeight: 240, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: 2 }}>
                     <Table size="small" stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Row</TableCell>
-                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Register No</TableCell>
-                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Field</TableCell>
-                          <TableCell sx={{ bgcolor: '#f8fafc', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #e2e8f0' }}>Error Reason</TableCell>
+                          <TableCell sx={{ bgcolor: '#EDF2FF', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #DCE6F5' }}>Row</TableCell>
+                          <TableCell sx={{ bgcolor: '#EDF2FF', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #DCE6F5' }}>Register No</TableCell>
+                          <TableCell sx={{ bgcolor: '#EDF2FF', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #DCE6F5' }}>Field</TableCell>
+                          <TableCell sx={{ bgcolor: '#EDF2FF', color: 'text.primary', fontWeight: 700, borderBottom: '1px solid #DCE6F5' }}>Error Reason</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -1180,7 +1180,7 @@ export const StudentsPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
         onClose={() => setCredentialModalData(null)}
-        PaperProps={{ sx: { borderRadius: 3, border: '1px solid #e2e8f0', p: 1 } }}
+        PaperProps={{ sx: { borderRadius: 3, border: '1px solid #DCE6F5', p: 1 } }}
       >
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
           <Box sx={{ bgcolor: 'primary.lighter', p: 1, borderRadius: 2, display: 'flex', color: 'primary.main' }}>

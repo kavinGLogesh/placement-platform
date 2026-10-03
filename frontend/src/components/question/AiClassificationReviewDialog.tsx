@@ -104,7 +104,7 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
     return (
       <Box sx={{ mb: 1.5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: '#334155' }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#405678' }}>
             {label}
           </Typography>
           <Typography
@@ -135,7 +135,7 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
           justifyContent: 'space-between',
           alignItems: 'center',
           pb: 1,
-          borderBottom: '1px solid #e2e8f0',
+          borderBottom: '1px solid #DCE6F5',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -159,18 +159,18 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
         {/* Question Statement Preview */}
         <Paper
           variant="outlined"
-          sx={{ p: 2, mb: 2.5, bgcolor: '#f8fafc', borderColor: '#e2e8f0', borderRadius: 2 }}
+          sx={{ p: 2, mb: 2.5, bgcolor: '#EDF2FF', borderColor: '#DCE6F5', borderRadius: 2 }}
         >
-          <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+          <Typography variant="caption" sx={{ fontWeight: 700, color: '#7182A0', textTransform: 'uppercase' }}>
             Question Statement
           </Typography>
-          <Typography variant="body1" sx={{ fontWeight: 600, color: '#0f172a', mt: 0.5 }}>
+          <Typography variant="body1" sx={{ fontWeight: 600, color: '#14264B', mt: 0.5 }}>
             {question.questionText}
           </Typography>
 
           {question.options && question.options.length > 0 && (
             <Box sx={{ mt: 1.5 }}>
-              <Typography variant="caption" sx={{ fontWeight: 600, color: '#64748b' }}>
+              <Typography variant="caption" sx={{ fontWeight: 600, color: '#7182A0' }}>
                 Options ({question.options.length}):
               </Typography>
               <Grid container spacing={1} sx={{ mt: 0.5 }}>
@@ -182,7 +182,7 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
                         borderRadius: 1,
                         bgcolor: opt.isCorrect ? '#f0fdf4' : '#ffffff',
                         border: '1px solid',
-                        borderColor: opt.isCorrect ? '#86efac' : '#e2e8f0',
+                        borderColor: opt.isCorrect ? '#86efac' : '#DCE6F5',
                         fontSize: '0.85rem',
                         display: 'flex',
                         alignItems: 'center',
@@ -213,10 +213,10 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
             <Grid item xs={12} md={6}>
               <Paper
                 variant="outlined"
-                sx={{ p: 2, height: '100%', borderColor: '#cbd5e1', borderRadius: 2 }}
+                sx={{ p: 2, height: '100%', borderColor: '#D1DEF0', borderRadius: 2 }}
               >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B' }}>
                     Confidence Analysis
                   </Typography>
                   <Chip
@@ -272,9 +272,9 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
             <Grid item xs={12} md={6}>
               <Paper
                 variant="outlined"
-                sx={{ p: 2, height: '100%', borderColor: '#cbd5e1', borderRadius: 2 }}
+                sx={{ p: 2, height: '100%', borderColor: '#D1DEF0', borderRadius: 2 }}
               >
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a', mb: 1.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B', mb: 1.5 }}>
                   AI Suggested Metadata
                 </Typography>
 
@@ -414,7 +414,7 @@ export const AiClassificationReviewDialog: React.FC<AiClassificationReviewDialog
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
+      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #DCE6F5', justifyContent: 'space-between' }}>
         <Box>
           <Button
             variant="text"

@@ -52,10 +52,10 @@ export const StudentResultsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <div>
-          <Typography variant="overline" sx={{ color: '#2563eb', fontWeight: 700, letterSpacing: '0.08em' }}>
+          <Typography variant="overline" sx={{ color: '#318992', fontWeight: 700, letterSpacing: '0.08em' }}>
             PERFORMANCE & QUALIFICATION EVALUATION
           </Typography>
-          <Typography variant="h4" fontWeight={800} sx={{ color: '#0f172a', letterSpacing: '-0.02em', mb: 0.5 }}>
+          <Typography variant="h4" fontWeight={800} sx={{ color: '#14264B', letterSpacing: '-0.02em', mb: 0.5 }}>
             My Assessment Results
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -80,13 +80,13 @@ export const StudentResultsPage: React.FC = () => {
       )}
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8, bgcolor: '#ffffff', borderRadius: 2.5, border: '1px solid #e2e8f0' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8, bgcolor: '#ffffff', borderRadius: 2.5, border: '1px solid #DCE6F5' }}>
           <CircularProgress size={32} />
         </Box>
       ) : results.length === 0 ? (
-        <Card sx={{ textAlign: 'center', py: 8, px: 3, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 2.5 }}>
-          <AssessmentIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
-          <Typography variant="h6" fontWeight={700} color="#0f172a" gutterBottom>
+        <Card sx={{ textAlign: 'center', py: 8, px: 3, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: 2.5 }}>
+          <AssessmentIcon sx={{ fontSize: 48, color: '#8293B0', mb: 2 }} />
+          <Typography variant="h6" fontWeight={700} color="#14264B" gutterBottom>
             No Completed Results Yet
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -108,19 +108,19 @@ export const StudentResultsPage: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     bgcolor: '#ffffff',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid #DCE6F5',
                     borderRadius: 2.5,
-                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+                    boxShadow: '0 1px 3px rgba(20, 38, 75, 0.04)',
                     transition: 'all 0.15s ease',
                     '&:hover': {
                       borderColor: isPassed ? '#10b981' : '#f87171',
-                      boxShadow: '0 6px 20px rgba(15, 23, 42, 0.08)',
+                      boxShadow: '0 6px 20px rgba(20, 38, 75, 0.08)',
                     },
                   }}
                 >
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ pr: 1 }}>
+                      <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ pr: 1 }}>
                         {result.assessment?.name || 'Assessment Result'}
                       </Typography>
                       <Chip
@@ -140,7 +140,7 @@ export const StudentResultsPage: React.FC = () => {
 
                     {/* Big Score Display */}
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, my: 2 }}>
-                      <Typography variant="h3" fontWeight={800} sx={{ color: isPassed ? '#059669' : '#0f172a' }}>
+                      <Typography variant="h3" fontWeight={800} sx={{ color: isPassed ? '#059669' : '#14264B' }}>
                         {result.percentage}%
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -148,7 +148,7 @@ export const StudentResultsPage: React.FC = () => {
                       </Typography>
                     </Box>
 
-                    <Divider sx={{ my: 2, borderColor: '#e2e8f0' }} />
+                    <Divider sx={{ my: 2, borderColor: '#DCE6F5' }} />
 
                     {/* Breakdown Metrics */}
                     <Grid container spacing={1}>
@@ -165,7 +165,7 @@ export const StudentResultsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Accuracy
                         </Typography>
-                        <Typography variant="body2" fontWeight={700} color="#0f172a">
+                        <Typography variant="body2" fontWeight={700} color="#14264B">
                           {result.accuracy}%
                         </Typography>
                       </Grid>
@@ -189,7 +189,7 @@ export const StudentResultsPage: React.FC = () => {
                       </Grid>
                     </Grid>
 
-                    <Box sx={{ mt: 2, pt: 1, borderTop: '1px dashed #e2e8f0' }}>
+                    <Box sx={{ mt: 2, pt: 1, borderTop: '1px dashed #DCE6F5' }}>
                       <Typography variant="caption" color="text.secondary">
                         Date: {new Date(result.createdAt).toLocaleDateString()} at{' '}
                         {new Date(result.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

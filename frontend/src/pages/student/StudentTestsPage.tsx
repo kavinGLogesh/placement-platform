@@ -120,10 +120,10 @@ export const StudentTestsPage: React.FC = () => {
       {/* Top Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
             CAMPUS PLACEMENT EXAMINATIONS
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             My Assessments & Examination Schedule
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -143,7 +143,7 @@ export const StudentTestsPage: React.FC = () => {
             variant="text"
             size="small"
             onClick={() => navigate('/student/dashboard')}
-            sx={{ fontWeight: 600, color: '#475569' }}
+            sx={{ fontWeight: 600, color: '#526584' }}
           >
             Dashboard
           </Button>
@@ -158,7 +158,7 @@ export const StudentTestsPage: React.FC = () => {
 
       {/* Track & Company Filter Bar */}
       <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.25 }}>
-        <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569', mr: 0.5, letterSpacing: '0.04em' }}>
+        <Typography variant="caption" sx={{ fontWeight: 700, color: '#526584', mr: 0.5, letterSpacing: '0.04em' }}>
           TRACK:
         </Typography>
         <Chip
@@ -172,10 +172,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'ALL' ? '#0F2744' : '#ffffff',
-            color: trackFilter === 'ALL' ? '#ffffff' : '#475569',
+            backgroundColor: trackFilter === 'ALL' ? '#1765B5' : '#ffffff',
+            color: trackFilter === 'ALL' ? '#ffffff' : '#526584',
             border: '1px solid',
-            borderColor: trackFilter === 'ALL' ? '#0F2744' : '#cbd5e1',
+            borderColor: trackFilter === 'ALL' ? '#1765B5' : '#D1DEF0',
           }}
         />
         <Chip
@@ -189,10 +189,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'GENERAL' ? '#0F2744' : '#ffffff',
-            color: trackFilter === 'GENERAL' ? '#ffffff' : '#475569',
+            backgroundColor: trackFilter === 'GENERAL' ? '#1765B5' : '#ffffff',
+            color: trackFilter === 'GENERAL' ? '#ffffff' : '#526584',
             border: '1px solid',
-            borderColor: trackFilter === 'GENERAL' ? '#0F2744' : '#cbd5e1',
+            borderColor: trackFilter === 'GENERAL' ? '#1765B5' : '#D1DEF0',
           }}
         />
         <Chip
@@ -204,10 +204,10 @@ export const StudentTestsPage: React.FC = () => {
           sx={{
             fontWeight: 600,
             borderRadius: '4px',
-            backgroundColor: trackFilter === 'COMPANY' ? '#0F2744' : '#ffffff',
-            color: trackFilter === 'COMPANY' ? '#ffffff' : '#475569',
+            backgroundColor: trackFilter === 'COMPANY' ? '#1765B5' : '#ffffff',
+            color: trackFilter === 'COMPANY' ? '#ffffff' : '#526584',
             border: '1px solid',
-            borderColor: trackFilter === 'COMPANY' ? '#0F2744' : '#cbd5e1',
+            borderColor: trackFilter === 'COMPANY' ? '#1765B5' : '#D1DEF0',
           }}
         />
 
@@ -215,7 +215,7 @@ export const StudentTestsPage: React.FC = () => {
         {trackFilter !== 'GENERAL' && availableCompanyCodes.length > 0 && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { xs: 0, sm: 1 }, flexWrap: 'wrap' }}>
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               Company:
             </Typography>
             <Chip
@@ -227,9 +227,9 @@ export const StudentTestsPage: React.FC = () => {
                 fontWeight: 600,
                 fontSize: '0.72rem',
                 borderRadius: '4px',
-                backgroundColor: selectedCompanyCode === 'ALL' ? '#0F2744' : '#f8fafc',
-                color: selectedCompanyCode === 'ALL' ? '#ffffff' : '#475569',
-                border: '1px solid #cbd5e1',
+                backgroundColor: selectedCompanyCode === 'ALL' ? '#1765B5' : '#EDF2FF',
+                color: selectedCompanyCode === 'ALL' ? '#ffffff' : '#526584',
+                border: '1px solid #D1DEF0',
               }}
             />
             {availableCompanyCodes.map((code) => (
@@ -243,9 +243,9 @@ export const StudentTestsPage: React.FC = () => {
                   fontWeight: 600,
                   fontSize: '0.72rem',
                   borderRadius: '4px',
-                  backgroundColor: selectedCompanyCode === code ? '#0F2744' : '#ffffff',
-                  color: selectedCompanyCode === code ? '#ffffff' : '#475569',
-                  border: '1px solid #cbd5e1',
+                  backgroundColor: selectedCompanyCode === code ? '#1765B5' : '#ffffff',
+                  color: selectedCompanyCode === code ? '#ffffff' : '#526584',
+                  border: '1px solid #D1DEF0',
                 }}
               />
             ))}
@@ -257,26 +257,26 @@ export const StudentTestsPage: React.FC = () => {
       {(trackFilter === 'COMPANY' || filteredTests.some((t) => t.isCompanyAssessment)) && (
         <Alert
           severity="info"
-          icon={<BusinessIcon sx={{ color: '#0F2744' }} />}
+          icon={<BusinessIcon sx={{ color: '#1765B5' }} />}
           sx={{
             mb: 2.5,
-            backgroundColor: '#f8fafc',
-            border: '1px solid #cbd5e1',
+            backgroundColor: '#EDF2FF',
+            border: '1px solid #D1DEF0',
             borderRadius: '6px',
-            color: '#1e293b',
+            color: '#33466A',
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B' }}>
             Company-Specific Placement Preparation & Mock Practice Module
           </Typography>
-          <Typography variant="caption" sx={{ color: '#475569', mt: 0.25, display: 'block' }}>
+          <Typography variant="caption" sx={{ color: '#526584', mt: 0.25, display: 'block' }}>
             Assessments tagged with corporate recruiters (TCS, Wipro, Cognizant, Infosys, Accenture, HCL) are simulated mock patterns designed for placement examination preparation.
           </Typography>
         </Alert>
       )}
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0', mb: 3 }}>
+      <Box sx={{ borderBottom: 1, borderColor: '#DCE6F5', mb: 3 }}>
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
@@ -300,13 +300,13 @@ export const StudentTestsPage: React.FC = () => {
 
       {/* Content */}
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #DCE6F5' }}>
           <CircularProgress size={28} />
         </Box>
       ) : filteredTests.length === 0 ? (
-        <Card elevation={0} sx={{ textAlign: 'center', py: 6, px: 3, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-          <AssignmentIcon sx={{ fontSize: 40, color: '#94a3b8', mb: 1.5 }} />
-          <Typography variant="subtitle1" fontWeight={700} color="#0f172a" gutterBottom>
+        <Card elevation={0} sx={{ textAlign: 'center', py: 6, px: 3, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+          <AssignmentIcon sx={{ fontSize: 40, color: '#8293B0', mb: 1.5 }} />
+          <Typography variant="subtitle1" fontWeight={700} color="#14264B" gutterBottom>
             No Assessments Found
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -333,11 +333,11 @@ export const StudentTestsPage: React.FC = () => {
                     flexDirection: 'column',
                     position: 'relative',
                     bgcolor: '#ffffff',
-                    border: hasActiveAttempt ? '2px solid #0F2744' : '1px solid #e2e8f0',
+                    border: hasActiveAttempt ? '2px solid #1765B5' : '1px solid #DCE6F5',
                     borderRadius: '8px',
                     transition: 'border-color 0.15s ease',
                     '&:hover': {
-                      borderColor: hasActiveAttempt ? '#0F2744' : '#94a3b8',
+                      borderColor: hasActiveAttempt ? '#1765B5' : '#8293B0',
                     },
                   }}
                 >
@@ -353,9 +353,9 @@ export const StudentTestsPage: React.FC = () => {
                               mb: 0.75,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: '#F0F4F9',
-                              color: '#0F2744',
-                              border: '1px solid #CBD5E1',
+                              backgroundColor: '#E4EEFC',
+                              color: '#1765B5',
+                              border: '1px solid #D1DEF0',
                               borderRadius: '4px',
                             }}
                           />
@@ -369,13 +369,13 @@ export const StudentTestsPage: React.FC = () => {
                               mb: 0.75,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: '#F0F4F9',
-                              color: '#0F2744',
+                              backgroundColor: '#E4EEFC',
+                              color: '#1765B5',
                               borderRadius: '4px',
                             }}
                           />
                         )}
-                        <Typography variant="subtitle1" fontWeight={700} color="#0f172a" sx={{ pr: 1 }}>
+                        <Typography variant="subtitle1" fontWeight={700} color="#14264B" sx={{ pr: 1 }}>
                           {test.name}
                         </Typography>
                       </Box>
@@ -392,14 +392,14 @@ export const StudentTestsPage: React.FC = () => {
                             ? '#ecfdf5'
                             : isUpcoming
                             ? '#eff6ff'
-                            : '#f1f5f9',
+                            : '#E7EEFA',
                           color: hasActiveAttempt
                             ? '#b45309'
                             : isAvailable
                             ? '#047857'
                             : isUpcoming
                             ? '#0369a1'
-                            : '#64748b',
+                            : '#7182A0',
                           border: '1px solid',
                           borderColor: hasActiveAttempt
                             ? '#fde68a'
@@ -407,7 +407,7 @@ export const StudentTestsPage: React.FC = () => {
                             ? '#a7f3d0'
                             : isUpcoming
                             ? '#bfdbfe'
-                            : '#cbd5e1',
+                            : '#D1DEF0',
                         }}
                       />
                     </Box>
@@ -418,7 +418,7 @@ export const StudentTestsPage: React.FC = () => {
                       </Typography>
                     )}
 
-                    <Divider sx={{ my: 1.25, borderColor: '#f1f5f9' }} />
+                    <Divider sx={{ my: 1.25, borderColor: '#E7EEFA' }} />
 
                     {/* Metadata Grid */}
                     <Grid container spacing={1} sx={{ mt: 0.25 }}>
@@ -426,7 +426,7 @@ export const StudentTestsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <TimerIcon sx={{ fontSize: 13 }} /> Duration
                         </Typography>
-                        <Typography variant="body2" fontWeight={600} color="#0f172a">
+                        <Typography variant="body2" fontWeight={600} color="#14264B">
                           {test.duration} mins
                         </Typography>
                       </Grid>
@@ -435,7 +435,7 @@ export const StudentTestsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <HelpOutlineIcon sx={{ fontSize: 13 }} /> Questions
                         </Typography>
-                        <Typography variant="body2" fontWeight={600} color="#0f172a">
+                        <Typography variant="body2" fontWeight={600} color="#14264B">
                           {test.totalQuestions || 'Multiple'}
                         </Typography>
                       </Grid>
@@ -444,7 +444,7 @@ export const StudentTestsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Passing Cut-off
                         </Typography>
-                        <Typography variant="body2" fontWeight={600} color="#0f172a">
+                        <Typography variant="body2" fontWeight={600} color="#14264B">
                           {test.passingPercentage}%
                         </Typography>
                       </Grid>
@@ -453,13 +453,13 @@ export const StudentTestsPage: React.FC = () => {
                         <Typography variant="caption" color="text.secondary">
                           Negative Marking
                         </Typography>
-                        <Typography variant="body2" fontWeight={600} color={test.negativeMarking ? '#b45309' : '#64748b'}>
+                        <Typography variant="body2" fontWeight={600} color={test.negativeMarking ? '#b45309' : '#7182A0'}>
                           {test.negativeMarking ? 'Yes (-0.25)' : 'None'}
                         </Typography>
                       </Grid>
                     </Grid>
 
-                    <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed #e2e8f0' }}>
+                    <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px dashed #DCE6F5' }}>
                       <Typography variant="caption" color="text.secondary">
                         Attempts: {test.attemptsCount} of {test.maximumAttempts} used
                       </Typography>

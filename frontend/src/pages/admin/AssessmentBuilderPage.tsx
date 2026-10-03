@@ -331,11 +331,11 @@ export const AssessmentBuilderPage: React.FC = () => {
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <IconButton onClick={() => navigate('/admin/assessments')} sx={{ color: '#475569', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+        <IconButton onClick={() => navigate('/admin/assessments')} sx={{ color: '#526584', bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '6px' }}>
           <ArrowBackIcon fontSize="small" />
         </IconButton>
         <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a' }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B' }}>
             Assessment Configuration Wizard
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -359,7 +359,7 @@ export const AssessmentBuilderPage: React.FC = () => {
           mb: 3,
           borderRadius: '8px',
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
         }}
       >
         <Stepper activeStep={activeStep}>
@@ -381,10 +381,10 @@ export const AssessmentBuilderPage: React.FC = () => {
                 p: 3,
                 borderRadius: '8px',
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
               }}
             >
-              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2.5 }}>
+              <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 2.5 }}>
                 1. Basic Details & Examination Rules
               </Typography>
 
@@ -440,7 +440,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                             </Typography>
                             <Chip label="Prep / Practice Mode" size="small" color="primary" sx={{ fontWeight: 600, fontSize: '0.75rem' }} />
                           </Box>
-                          <Typography variant="body2" sx={{ color: '#1e3a8a', mt: 0.5 }}>
+                          <Typography variant="body2" sx={{ color: '#3B82D0', mt: 0.5 }}>
                             {selectedComp?.description || 'Tailored mock assessment for recruitment pattern readiness.'} The automated paper generator will prioritize questions tagged with this company from the Question Bank.
                           </Typography>
                         </Alert>
@@ -522,9 +522,9 @@ export const AssessmentBuilderPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
+              <Divider sx={{ my: 3.5, borderColor: '#DCE6F5' }} />
 
-              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+              <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
                 Department Targeting
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -541,14 +541,14 @@ export const AssessmentBuilderPage: React.FC = () => {
                       p: 2.5,
                       cursor: 'pointer',
                       border: '2px solid',
-                      borderColor: departmentTargeting === 'SPECIFIC' ? '#2563eb' : '#e2e8f0',
+                      borderColor: departmentTargeting === 'SPECIFIC' ? '#318992' : '#DCE6F5',
                       bgcolor: departmentTargeting === 'SPECIFIC' ? '#eff6ff' : '#ffffff',
                       borderRadius: 2,
                       transition: 'all 0.15s ease',
                       '&:hover': { borderColor: '#93c5fd' },
                     }}
                   >
-                    <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                    <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                       Specific Department
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
@@ -567,14 +567,14 @@ export const AssessmentBuilderPage: React.FC = () => {
                       p: 2.5,
                       cursor: 'pointer',
                       border: '2px solid',
-                      borderColor: departmentTargeting === 'ALL' ? '#2563eb' : '#e2e8f0',
+                      borderColor: departmentTargeting === 'ALL' ? '#318992' : '#DCE6F5',
                       bgcolor: departmentTargeting === 'ALL' ? '#eff6ff' : '#ffffff',
                       borderRadius: 2,
                       transition: 'all 0.15s ease',
                       '&:hover': { borderColor: '#93c5fd' },
                     }}
                   >
-                    <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                    <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                       All Departments
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
@@ -625,9 +625,9 @@ export const AssessmentBuilderPage: React.FC = () => {
                 )}
               </Grid>
 
-              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
+              <Divider sx={{ my: 3.5, borderColor: '#DCE6F5' }} />
 
-              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+              <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 2 }}>
                 Evaluation Options
               </Typography>
 
@@ -690,13 +690,13 @@ export const AssessmentBuilderPage: React.FC = () => {
               sx={{
                 p: 2.5,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                <TuneIcon sx={{ color: '#0F2744' }} />
-                <Typography variant="h6" fontWeight={700} color="#0f172a">
+                <TuneIcon sx={{ color: '#1765B5' }} />
+                <Typography variant="h6" fontWeight={700} color="#14264B">
                   Assessment Blueprint
                 </Typography>
               </Box>
@@ -707,19 +707,19 @@ export const AssessmentBuilderPage: React.FC = () => {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Paper Sets:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{numberOfPapers} Paper(s)</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{numberOfPapers} Paper(s)</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Test Duration:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{duration} mins</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{duration} mins</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Passing Score:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{passingPercentage}%</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{passingPercentage}%</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Negative Marking:</Typography>
-                  <Typography variant="body2" fontWeight={700} color={negativeMarking ? '#d97706' : '#64748b'}>
+                  <Typography variant="body2" fontWeight={700} color={negativeMarking ? '#d97706' : '#7182A0'}>
                     {negativeMarking ? 'Active' : 'Disabled'}
                   </Typography>
                 </Box>
@@ -740,10 +740,10 @@ export const AssessmentBuilderPage: React.FC = () => {
               mb: 3,
               borderRadius: '8px',
               bgcolor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
             }}
           >
-            <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1.5 }}>
+            <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1.5 }}>
               Add Assessment Section:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -776,7 +776,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                     p: 2.5,
                     borderRadius: '8px',
                     bgcolor: '#ffffff',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid #DCE6F5',
                   }}
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -791,7 +791,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                         label={COMPONENT_LABELS[sec.component]}
                         size="small"
                         variant="outlined"
-                        sx={{ fontWeight: 600, color: '#2563eb', borderColor: '#bfdbfe' }}
+                        sx={{ fontWeight: 600, color: '#318992', borderColor: '#bfdbfe' }}
                       />
                     </Box>
                     <IconButton
@@ -899,7 +899,7 @@ export const AssessmentBuilderPage: React.FC = () => {
                     <Grid item xs={12}>
                       <Box sx={{ mt: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="caption" sx={{ color: '#475569', fontWeight: 600 }}>
+                          <Typography variant="caption" sx={{ color: '#526584', fontWeight: 600 }}>
                             Select Target Topics for {COMPONENT_LABELS[sec.component]}:
                           </Typography>
                           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -953,10 +953,10 @@ export const AssessmentBuilderPage: React.FC = () => {
                 p: 3,
                 borderRadius: '8px',
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
               }}
             >
-              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+              <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
                 Optional Window Scheduling
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -987,9 +987,9 @@ export const AssessmentBuilderPage: React.FC = () => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 3.5, borderColor: '#e2e8f0' }} />
+              <Divider sx={{ my: 3.5, borderColor: '#DCE6F5' }} />
 
-              <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+              <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 2 }}>
                 Configured Sections Breakdown
               </Typography>
 
@@ -1000,12 +1000,12 @@ export const AssessmentBuilderPage: React.FC = () => {
                     sx={{
                       p: 2,
                       borderRadius: 2,
-                      bgcolor: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      bgcolor: '#EDF2FF',
+                      border: '1px solid #DCE6F5',
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                      <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                         {idx + 1}. {sec.name} ({COMPONENT_LABELS[sec.component]})
                       </Typography>
                       <Typography variant="caption" color="text.secondary" fontWeight={600}>
@@ -1033,13 +1033,13 @@ export const AssessmentBuilderPage: React.FC = () => {
               sx={{
                 p: 2.5,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                 <CheckCircleOutlineIcon sx={{ color: '#047857' }} />
-                <Typography variant="h6" fontWeight={700} color="#0f172a">
+                <Typography variant="h6" fontWeight={700} color="#14264B">
                   Summary & Verification
                 </Typography>
               </Box>
@@ -1058,22 +1058,22 @@ export const AssessmentBuilderPage: React.FC = () => {
                 )}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Questions per Paper:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{questionsPerPaper}</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{questionsPerPaper}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Total Marks per Paper:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{marksPerPaper}</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{marksPerPaper}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2" color="text.secondary">Paper Sets:</Typography>
-                  <Typography variant="body2" fontWeight={700} color="#0f172a">{numberOfPapers}</Typography>
+                  <Typography variant="body2" fontWeight={700} color="#14264B">{numberOfPapers}</Typography>
                 </Box>
-                <Divider sx={{ my: 1, borderColor: '#e2e8f0' }} />
+                <Divider sx={{ my: 1, borderColor: '#DCE6F5' }} />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" fontWeight={600} color="#2563eb">
+                  <Typography variant="body2" fontWeight={600} color="#318992">
                     Questions Required:
                   </Typography>
-                  <Typography variant="body2" fontWeight={800} color="#2563eb">
+                  <Typography variant="body2" fontWeight={800} color="#318992">
                     {totalUniqueQuestionsNeeded} Questions
                   </Typography>
                 </Box>

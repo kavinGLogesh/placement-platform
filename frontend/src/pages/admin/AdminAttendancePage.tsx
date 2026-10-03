@@ -289,9 +289,9 @@ export const AdminAttendancePage: React.FC = () => {
               height: 22,
               fontSize: '0.72rem',
               fontWeight: 600,
-              bgcolor: '#f1f5f9',
-              color: '#475569',
-              border: '1px solid #e2e8f0',
+              bgcolor: '#E7EEFA',
+              color: '#526584',
+              border: '1px solid #DCE6F5',
               borderRadius: '4px',
             }}
           />
@@ -308,7 +308,7 @@ export const AdminAttendancePage: React.FC = () => {
           p: { xs: 2.5, md: 3 },
           borderRadius: '8px',
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -322,16 +322,16 @@ export const AdminAttendancePage: React.FC = () => {
               size="small"
               startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
               onClick={() => navigate('/admin/dashboard')}
-              sx={{ color: '#64748b', fontWeight: 600, minWidth: 'auto', p: 0, mr: 1 }}
+              sx={{ color: '#7182A0', fontWeight: 600, minWidth: 'auto', p: 0, mr: 1 }}
             >
               Dashboard
             </Button>
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>/</Typography>
-            <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <Typography variant="caption" sx={{ color: '#8293B0' }}>/</Typography>
+            <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
               CAMPUS RECRUITMENT & ATTENDANCE
             </Typography>
           </Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             Placement Assessment Attendance & Follow-up
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -345,7 +345,7 @@ export const AdminAttendancePage: React.FC = () => {
             size="small"
             startIcon={<HistoryIcon />}
             onClick={() => setIsRepeatedInsightsOpen(true)}
-            sx={{ fontWeight: 600, borderColor: '#cbd5e1', color: '#0f172a' }}
+            sx={{ fontWeight: 600, borderColor: '#D1DEF0', color: '#14264B' }}
           >
             Repeated Absence
           </Button>
@@ -357,7 +357,7 @@ export const AdminAttendancePage: React.FC = () => {
                 size="small"
                 startIcon={<SettingsIcon />}
                 onClick={() => setIsConfigDialogOpen(true)}
-                sx={{ fontWeight: 600, borderColor: '#cbd5e1', color: '#0f172a' }}
+                sx={{ fontWeight: 600, borderColor: '#D1DEF0', color: '#14264B' }}
               >
                 Automation Rules
               </Button>
@@ -367,7 +367,7 @@ export const AdminAttendancePage: React.FC = () => {
                 startIcon={<SyncIcon />}
                 onClick={() => syncAssessmentsMutation.mutate()}
                 disabled={syncAssessmentsMutation.isPending}
-                sx={{ fontWeight: 600, borderColor: '#cbd5e1', color: '#0f172a' }}
+                sx={{ fontWeight: 600, borderColor: '#D1DEF0', color: '#14264B' }}
               >
                 Sync Closures
               </Button>
@@ -380,7 +380,7 @@ export const AdminAttendancePage: React.FC = () => {
             startIcon={<FileDownloadIcon />}
             onClick={handleExportExcel}
             disabled={!overview || overview.notAttended === 0}
-            sx={{ fontWeight: 600, borderColor: '#cbd5e1', color: '#0f172a' }}
+            sx={{ fontWeight: 600, borderColor: '#D1DEF0', color: '#14264B' }}
           >
             Export Not Attended
           </Button>
@@ -392,7 +392,7 @@ export const AdminAttendancePage: React.FC = () => {
               startIcon={<SendIcon />}
               onClick={() => setIsReminderDialogOpen(true)}
               disabled={!overview || overview.notAttended === 0}
-              sx={{ bgcolor: '#0F2744', '&:hover': { bgcolor: '#0A1C30' }, fontWeight: 600 }}
+              sx={{ bgcolor: '#1765B5', '&:hover': { bgcolor: '#104B91' }, fontWeight: 600 }}
             >
               Send Reminders
             </Button>
@@ -438,10 +438,10 @@ export const AdminAttendancePage: React.FC = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                    <Typography variant="body2" fontWeight={700} sx={{ color: '#14264B' }}>
                       {alert.alertMessage}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       Assigned: {alert.assignedCount} | Absent: {alert.notAttendedCount} candidates
                     </Typography>
                   </Box>
@@ -462,7 +462,7 @@ export const AdminAttendancePage: React.FC = () => {
                           handleAssessmentChange(alert.assessmentId);
                           setIsReminderDialogOpen(true);
                         }}
-                        sx={{ fontSize: '0.75rem', py: 0.5, bgcolor: '#0F2744' }}
+                        sx={{ fontSize: '0.75rem', py: 0.5, bgcolor: '#1765B5' }}
                       >
                         Reminder
                       </Button>
@@ -489,7 +489,7 @@ export const AdminAttendancePage: React.FC = () => {
           mb: 3,
           p: 2.5,
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
@@ -529,7 +529,7 @@ export const AdminAttendancePage: React.FC = () => {
                     borderRadius: '4px',
                   }}
                 />
-                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0' }}>
                   {overview.endDate
                     ? `End Date: ${new Date(overview.endDate).toLocaleString()}`
                     : 'No end date scheduled'}
@@ -542,12 +542,12 @@ export const AdminAttendancePage: React.FC = () => {
 
       {/* 4. Real Database Values KPI Grid (8 Standard Cards) */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#0F2744', letterSpacing: '0.04em', mb: 1.5 }}>
+        <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#1765B5', letterSpacing: '0.04em', mb: 1.5 }}>
           REAL DATABASE ATTENDANCE & CONVERSION METRICS
         </Typography>
 
         {isLoadingOverview ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
             <CircularProgress size={28} />
           </Box>
         ) : isOverviewError || !overview ? (
@@ -556,9 +556,9 @@ export const AdminAttendancePage: React.FC = () => {
           <Grid container spacing={1.5}>
             {/* 1. Total Registered */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>REGISTERED</Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.25 }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>REGISTERED</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', my: 0.25 }}>
                   {overview.totalRegistered}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">Active campus pool</Typography>
@@ -567,9 +567,9 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 2. Eligible Students */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>ELIGIBLE</Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.25 }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>ELIGIBLE</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', my: 0.25 }}>
                   {overview.eligibleStudents}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">Targeted cohort</Typography>
@@ -578,9 +578,9 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 3. Assigned Students */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>ASSIGNED</Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.25 }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>ASSIGNED</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#1765B5', my: 0.25 }}>
                   {overview.assignedStudents}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">Tests allocated</Typography>
@@ -589,9 +589,9 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 4. Attended */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>ATTENDED</Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.25 }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>ATTENDED</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#1765B5', my: 0.25 }}>
                   {overview.attended}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -608,7 +608,7 @@ export const AdminAttendancePage: React.FC = () => {
                   p: 2,
                   bgcolor: '#ffffff',
                   border: '1px solid',
-                  borderColor: overview.notAttended > 0 ? '#fecaca' : '#e2e8f0',
+                  borderColor: overview.notAttended > 0 ? '#fecaca' : '#DCE6F5',
                   borderRadius: '8px',
                 }}
               >
@@ -616,7 +616,7 @@ export const AdminAttendancePage: React.FC = () => {
                 <Typography variant="h5" fontWeight={700} sx={{ color: '#b91c1c', my: 0.25 }}>
                   {overview.notAttended}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0' }}>
                   {overview.isWindowClosed ? 'Window closed' : 'Pending start'}
                 </Typography>
               </Card>
@@ -624,9 +624,9 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 6. Completed */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>COMPLETED</Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.25 }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>COMPLETED</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', my: 0.25 }}>
                   {overview.completed}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">Submissions evaluated</Typography>
@@ -635,7 +635,7 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 7. Passed */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
                 <Typography variant="caption" sx={{ color: '#15803d', fontWeight: 700 }}>PASSED</Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: '#15803d', my: 0.25 }}>
                   {overview.passed}
@@ -646,7 +646,7 @@ export const AdminAttendancePage: React.FC = () => {
 
             {/* 8. Failed */}
             <Grid item xs={6} sm={4} md={3} lg={1.5}>
-              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+              <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
                 <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 600 }}>FAILED</Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: '#b91c1c', my: 0.25 }}>
                   {overview.failed}
@@ -663,13 +663,13 @@ export const AdminAttendancePage: React.FC = () => {
         elevation={0}
         sx={{
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
           overflow: 'hidden',
         }}
       >
         {/* Table Filters Header */}
-        <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid #DCE6F5', display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Tabs
               value={statusFilter}
@@ -719,7 +719,7 @@ export const AdminAttendancePage: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
-                  startAdornment: <SearchIcon sx={{ color: '#94a3b8', fontSize: 18, mr: 0.5 }} />,
+                  startAdornment: <SearchIcon sx={{ color: '#8293B0', fontSize: 18, mr: 0.5 }} />,
                 }}
                 sx={{ width: 280 }}
               />
@@ -741,22 +741,22 @@ export const AdminAttendancePage: React.FC = () => {
         ) : (
           <TableContainer>
             <Table size="small">
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
+              <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>CANDIDATE</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>REGISTER NO</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>DEPT & COURSE</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>CLASS / SECTION</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>ATTENDANCE STATUS</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>PERFORMANCE</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#475569' }}>FOLLOW-UP STATUS</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>CANDIDATE</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>REGISTER NO</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>DEPT & COURSE</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>CLASS / SECTION</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>ATTENDANCE STATUS</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>PERFORMANCE</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem', color: '#526584' }}>FOLLOW-UP STATUS</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {recordsData.records.map((row) => (
                   <TableRow key={row.studentId} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={600} color="#0f172a">
+                      <Typography variant="body2" fontWeight={600} color="#14264B">
                         {row.studentName}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -809,7 +809,7 @@ export const AdminAttendancePage: React.FC = () => {
                             icon={<EmailOutlinedIcon sx={{ fontSize: '14px !important' }} />}
                             label={`Notified (${row.reminderSentCount})`}
                             size="small"
-                            sx={{ height: 22, fontSize: '0.7rem', bgcolor: '#f1f5f9', color: '#334155' }}
+                            sx={{ height: 22, fontSize: '0.7rem', bgcolor: '#E7EEFA', color: '#405678' }}
                           />
                         </Tooltip>
                       ) : row.attendanceStatus === 'NOT_ATTENDED' ? (
@@ -838,7 +838,7 @@ export const AdminAttendancePage: React.FC = () => {
         fullWidth
         PaperProps={{ sx: { borderRadius: '8px' } }}
       >
-        <DialogTitle sx={{ borderBottom: '1px solid #e2e8f0', bgcolor: '#ffffff', color: '#0f172a', fontWeight: 700 }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #DCE6F5', bgcolor: '#ffffff', color: '#14264B', fontWeight: 700 }}>
           Dispatch Attendance Follow-up Reminders
         </DialogTitle>
         <DialogContent sx={{ pt: 2.5 }}>
@@ -848,7 +848,7 @@ export const AdminAttendancePage: React.FC = () => {
             <strong>{overview?.assessmentName}</strong>.
           </Alert>
 
-          <Typography variant="body2" sx={{ color: '#334155', mb: 2 }}>
+          <Typography variant="body2" sx={{ color: '#405678', mb: 2 }}>
             <strong>Idempotency Notice:</strong> The system automatically verifies delivery history and skips candidates who have already been sent a follow-up notice for this assessment.
           </Typography>
 
@@ -863,8 +863,8 @@ export const AdminAttendancePage: React.FC = () => {
             sx={{ mb: 1 }}
           />
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid #e2e8f0' }}>
-          <Button onClick={() => setIsReminderDialogOpen(false)} sx={{ color: '#64748b' }}>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #DCE6F5' }}>
+          <Button onClick={() => setIsReminderDialogOpen(false)} sx={{ color: '#7182A0' }}>
             Cancel
           </Button>
           <Button
@@ -872,7 +872,7 @@ export const AdminAttendancePage: React.FC = () => {
             onClick={() => sendRemindersMutation.mutate(customReminderMessage)}
             disabled={sendRemindersMutation.isPending || !overview || overview.notAttended === 0}
             startIcon={<SendIcon />}
-            sx={{ bgcolor: '#0F2744', '&:hover': { bgcolor: '#0A1C30' } }}
+            sx={{ bgcolor: '#1765B5', '&:hover': { bgcolor: '#104B91' } }}
           >
             {sendRemindersMutation.isPending ? 'Sending...' : 'Send Official Reminders'}
           </Button>
@@ -887,7 +887,7 @@ export const AdminAttendancePage: React.FC = () => {
         fullWidth
         PaperProps={{ sx: { borderRadius: '8px' } }}
       >
-        <DialogTitle sx={{ borderBottom: '1px solid #e2e8f0', bgcolor: '#ffffff', color: '#0f172a', fontWeight: 700 }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #DCE6F5', bgcolor: '#ffffff', color: '#14264B', fontWeight: 700 }}>
           Attendance Automation & Reminder Configuration
         </DialogTitle>
         <DialogContent sx={{ pt: 2.5 }}>
@@ -896,8 +896,8 @@ export const AdminAttendancePage: React.FC = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Box sx={{ p: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+            <Box sx={{ p: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5', borderRadius: '6px' }}>
+              <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                 Follow-up Reminders Active
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -912,8 +912,8 @@ export const AdminAttendancePage: React.FC = () => {
               </Box>
             </Box>
 
-            <Box sx={{ p: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+            <Box sx={{ p: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5', borderRadius: '6px' }}>
+              <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                 Auto-closure Follow-up Delivery
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -929,8 +929,8 @@ export const AdminAttendancePage: React.FC = () => {
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid #e2e8f0' }}>
-          <Button onClick={() => setIsConfigDialogOpen(false)} sx={{ color: '#64748b' }}>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #DCE6F5' }}>
+          <Button onClick={() => setIsConfigDialogOpen(false)} sx={{ color: '#7182A0' }}>
             Close
           </Button>
           <Button
@@ -940,7 +940,7 @@ export const AdminAttendancePage: React.FC = () => {
                 isEmailReminderEnabled: !configData?.isEmailReminderEnabled,
               })
             }
-            sx={{ bgcolor: '#0F2744' }}
+            sx={{ bgcolor: '#1765B5' }}
           >
             Toggle Reminders
           </Button>
@@ -955,7 +955,7 @@ export const AdminAttendancePage: React.FC = () => {
         fullWidth
         PaperProps={{ sx: { borderRadius: '8px' } }}
       >
-        <DialogTitle sx={{ borderBottom: '1px solid #e2e8f0', bgcolor: '#ffffff', color: '#0f172a', fontWeight: 700 }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #DCE6F5', bgcolor: '#ffffff', color: '#14264B', fontWeight: 700 }}>
           Historical Repeated Non-Attendance Audit
         </DialogTitle>
         <DialogContent sx={{ pt: 2.5 }}>
@@ -972,9 +972,9 @@ export const AdminAttendancePage: React.FC = () => {
               No candidates have accumulated 2 or more unexcused placement assessment absences.
             </Alert>
           ) : (
-            <TableContainer sx={{ border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+            <TableContainer sx={{ border: '1px solid #DCE6F5', borderRadius: '6px' }}>
               <Table size="small">
-                <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem' }}>CANDIDATE</TableCell>
                     <TableCell sx={{ fontWeight: 700, fontSize: '0.75rem' }}>REGISTER NO</TableCell>
@@ -987,7 +987,7 @@ export const AdminAttendancePage: React.FC = () => {
                   {repeatedInsights.map((stu) => (
                     <TableRow key={stu.studentId}>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={600} color="#0f172a">{stu.studentName}</Typography>
+                        <Typography variant="body2" fontWeight={600} color="#14264B">{stu.studentName}</Typography>
                         <Typography variant="caption" color="text.secondary">{stu.collegeEmail}</Typography>
                       </TableCell>
                       <TableCell sx={{ fontFamily: 'monospace' }}>{stu.registerNumber}</TableCell>
@@ -1011,8 +1011,8 @@ export const AdminAttendancePage: React.FC = () => {
             </TableContainer>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid #e2e8f0' }}>
-          <Button onClick={() => setIsRepeatedInsightsOpen(false)} sx={{ color: '#0F2744' }}>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #DCE6F5' }}>
+          <Button onClick={() => setIsRepeatedInsightsOpen(false)} sx={{ color: '#1765B5' }}>
             Close
           </Button>
         </DialogActions>

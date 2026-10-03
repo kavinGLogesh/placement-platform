@@ -91,10 +91,10 @@ export const StudentInterviewsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B' }}>
             My Structured Interviews
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             View your scheduled Technical, HR, Mock, and Managerial interviews, criterion scores, strengths, and areas for improvement.
           </Typography>
         </Box>
@@ -118,17 +118,17 @@ export const StudentInterviewsPage: React.FC = () => {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={4}>
           <Card variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               ASSIGNED INTERVIEWS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0f172a' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#14264B' }}>
               {items.length}
             </Typography>
           </Card>
         </Grid>
         <Grid item xs={12} sm={4}>
           <Card variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               COMPLETED EVALUATIONS
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#16a34a' }}>
@@ -138,10 +138,10 @@ export const StudentInterviewsPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <Card variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               AVERAGE INTERVIEW SCORE
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#2563eb' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#318992' }}>
               {avgScore !== null ? `${avgScore}%` : '—'}
             </Typography>
           </Card>
@@ -155,11 +155,11 @@ export const StudentInterviewsPage: React.FC = () => {
         </Box>
       ) : items.length === 0 ? (
         <Paper variant="outlined" sx={{ p: 6, textAlign: 'center', borderRadius: 2 }}>
-          <WorkIcon sx={{ fontSize: 56, color: '#94a3b8', mb: 1.5 }} />
-          <Typography variant="h6" sx={{ color: '#475569' }}>
+          <WorkIcon sx={{ fontSize: 56, color: '#8293B0', mb: 1.5 }} />
+          <Typography variant="h6" sx={{ color: '#526584' }}>
             No Interviews Assigned
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#7182A0', mt: 0.5 }}>
             You have not been scheduled for any mock or placement interviews yet.
           </Typography>
         </Paper>
@@ -182,7 +182,7 @@ export const StudentInterviewsPage: React.FC = () => {
                 >
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#14264B' }}>
                         {item.title}
                       </Typography>
                       <Stack direction="row" spacing={1}>
@@ -222,13 +222,13 @@ export const StudentInterviewsPage: React.FC = () => {
                       </Stack>
                     </Box>
 
-                    <Stack direction="row" spacing={2} sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1.5 }}>
+                    <Stack direction="row" spacing={2} sx={{ color: '#7182A0', fontSize: '0.8rem', mb: 1.5 }}>
                       <span>📅 {new Date(item.scheduledDate).toLocaleString()}</span>
                       <span>⏱ {item.durationMinutes} mins</span>
                     </Stack>
 
                     {item.instructions && (
-                      <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 1.5 }}>
+                      <Typography variant="caption" sx={{ color: '#7182A0', display: 'block', mb: 1.5 }}>
                         <strong>Instructions:</strong> {item.instructions}
                       </Typography>
                     )}
@@ -242,7 +242,7 @@ export const StudentInterviewsPage: React.FC = () => {
                           <Typography variant="body2" sx={{ fontWeight: 700, color: '#16a34a' }}>
                             Score: {ev.percentage}% ({ev.totalScore}/{ev.maxPossibleMarks})
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b' }}>
+                          <Typography variant="caption" sx={{ color: '#7182A0' }}>
                             Interviewer: {ev.evaluatorName}
                           </Typography>
                         </Box>
@@ -267,7 +267,7 @@ export const StudentInterviewsPage: React.FC = () => {
                             <Typography variant="caption" sx={{ fontWeight: 700, color: '#166534', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               <ThumbUpIcon fontSize="inherit" /> Strengths:
                             </Typography>
-                            <Typography variant="body2" sx={{ color: '#334155', fontSize: '0.85rem' }}>
+                            <Typography variant="body2" sx={{ color: '#405678', fontSize: '0.85rem' }}>
                               {ev.strengths}
                             </Typography>
                           </Box>
@@ -278,14 +278,14 @@ export const StudentInterviewsPage: React.FC = () => {
                             <Typography variant="caption" sx={{ fontWeight: 700, color: '#c2410c', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               <LightbulbIcon fontSize="inherit" /> Areas for Improvement:
                             </Typography>
-                            <Typography variant="body2" sx={{ color: '#334155', fontSize: '0.85rem' }}>
+                            <Typography variant="body2" sx={{ color: '#405678', fontSize: '0.85rem' }}>
                               {ev.areasForImprovement}
                             </Typography>
                           </Box>
                         )}
                       </Box>
                     ) : (
-                      <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                      <Typography variant="body2" sx={{ color: '#8293B0', fontStyle: 'italic' }}>
                         Evaluation pending after interview session.
                       </Typography>
                     )}
@@ -322,10 +322,10 @@ export const StudentInterviewsPage: React.FC = () => {
           {selectedItem && (
             <Stack spacing={2.5}>
               <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#14264B' }}>
                   {selectedItem.interviewType} Interview
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#64748b' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0' }}>
                   Scheduled: {new Date(selectedItem.scheduledDate).toLocaleString()} ({selectedItem.durationMinutes} mins)
                 </Typography>
               </Box>
@@ -342,13 +342,13 @@ export const StudentInterviewsPage: React.FC = () => {
                   const intEval = selectedItem.evaluation as InterviewEvaluationDto;
                   return (
                     <>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B' }}>
                         Criterion-wise Marks (Human Evaluated)
                       </Typography>
 
                       <TableContainer component={Paper} variant="outlined">
                         <Table size="small">
-                          <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                          <TableHead sx={{ backgroundColor: '#EDF2FF' }}>
                             <TableRow>
                               <TableCell sx={{ fontWeight: 600 }}>Criterion</TableCell>
                               <TableCell sx={{ fontWeight: 600, width: 140 }}>Score</TableCell>
@@ -365,7 +365,7 @@ export const StudentInterviewsPage: React.FC = () => {
                                   </Typography>
                                 </TableCell>
                                 <TableCell>
-                                  <Typography variant="body2" sx={{ color: '#475569' }}>
+                                  <Typography variant="body2" sx={{ color: '#526584' }}>
                                     {cs.comment || '—'}
                                   </Typography>
                                 </TableCell>
@@ -400,7 +400,7 @@ export const StudentInterviewsPage: React.FC = () => {
                               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#166534', mb: 0.5 }}>
                                 Key Strengths:
                               </Typography>
-                              <Typography variant="body2" sx={{ color: '#334155' }}>
+                              <Typography variant="body2" sx={{ color: '#405678' }}>
                                 {intEval.strengths}
                               </Typography>
                             </Paper>
@@ -412,7 +412,7 @@ export const StudentInterviewsPage: React.FC = () => {
                               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#c2410c', mb: 0.5 }}>
                                 Areas for Improvement:
                               </Typography>
-                              <Typography variant="body2" sx={{ color: '#334155' }}>
+                              <Typography variant="body2" sx={{ color: '#405678' }}>
                                 {intEval.areasForImprovement}
                               </Typography>
                             </Paper>
@@ -425,8 +425,8 @@ export const StudentInterviewsPage: React.FC = () => {
                           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
                             Overall Evaluator Feedback:
                           </Typography>
-                          <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#f8fafc' }}>
-                            <Typography variant="body2" sx={{ color: '#334155' }}>
+                          <Paper variant="outlined" sx={{ p: 2, backgroundColor: '#EDF2FF' }}>
+                            <Typography variant="body2" sx={{ color: '#405678' }}>
                               {intEval.overallFeedback}
                             </Typography>
                           </Paper>

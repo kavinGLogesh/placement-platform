@@ -157,13 +157,13 @@ export const AdminReportsPage: React.FC = () => {
     <Box>
       {/* Header Banner */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+        <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
           INSTITUTIONAL AUDIT & EXPORT REPOSITORY
         </Typography>
-        <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
+        <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#14264B' }}>
           Placement Reports & Compliance Center
         </Typography>
-        <Typography variant="body2" sx={{ color: '#64748b' }}>
+        <Typography variant="body2" sx={{ color: '#7182A0' }}>
           Generate official placement audit reports, psychometric evaluations, department scorecards, and multi-format exports (Excel, CSV, PDF, Print HTML).
         </Typography>
       </Box>
@@ -174,7 +174,7 @@ export const AdminReportsPage: React.FC = () => {
         sx={{
           mb: 3,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
@@ -198,9 +198,9 @@ export const AdminReportsPage: React.FC = () => {
               display: 'flex',
               flexDirection: 'row',
               gap: 1,
-              color: '#64748b',
+              color: '#7182A0',
               '&.Mui-selected': {
-                color: '#0F2744',
+                color: '#1765B5',
                 fontWeight: 700,
               },
             },
@@ -228,7 +228,7 @@ export const AdminReportsPage: React.FC = () => {
         sx={{
           mb: 3,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
@@ -243,12 +243,12 @@ export const AdminReportsPage: React.FC = () => {
               gap: 2,
               mb: 2.5,
               pb: 2,
-              borderBottom: '1px solid #f1f5f9',
+              borderBottom: '1px solid #E7EEFA',
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FilterAltIcon sx={{ color: '#0F2744' }} fontSize="small" />
-              <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#0f172a' }}>
+              <FilterAltIcon sx={{ color: '#1765B5' }} fontSize="small" />
+              <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#14264B' }}>
                 Report Filters & Export Tools
               </Typography>
             </Box>
@@ -318,12 +318,12 @@ export const AdminReportsPage: React.FC = () => {
                 disabled={Boolean(exportLoading)}
                 onClick={() => handleExport('html')}
                 sx={{
-                  bgcolor: '#0F2744',
+                  bgcolor: '#1765B5',
                   textTransform: 'none',
                   fontWeight: 600,
                   fontSize: '0.8rem',
                   borderRadius: '6px',
-                  '&:hover': { bgcolor: '#0A1C30' },
+                  '&:hover': { bgcolor: '#104B91' },
                 }}
               >
                 Print Preview
@@ -406,12 +406,12 @@ export const AdminReportsPage: React.FC = () => {
 
             <Grid item xs={12} sm={6} md={1} sx={{ display: 'flex', gap: 1 }}>
               <Tooltip title="Clear Filters">
-                <IconButton size="small" onClick={handleClearFilters} sx={{ color: '#64748b' }}>
+                <IconButton size="small" onClick={handleClearFilters} sx={{ color: '#7182A0' }}>
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Refresh Data">
-                <IconButton size="small" onClick={() => refetch()} sx={{ color: '#0F2744' }}>
+                <IconButton size="small" onClick={() => refetch()} sx={{ color: '#1765B5' }}>
                   <RefreshIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -430,7 +430,7 @@ export const AdminReportsPage: React.FC = () => {
       {/* Loading State */}
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} sx={{ color: '#0F2744' }} />
+          <CircularProgress size={32} sx={{ color: '#1765B5' }} />
         </Box>
       ) : (
         <>
@@ -443,15 +443,15 @@ export const AdminReportsPage: React.FC = () => {
                     elevation={0}
                     sx={{
                       bgcolor: '#ffffff',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid #DCE6F5',
                       borderRadius: '8px',
                     }}
                   >
                     <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                      <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, textTransform: 'capitalize' }}>
+                      <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, textTransform: 'capitalize' }}>
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </Typography>
-                      <Typography variant="h6" fontWeight={800} sx={{ mt: 0.5, color: '#0f172a' }}>
+                      <Typography variant="h6" fontWeight={800} sx={{ mt: 0.5, color: '#14264B' }}>
                         {typeof val === 'number' && key.toLowerCase().includes('rate')
                           ? `${val}%`
                           : typeof val === 'number' && key.toLowerCase().includes('percentage')
@@ -471,79 +471,79 @@ export const AdminReportsPage: React.FC = () => {
             elevation={0}
             sx={{
               bgcolor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
               mb: 3,
             }}
           >
             <Table size="small">
-              <TableHead sx={{ bgcolor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+              <TableHead sx={{ bgcolor: '#EDF2FF', borderBottom: '2px solid #DCE6F5' }}>
                 {selectedReport === 'students' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Class</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Completed</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Class</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Completed</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'assessments' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assessment</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Result</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Submitted At</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assessment</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dept</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Result</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Submitted At</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'departments' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Code</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Department Name</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Enrolled</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attempts</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Passed</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Pass Rate</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Code</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Department Name</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Enrolled</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attempts</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Passed</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Pass Rate</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Average %</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Accuracy</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'gd' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GD Round</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Topic</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluator</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluated Date</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>GD Round</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Topic</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Student Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluator</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluated Date</TableCell>
                   </TableRow>
                 )}
 
                 {selectedReport === 'interviews' && (
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interview Round</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Type</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate Name</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interviewer</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
-                    <TableCell sx={{ fontWeight: 600, color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Feedback / Strengths</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interview Round</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Type</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Register No</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Candidate Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interviewer</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Attendance</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Marks</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Score %</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: '#526584', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Feedback / Strengths</TableCell>
                   </TableRow>
                 )}
               </TableHead>
@@ -552,16 +552,16 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 1. Students Table */}
                 {selectedReport === 'students' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.studentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.registerNumber}</TableCell>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.departmentCode}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.className || r.sectionName || '-'}</TableCell>
+                    <TableRow key={r.studentId} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                      <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.registerNumber}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#7182A0' }}>{r.departmentCode}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#7182A0' }}>{r.className || r.sectionName || '-'}</TableCell>
                       <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.assessmentsCompleted}</TableCell>
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.totalMarksObtained} / {r.totalMarksPossible}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>
                         {r.averagePercentage}%
                       </TableCell>
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.averageAccuracy}%</TableCell>
@@ -586,15 +586,15 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 2. Assessments Table */}
                 {selectedReport === 'assessments' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.resultId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.assessmentTitle}</TableCell>
+                    <TableRow key={r.resultId} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.assessmentTitle}</TableCell>
                       <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.departmentCode}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#14264B' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#7182A0' }}>{r.departmentCode}</TableCell>
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.obtainedMarks} / {r.totalMarks}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>
                         {r.percentage}%
                       </TableCell>
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.accuracy}%</TableCell>
@@ -613,7 +613,7 @@ export const AdminReportsPage: React.FC = () => {
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#7182A0' }}>
                         {r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : '-'}
                       </TableCell>
                     </TableRow>
@@ -622,13 +622,13 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 3. Departments Table */}
                 {selectedReport === 'departments' &&
                   currentRows.map((r: any) => (
-                    <TableRow key={r.departmentId} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                      <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>{r.departmentCode}</TableCell>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.departmentName}</TableCell>
+                    <TableRow key={r.departmentId} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                      <TableCell sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>{r.departmentCode}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.departmentName}</TableCell>
                       <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.enrolledStudents}</TableCell>
                       <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.totalAttemptsCompleted}</TableCell>
                       <TableCell align="center" sx={{ fontSize: '0.82rem' }}>{r.totalPassed}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>
                         {r.passRate}%
                       </TableCell>
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>{r.averagePercentage}%</TableCell>
@@ -639,12 +639,12 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 4. GD Table */}
                 {selectedReport === 'gd' &&
                   currentRows.map((r: any, idx: number) => (
-                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.roundTitle}</TableCell>
+                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.roundTitle}</TableCell>
                       <TableCell sx={{ fontSize: '0.82rem' }}>{r.topic}</TableCell>
                       <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.evaluatorName || '—'}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#7182A0' }}>{r.evaluatorName || '—'}</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
@@ -663,10 +663,10 @@ export const AdminReportsPage: React.FC = () => {
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.totalScore !== null ? `${r.totalScore} / ${r.maxPossibleMarks}` : '—'}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>
                         {r.percentage !== null ? `${r.percentage}%` : 'Pending'}
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      <TableCell sx={{ fontSize: '0.75rem', color: '#7182A0' }}>
                         {r.evaluatedAt ? new Date(r.evaluatedAt).toLocaleDateString() : '—'}
                       </TableCell>
                     </TableRow>
@@ -675,8 +675,8 @@ export const AdminReportsPage: React.FC = () => {
                 {/* 5. Interviews Table */}
                 {selectedReport === 'interviews' &&
                   currentRows.map((r: any, idx: number) => (
-                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.roundTitle}</TableCell>
+                    <TableRow key={r.roundId + r.studentId + idx} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.roundTitle}</TableCell>
                       <TableCell>
                         <Chip
                           size="small"
@@ -685,15 +685,15 @@ export const AdminReportsPage: React.FC = () => {
                             fontWeight: 600,
                             fontSize: '0.7rem',
                             borderRadius: '4px',
-                            bgcolor: '#f1f5f9',
-                            color: '#334155',
-                            border: '1px solid #cbd5e1',
+                            bgcolor: '#E7EEFA',
+                            color: '#405678',
+                            border: '1px solid #D1DEF0',
                           }}
                         />
                       </TableCell>
                       <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.82rem' }}>{r.registerNumber}</TableCell>
-                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#0f172a' }}>{r.studentName}</TableCell>
-                      <TableCell sx={{ fontSize: '0.82rem', color: '#64748b' }}>{r.interviewerName || '—'}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#14264B' }}>{r.studentName}</TableCell>
+                      <TableCell sx={{ fontSize: '0.82rem', color: '#7182A0' }}>{r.interviewerName || '—'}</TableCell>
                       <TableCell align="center">
                         <Chip
                           size="small"
@@ -712,10 +712,10 @@ export const AdminReportsPage: React.FC = () => {
                       <TableCell align="right" sx={{ fontSize: '0.82rem' }}>
                         {r.totalScore !== null ? `${r.totalScore} / ${r.maxPossibleMarks}` : '—'}
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#0f172a' }}>
+                      <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.82rem', color: '#14264B' }}>
                         {r.percentage !== null ? `${r.percentage}%` : 'Pending'}
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.75rem', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>
+                      <TableCell sx={{ fontSize: '0.75rem', maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#7182A0' }}>
                         {r.strengths || r.overallFeedback || '—'}
                       </TableCell>
                     </TableRow>
@@ -725,7 +725,7 @@ export const AdminReportsPage: React.FC = () => {
                 {currentRows.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
-                      <Typography variant="body2" sx={{ color: '#64748b' }}>
+                      <Typography variant="body2" sx={{ color: '#7182A0' }}>
                         No report records found matching the specified parameters.
                       </Typography>
                     </TableCell>

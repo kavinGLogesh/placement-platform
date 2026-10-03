@@ -346,10 +346,10 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
       {/* Title & Stats */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#14264B' }}>
             {title}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#64748b' }}>
+          <Typography variant="caption" sx={{ color: '#7182A0' }}>
             {helperText || 'Filter by Department → Course → Class → Section to select students across cohorts'}
           </Typography>
         </Box>
@@ -379,7 +379,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
       )}
 
       {/* Dynamic Cascading Filters */}
-      <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: '#f8fafc', borderRadius: 1.5 }}>
+      <Paper variant="outlined" sx={{ p: 2, mb: 2, backgroundColor: '#EDF2FF', borderRadius: 1.5 }}>
         <Grid container spacing={1.5} alignItems="center">
           {/* 1. Department */}
           <Grid item xs={12} sm={6} md={3}>
@@ -480,7 +480,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon fontSize="small" sx={{ color: '#94a3b8' }} />
+                    <SearchIcon fontSize="small" sx={{ color: '#8293B0' }} />
                   </InputAdornment>
                 ),
                 endAdornment: searchQuery ? (
@@ -515,7 +515,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
 
       {/* Action Toolbar */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Typography variant="body2" sx={{ color: '#64748b' }}>
+        <Typography variant="body2" sx={{ color: '#7182A0' }}>
           Showing <strong>{displayedStudents.length}</strong> student{displayedStudents.length !== 1 ? 's' : ''}
         </Typography>
         <Stack direction="row" spacing={1}>
@@ -546,13 +546,13 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
           maxHeight,
           overflowY: 'auto',
           borderRadius: 1.5,
-          borderColor: '#e2e8f0',
+          borderColor: '#DCE6F5',
         }}
       >
         <Table stickyHeader size="small">
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f1f5f9' }}>
-              <TableCell padding="checkbox" sx={{ backgroundColor: '#f1f5f9' }}>
+            <TableRow sx={{ backgroundColor: '#E7EEFA' }}>
+              <TableCell padding="checkbox" sx={{ backgroundColor: '#E7EEFA' }}>
                 <Checkbox
                   size="small"
                   indeterminate={isSomeVisibleSelected}
@@ -561,13 +561,13 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                   disabled={unassignedVisible.length === 0 || loadingStudents}
                 />
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Student Name</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Register Number</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Department</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Course</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Class</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9' }}>Section</TableCell>
-              <TableCell sx={{ fontWeight: 700, backgroundColor: '#f1f5f9', textAlign: 'center' }}>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Student Name</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Register Number</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Department</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Course</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Class</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA' }}>Section</TableCell>
+              <TableCell sx={{ fontWeight: 700, backgroundColor: '#E7EEFA', textAlign: 'center' }}>
                 Status
               </TableCell>
             </TableRow>
@@ -577,7 +577,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                   <CircularProgress size={28} />
-                  <Typography variant="body2" sx={{ color: '#64748b', mt: 1 }}>
+                  <Typography variant="body2" sx={{ color: '#7182A0', mt: 1 }}>
                     Loading students...
                   </Typography>
                 </TableCell>
@@ -585,7 +585,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
             ) : displayedStudents.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  <Typography variant="body2" sx={{ color: '#64748b' }}>
+                  <Typography variant="body2" sx={{ color: '#7182A0' }}>
                     {showSelectedOnly
                       ? 'No students currently selected.'
                       : 'No students found matching the selected filters.'}
@@ -606,7 +606,7 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                     sx={{
                       cursor: isAlreadyAssigned ? 'default' : 'pointer',
                       backgroundColor: isAlreadyAssigned
-                        ? '#f8fafc'
+                        ? '#EDF2FF'
                         : isSelected
                         ? '#eff6ff'
                         : 'inherit',
@@ -623,10 +623,10 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                     </TableCell>
                     <TableCell>
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#14264B' }}>
                           {st.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748b' }}>
+                        <Typography variant="caption" sx={{ color: '#7182A0' }}>
                           {st.collegeEmail}
                         </Typography>
                       </Box>
@@ -640,22 +640,22 @@ export const StudentSelector: React.FC<StudentSelectorProps> = ({
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: '#334155' }}>
+                      <Typography variant="body2" sx={{ color: '#405678' }}>
                         {st.department?.name || st.department?.code || '-'}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: '#334155' }}>
+                      <Typography variant="body2" sx={{ color: '#405678' }}>
                         {st.course?.code || st.course?.name || '-'}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: '#334155' }}>
+                      <Typography variant="body2" sx={{ color: '#405678' }}>
                         {st.class?.name || (st.class?.batchYear ? `Batch ${st.class.batchYear}` : '-')}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: '#334155' }}>
+                      <Typography variant="body2" sx={{ color: '#405678' }}>
                         {st.section?.name ? `Sec ${st.section.name}` : '-'}
                       </Typography>
                     </TableCell>

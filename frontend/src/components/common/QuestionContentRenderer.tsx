@@ -18,7 +18,7 @@ interface Segment {
 export const QuestionContentRenderer: React.FC<QuestionContentRendererProps> = ({
   content,
   variant = 'body1',
-  color = '#0f172a',
+  color = '#14264B',
   sx = {},
 }) => {
   if (!content) return null;
@@ -99,14 +99,14 @@ export const QuestionContentRenderer: React.FC<QuestionContentRendererProps> = (
                   maxHeight: 380,
                   borderRadius: 2,
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   objectFit: 'contain',
                   bgcolor: '#ffffff',
                   p: 0.5,
                 }}
               />
               {seg.altText && seg.altText !== 'Question Graphic' && (
-                <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, fontStyle: 'italic' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', mt: 0.5, fontStyle: 'italic' }}>
                   {seg.altText}
                 </Typography>
               )}

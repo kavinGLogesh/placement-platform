@@ -171,10 +171,10 @@ export const AdminResultsPage: React.FC = () => {
         }}
       >
         <div>
-          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
             EXAMINATION EVALUATION REGISTRY
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             Assessment Results & Scoring Registry
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -198,7 +198,7 @@ export const AdminResultsPage: React.FC = () => {
         sx={{
           mb: 2.5,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
@@ -235,13 +235,13 @@ export const AdminResultsPage: React.FC = () => {
           mb: 3,
           p: 2,
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterAltIcon sx={{ color: '#0F2744', fontSize: 18 }} />
-          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+          <FilterAltIcon sx={{ color: '#1765B5', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#14264B">
             Search, Filter & Sort Records
           </Typography>
         </Box>

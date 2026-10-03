@@ -129,9 +129,9 @@ export const AssessmentsPage: React.FC = () => {
   const draftCount = assessments.filter((a) => a.status === 'DRAFT').length;
 
   const renderStatusChip = (status: AssessmentStatus) => {
-    let bg = '#f1f5f9';
-    let color = '#475569';
-    let border = '#cbd5e1';
+    let bg = '#E7EEFA';
+    let color = '#526584';
+    let border = '#D1DEF0';
 
     if (status === 'PUBLISHED') {
       bg = '#ecfdf5';
@@ -172,7 +172,7 @@ export const AssessmentsPage: React.FC = () => {
       render: (row) => (
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: '#14264B' }}>
               {row.name}
             </Typography>
             {row.company && (
@@ -184,9 +184,9 @@ export const AssessmentsPage: React.FC = () => {
                   height: 20,
                   fontSize: '0.68rem',
                   fontWeight: 700,
-                  backgroundColor: '#F0F4F9',
-                  color: '#0F2744',
-                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#E4EEFC',
+                  color: '#1765B5',
+                  border: '1px solid #D1DEF0',
                   borderRadius: '3px',
                 }}
               />
@@ -200,8 +200,8 @@ export const AssessmentsPage: React.FC = () => {
                   height: 20,
                   fontSize: '0.68rem',
                   fontWeight: 700,
-                  backgroundColor: '#F0F4F9',
-                  color: '#0F2744',
+                  backgroundColor: '#E4EEFC',
+                  color: '#1765B5',
                   borderRadius: '3px',
                 }}
               />
@@ -211,7 +211,7 @@ export const AssessmentsPage: React.FC = () => {
             <Typography
               variant="caption"
               sx={{
-                color: '#64748b',
+                color: '#7182A0',
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
@@ -237,8 +237,8 @@ export const AssessmentsPage: React.FC = () => {
       minWidth: 140,
       render: (row) => (
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>{row.duration} mins</Typography>
-          <Typography variant="caption" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#33466A' }}>{row.duration} mins</Typography>
+          <Typography variant="caption" sx={{ color: '#7182A0' }}>
             Max Attempts: {row.maximumAttempts}
           </Typography>
         </Box>
@@ -270,10 +270,10 @@ export const AssessmentsPage: React.FC = () => {
       minWidth: 160,
       render: (row) => (
         <Box>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#33466A' }}>
             {row.totalQuestions} Questions
           </Typography>
-          <Typography variant="caption" sx={{ color: '#64748b' }}>
+          <Typography variant="caption" sx={{ color: '#7182A0' }}>
             Total: {row.totalMarks} Marks ({row.passingPercentage}% to pass)
           </Typography>
         </Box>
@@ -285,14 +285,14 @@ export const AssessmentsPage: React.FC = () => {
       minWidth: 150,
       render: (row) => {
         if (!row.startDate && !row.endDate) {
-          return <Typography variant="caption" sx={{ color: '#94a3b8' }}>Unscheduled (Immediate)</Typography>;
+          return <Typography variant="caption" sx={{ color: '#8293B0' }}>Unscheduled (Immediate)</Typography>;
         }
         return (
           <Box>
-            <Typography variant="caption" display="block" sx={{ color: '#1e293b', fontWeight: 600 }}>
+            <Typography variant="caption" display="block" sx={{ color: '#33466A', fontWeight: 600 }}>
               {row.startDate ? new Date(row.startDate).toLocaleDateString() : 'Immediate'}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0' }}>
               to {row.endDate ? new Date(row.endDate).toLocaleDateString() : 'Indefinite'}
             </Typography>
           </Box>
@@ -310,7 +310,7 @@ export const AssessmentsPage: React.FC = () => {
             <IconButton
               size="small"
               onClick={() => navigate(`/admin/assessments/${row.id}`)}
-              sx={{ color: '#0F2744' }}
+              sx={{ color: '#1765B5' }}
             >
               <VisibilityIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -347,12 +347,12 @@ export const AssessmentsPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
-            <AssignmentIcon sx={{ fontSize: 24, color: '#0F2744' }} />
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
+            <AssignmentIcon sx={{ fontSize: 24, color: '#1765B5' }} />
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B' }}>
               Assessment Management & Engine
             </Typography>
           </Box>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             Configure multi-component placement evaluations, enforce monthly no-repeat rules, and generate deterministic test papers.
           </Typography>
         </Box>
@@ -385,18 +385,18 @@ export const AssessmentsPage: React.FC = () => {
             sx={{
               p: 2,
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               backgroundColor: '#ffffff',
             }}
           >
             <CardContent sx={{ p: '0 !important' }}>
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 TOTAL ASSESSMENTS
               </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5, mb: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B', mt: 0.5, mb: 0.5 }}>
                 {totalCount}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                 Configured across all tracks
               </Typography>
             </CardContent>
@@ -409,12 +409,12 @@ export const AssessmentsPage: React.FC = () => {
             sx={{
               p: 2,
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               backgroundColor: '#ffffff',
             }}
           >
             <CardContent sx={{ p: '0 !important' }}>
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 PUBLISHED & ACTIVE
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 700, color: '#047857', mt: 0.5, mb: 0.5 }}>
@@ -433,18 +433,18 @@ export const AssessmentsPage: React.FC = () => {
             sx={{
               p: 2,
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               backgroundColor: '#ffffff',
             }}
           >
             <CardContent sx={{ p: '0 !important' }}>
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 UPCOMING SCHEDULED
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 700, color: '#0369a1', mt: 0.5, mb: 0.5 }}>
                 {scheduledCount}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                 Timed placement drives
               </Typography>
             </CardContent>
@@ -457,18 +457,18 @@ export const AssessmentsPage: React.FC = () => {
             sx={{
               p: 2,
               borderRadius: '8px',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               backgroundColor: '#ffffff',
             }}
           >
             <CardContent sx={{ p: '0 !important' }}>
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 DRAFTS IN PROGRESS
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 700, color: '#b45309', mt: 0.5, mb: 0.5 }}>
                 {draftCount}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                 Under section authoring
               </Typography>
             </CardContent>
@@ -490,7 +490,7 @@ export const AssessmentsPage: React.FC = () => {
           mb: 2.5,
           borderRadius: '8px',
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
         }}
       >
         <Grid container spacing={2} alignItems="center">
@@ -558,7 +558,7 @@ export const AssessmentsPage: React.FC = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
+                    <SearchIcon sx={{ color: '#8293B0', fontSize: 18 }} />
                   </InputAdornment>
                 ),
               }}

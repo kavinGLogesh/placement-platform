@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Box, CircularProgress } from '@mui/material';
 import { RootLayout } from '../layouts/RootLayout.js';
-import { HealthStatusPage } from '../pages/HealthStatusPage.js';
 import { LoginPage } from '../pages/LoginPage.js';
 import { AdminDashboardPage } from '../pages/AdminDashboardPage.js';
 import { StudentDashboardPage } from '../pages/StudentDashboardPage.js';
@@ -35,15 +35,43 @@ import { StudentReportsPage } from '../pages/student/StudentReportsPage.js';
 import { StudentProfilePage } from '../pages/student/StudentProfilePage.js';
 import { StudentChangePasswordPage } from '../pages/student/StudentChangePasswordPage.js';
 import { ProtectedRoute } from './ProtectedRoute.js';
+import { useAuth } from '../hooks/useAuth.js';
+
+const HomeRedirect: React.FC = () => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role === 'STUDENT') {
+    return (
+      <Navigate
+        to={user.mustChangePassword ? '/student/change-password' : '/student/dashboard'}
+        replace
+      />
+    );
+  }
+
+  return <Navigate to="/admin/dashboard" replace />;
+};
 
 export const AppRoutes: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RootLayout />}>
-          {/* Phase 1 Health & Architecture Console */}
-          <Route index element={<HealthStatusPage />} />
-          <Route path="admin/health" element={<HealthStatusPage />} />
+          <Route index element={<HomeRedirect />} />
 
           {/* Phase 2 Auth: Public Login */}
           <Route path="login" element={<LoginPage />} />

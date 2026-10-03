@@ -71,7 +71,7 @@ export function DataTable<T extends { id: string | number }>({
       elevation={0}
       sx={{
         backgroundColor: '#ffffff',
-        border: '1px solid #e2e8f0',
+        border: '1px solid #DCE6F5',
         borderRadius: 2,
         overflow: 'hidden',
         boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
@@ -88,7 +88,7 @@ export function DataTable<T extends { id: string | number }>({
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: 1.5,
-            borderBottom: '1px solid #f1f5f9',
+            borderBottom: '1px solid #E7EEFA',
             backgroundColor: '#ffffff',
           }}
         >
@@ -101,14 +101,14 @@ export function DataTable<T extends { id: string | number }>({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
+                    <SearchIcon sx={{ color: '#8293B0', fontSize: 18 }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
                 width: { xs: '100%', sm: 280 },
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#EDF2FF',
                   borderRadius: 1.25,
                   fontSize: '0.84rem',
                   height: 36,
@@ -138,13 +138,13 @@ export function DataTable<T extends { id: string | number }>({
                   align={col.align || 'left'}
                   sx={{
                     minWidth: col.minWidth,
-                    backgroundColor: '#f8fafc',
-                    color: '#475569',
+                    backgroundColor: '#EDF2FF',
+                    color: '#526584',
                     fontWeight: 600,
                     fontSize: '0.74rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    borderBottom: '1px solid #e2e8f0',
+                    borderBottom: '1px solid #DCE6F5',
                     py: 1.25,
                     px: 2,
                   }}
@@ -155,8 +155,8 @@ export function DataTable<T extends { id: string | number }>({
                       direction={sortBy === col.id ? sortOrder : 'asc'}
                       onClick={() => onSortChange(col.id)}
                       sx={{
-                        '&.Mui-active': { color: '#0f2744' },
-                        '& .MuiTableSortLabel-icon': { color: '#0f2744 !important' },
+                        '&.Mui-active': { color: '#1765B5' },
+                        '& .MuiTableSortLabel-icon': { color: '#1765B5 !important' },
                       }}
                     >
                       {col.label}
@@ -176,7 +176,7 @@ export function DataTable<T extends { id: string | number }>({
                 <TableRow key={`skeleton-${rIdx}`}>
                   {columns.map((_, cIdx) => (
                     <TableCell key={`cell-sk-${cIdx}`} sx={{ py: 1.5, px: 2 }}>
-                      <Skeleton variant="text" sx={{ bgcolor: '#f1f5f9' }} height={20} />
+                      <Skeleton variant="text" sx={{ bgcolor: '#E7EEFA' }} height={20} />
                     </TableCell>
                   ))}
                 </TableRow>
@@ -185,7 +185,7 @@ export function DataTable<T extends { id: string | number }>({
               // Empty State
               <TableRow>
                 <TableCell colSpan={columns.length} align="center" sx={{ py: 7, px: 2 }}>
-                  <InboxOutlinedIcon sx={{ fontSize: 40, color: '#94a3b8', mb: 1, opacity: 0.7 }} />
+                  <InboxOutlinedIcon sx={{ fontSize: 40, color: '#8293B0', mb: 1, opacity: 0.7 }} />
                   <Typography variant="body2" color="text.primary" fontWeight={600} sx={{ mb: 0.5 }}>
                     {emptyMessage}
                   </Typography>
@@ -202,9 +202,9 @@ export function DataTable<T extends { id: string | number }>({
                   hover
                   sx={{
                     '&:hover': {
-                      backgroundColor: '#f8fafc !important',
+                      backgroundColor: '#EDF2FF !important',
                     },
-                    borderBottom: '1px solid #f1f5f9',
+                    borderBottom: '1px solid #E7EEFA',
                   }}
                 >
                   {columns.map((col) => (
@@ -212,8 +212,8 @@ export function DataTable<T extends { id: string | number }>({
                       key={col.id}
                       align={col.align || 'left'}
                       sx={{
-                        borderBottom: '1px solid #f1f5f9',
-                        color: '#1e293b',
+                        borderBottom: '1px solid #E7EEFA',
+                        color: '#33466A',
                         fontSize: '0.84rem',
                         py: 1.25,
                         px: 2,
@@ -242,8 +242,8 @@ export function DataTable<T extends { id: string | number }>({
           onPageChange={(_e, newPage) => onPageChange(newPage)}
           onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
           sx={{
-            borderTop: '1px solid #e2e8f0',
-            color: '#64748b',
+            borderTop: '1px solid #DCE6F5',
+            color: '#7182A0',
             '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
               fontSize: '0.8rem',
             },

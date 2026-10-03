@@ -101,7 +101,7 @@ export const AdminDashboardPage: React.FC = () => {
           p: { xs: 2.5, md: 3 },
           borderRadius: '8px',
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -111,7 +111,7 @@ export const AdminDashboardPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
               CAMPUS PLACEMENT SYSTEM
             </Typography>
             <Chip
@@ -122,13 +122,13 @@ export const AdminDashboardPage: React.FC = () => {
                 fontSize: '0.72rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                bgcolor: isSuperAdmin ? '#f8fafc' : '#F0F4F9',
-                color: '#0F2744',
-                border: '1px solid #cbd5e1',
+                bgcolor: isSuperAdmin ? '#EDF2FF' : '#E4EEFC',
+                color: '#1765B5',
+                border: '1px solid #D1DEF0',
               }}
             />
           </Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             {isSuperAdmin ? 'Institutional Governance & Oversight Console' : 'Placement Operations Dashboard'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -201,8 +201,8 @@ export const AdminDashboardPage: React.FC = () => {
             mb: 3,
             p: 2.5,
             bgcolor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderLeft: '4px solid #0F2744',
+            border: '1px solid #DCE6F5',
+            borderLeft: '4px solid #1765B5',
             borderRadius: '8px',
           }}
         >
@@ -219,7 +219,7 @@ export const AdminDashboardPage: React.FC = () => {
                   sx={{ height: 20, fontSize: '0.7rem', fontWeight: 700, bgcolor: '#fef2f2', color: '#b91c1c', borderRadius: '4px' }}
                 />
               </Box>
-              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#0f172a' }}>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#14264B' }}>
                 Concluded Placement Drives Requiring Attendance Follow-up
               </Typography>
             </Box>
@@ -227,7 +227,7 @@ export const AdminDashboardPage: React.FC = () => {
               size="small"
               variant="outlined"
               onClick={() => navigate('/admin/attendance')}
-              sx={{ fontWeight: 600, fontSize: '0.8rem', color: '#0F2744', borderColor: '#cbd5e1' }}
+              sx={{ fontWeight: 600, fontSize: '0.8rem', color: '#1765B5', borderColor: '#D1DEF0' }}
             >
               Open Attendance Console
             </Button>
@@ -239,8 +239,8 @@ export const AdminDashboardPage: React.FC = () => {
                 <Box
                   sx={{
                     p: 2,
-                    bgcolor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    bgcolor: '#EDF2FF',
+                    border: '1px solid #DCE6F5',
                     borderRadius: '6px',
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -250,10 +250,10 @@ export const AdminDashboardPage: React.FC = () => {
                   }}
                 >
                   <Box>
-                    <Typography variant="body2" fontWeight={700} sx={{ color: '#0f172a' }}>
+                    <Typography variant="body2" fontWeight={700} sx={{ color: '#14264B' }}>
                       {alert.notAttendedCount} students did not attend the {alert.assessmentTitle}.
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       Allocated Candidates: {alert.assignedCount} | Missed Without Attempt: {alert.notAttendedCount}
                     </Typography>
                   </Box>
@@ -263,7 +263,7 @@ export const AdminDashboardPage: React.FC = () => {
                       size="small"
                       variant="outlined"
                       onClick={() => navigate(`/admin/attendance?assessmentId=${alert.assessmentId}`)}
-                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#0F2744', borderColor: '#cbd5e1' }}
+                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#1765B5', borderColor: '#D1DEF0' }}
                     >
                       View Students
                     </Button>
@@ -272,7 +272,7 @@ export const AdminDashboardPage: React.FC = () => {
                       variant="outlined"
                       startIcon={<FileDownloadIcon sx={{ fontSize: '15px !important' }} />}
                       onClick={() => handleExportAlertExcel(alert.assessmentId, alert.assessmentTitle)}
-                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#0F2744', borderColor: '#cbd5e1' }}
+                      sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#ffffff', color: '#1765B5', borderColor: '#D1DEF0' }}
                     >
                       Export Excel
                     </Button>
@@ -282,7 +282,7 @@ export const AdminDashboardPage: React.FC = () => {
                         variant="contained"
                         startIcon={<SendIcon sx={{ fontSize: '14px !important' }} />}
                         onClick={() => handleSendAlertReminder(alert.assessmentId, alert.assessmentTitle)}
-                        sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#0F2744', '&:hover': { bgcolor: '#0A1C30' } }}
+                        sx={{ fontSize: '0.78rem', py: 0.5, bgcolor: '#1765B5', '&:hover': { bgcolor: '#104B91' } }}
                       >
                         Send Reminder
                       </Button>
@@ -313,7 +313,7 @@ export const AdminDashboardPage: React.FC = () => {
       <Box sx={{ mb: 3.5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Box>
-            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+            <Typography variant="subtitle1" fontWeight={700} color="#14264B">
               Real-Time Placement Performance Metrics
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -331,7 +331,7 @@ export const AdminDashboardPage: React.FC = () => {
         </Box>
 
         {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #DCE6F5' }}>
             <CircularProgress size={28} />
           </Box>
         ) : (
@@ -343,21 +343,21 @@ export const AdminDashboardPage: React.FC = () => {
                 sx={{
                   p: 2.25,
                   bgcolor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: '8px',
                 }}
               >
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                   REGISTERED CANDIDATES
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.5 }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', my: 0.5 }}>
                   {overview?.totalStudents || 0}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                   <Chip
                     label={`${overview?.activeStudents || 0} Active`}
                     size="small"
-                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#f1f5f9', color: '#334155', fontWeight: 600, borderRadius: '4px' }}
+                    sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#E7EEFA', color: '#405678', fontWeight: 600, borderRadius: '4px' }}
                   />
                   <Typography variant="caption" color="text.secondary">
                     across all departments
@@ -373,15 +373,15 @@ export const AdminDashboardPage: React.FC = () => {
                 sx={{
                   p: 2.25,
                   bgcolor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: '8px',
                 }}
               >
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                   ASSESSMENT ATTENDANCE
                 </Typography>
-                <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.5 }}>
-                  {overview?.activeStudents || 0} <Typography component="span" variant="body2" sx={{ color: '#64748b' }}>/ {overview?.totalStudents || 0}</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#1765B5', my: 0.5 }}>
+                  {overview?.activeStudents || 0} <Typography component="span" variant="body2" sx={{ color: '#7182A0' }}>/ {overview?.totalStudents || 0}</Typography>
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   Appeared for at least 1 placement evaluation
@@ -396,11 +396,11 @@ export const AdminDashboardPage: React.FC = () => {
                 sx={{
                   p: 2.25,
                   bgcolor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: '8px',
                 }}
               >
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                   QUALIFICATION OUTCOMES
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: 0.5 }}>
@@ -412,7 +412,7 @@ export const AdminDashboardPage: React.FC = () => {
                       {overview?.passedCount ?? 0}
                     </Typography>
                   </Box>
-                  <Box sx={{ height: 32, width: '1px', bgcolor: '#e2e8f0' }} />
+                  <Box sx={{ height: 32, width: '1px', bgcolor: '#DCE6F5' }} />
                   <Box>
                     <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 700 }}>
                       Needs Prep:
@@ -435,11 +435,11 @@ export const AdminDashboardPage: React.FC = () => {
                 sx={{
                   p: 2.25,
                   bgcolor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: '8px',
                 }}
               >
-                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                   OVERALL PASS RATE
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ color: '#b45309', my: 0.5 }}>
@@ -448,7 +448,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(100, overview?.passPercentage || 0)}
-                  sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#f1f5f9', '& .MuiLinearProgress-bar': { bgcolor: '#b45309' } }}
+                  sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#E7EEFA', '& .MuiLinearProgress-bar': { bgcolor: '#b45309' } }}
                 />
                 <Typography variant="caption" color="text.secondary">
                   Candidates meeting cut-off criteria
@@ -467,13 +467,13 @@ export const AdminDashboardPage: React.FC = () => {
             mb: 3.5,
             p: 2.5,
             bgcolor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: '8px',
           }}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
             <Box>
-              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+              <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                 Placement Pipeline Progression Funnel
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -497,26 +497,26 @@ export const AdminDashboardPage: React.FC = () => {
                   sx={{
                     p: 1.75,
                     borderRadius: '6px',
-                    bgcolor: st.isImplemented ? '#f8fafc' : '#ffffff',
+                    bgcolor: st.isImplemented ? '#EDF2FF' : '#ffffff',
                     border: '1px solid',
-                    borderColor: st.isImplemented ? '#cbd5e1' : '#f1f5f9',
+                    borderColor: st.isImplemented ? '#D1DEF0' : '#E7EEFA',
                   }}
                 >
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
-                    <Typography variant="caption" fontWeight={700} color="#334155">
+                    <Typography variant="caption" fontWeight={700} color="#405678">
                       {st.stage}
                     </Typography>
                     {!st.isImplemented && (
-                      <Chip label="Upcoming" size="small" sx={{ fontSize: '0.62rem', height: 16, bgcolor: '#f1f5f9', color: '#94a3b8', borderRadius: '3px' }} />
+                      <Chip label="Upcoming" size="small" sx={{ fontSize: '0.62rem', height: 16, bgcolor: '#E7EEFA', color: '#8293B0', borderRadius: '3px' }} />
                     )}
                   </Box>
-                  <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ my: 0.25 }}>
+                  <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ my: 0.25 }}>
                     {st.count}
                   </Typography>
                   <LinearProgress
                     variant="determinate"
                     value={Math.min(100, st.conversionRate)}
-                    sx={{ height: 4, borderRadius: '2px', mb: 0.5, bgcolor: '#e2e8f0' }}
+                    sx={{ height: 4, borderRadius: '2px', mb: 0.5, bgcolor: '#DCE6F5' }}
                   />
                   <Typography variant="caption" color="text.secondary" fontWeight={500}>
                     {st.conversionRate}% of cohort
@@ -534,14 +534,14 @@ export const AdminDashboardPage: React.FC = () => {
         sx={{
           mb: 4,
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
           overflow: 'hidden',
         }}
       >
-        <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid #DCE6F5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
           <Box>
-            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+            <Typography variant="subtitle1" fontWeight={700} color="#14264B">
               Recent Assessment Submissions
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -562,34 +562,34 @@ export const AdminDashboardPage: React.FC = () => {
         {overview?.recentResults && overview.recentResults.length > 0 ? (
           <TableContainer>
             <Table size="small">
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
+              <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Candidate</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Register No.</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Assessment</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Department</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Score</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Accuracy</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }} align="right">Action</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Candidate</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Register No.</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Assessment</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Department</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Score</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Accuracy</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }} align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {overview.recentResults.map((item) => (
-                  <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                    <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{item.studentName}</TableCell>
-                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{item.registerNumber}</TableCell>
-                    <TableCell sx={{ color: '#1e293b', fontSize: '0.82rem' }}>{item.assessmentTitle}</TableCell>
-                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{item.departmentCode || item.departmentName || '—'}</TableCell>
+                  <TableRow key={item.id} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                    <TableCell sx={{ fontWeight: 600, color: '#14264B', fontSize: '0.82rem' }}>{item.studentName}</TableCell>
+                    <TableCell sx={{ color: '#7182A0', fontSize: '0.8rem' }}>{item.registerNumber}</TableCell>
+                    <TableCell sx={{ color: '#33466A', fontSize: '0.82rem' }}>{item.assessmentTitle}</TableCell>
+                    <TableCell sx={{ color: '#7182A0', fontSize: '0.8rem' }}>{item.departmentCode || item.departmentName || '—'}</TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={700} color="#0f172a" sx={{ fontSize: '0.82rem' }}>
+                      <Typography variant="body2" fontWeight={700} color="#14264B" sx={{ fontSize: '0.82rem' }}>
                         {item.percentage}%
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {item.obtainedMarks}/{item.totalMarks} marks
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ color: '#334155', fontWeight: 600, fontSize: '0.82rem' }}>{item.accuracy}%</TableCell>
+                    <TableCell sx={{ color: '#405678', fontWeight: 600, fontSize: '0.82rem' }}>{item.accuracy}%</TableCell>
                     <TableCell>
                       <Chip
                         icon={item.isPassed ? <CheckCircleOutlineIcon sx={{ '&&': { fontSize: 14 } }} /> : <CancelOutlinedIcon sx={{ '&&': { fontSize: 14 } }} />}

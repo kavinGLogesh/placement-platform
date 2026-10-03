@@ -107,29 +107,29 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
           justifyContent: 'space-between',
           alignItems: 'center',
           backgroundColor: '#ffffff',
-          color: '#0f172a',
-          borderBottom: '1px solid #e2e8f0',
+          color: '#14264B',
+          borderBottom: '1px solid #DCE6F5',
           py: 2,
           px: 2.5,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <CloudUploadIcon sx={{ color: '#0f2744', fontSize: 22 }} />
+          <CloudUploadIcon sx={{ color: '#1765B5', fontSize: 22 }} />
           <Box>
-            <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, color: '#0f172a', fontSize: '1.05rem' }}>
+            <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, color: '#14264B', fontSize: '1.05rem' }}>
               Upload Question Bank — {company.name} ({company.code})
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.74rem' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontSize: '0.74rem' }}>
               Multi-Level Duplicate Detection & Integrity Pipeline
             </Typography>
           </Box>
         </Box>
-        <IconButton size="small" onClick={handleDialogClose} sx={{ color: '#64748b', '&:hover': { color: '#0f172a' } }}>
+        <IconButton size="small" onClick={handleDialogClose} sx={{ color: '#7182A0', '&:hover': { color: '#14264B' } }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers sx={{ p: 2.5, backgroundColor: '#f8fafc' }}>
+      <DialogContent dividers sx={{ p: 2.5, backgroundColor: '#EDF2FF' }}>
         {/* Upload Pipeline Stepper */}
         <Paper
           elevation={0}
@@ -137,7 +137,7 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
             p: 1.5,
             mb: 2.5,
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 1.5,
           }}
         >
@@ -155,8 +155,8 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                     width: 22,
                     height: 22,
                     borderRadius: '50%',
-                    backgroundColor: result ? '#15803d' : uploading ? '#0f2744' : '#e2e8f0',
-                    color: result || uploading ? '#ffffff' : '#475569',
+                    backgroundColor: result ? '#15803d' : uploading ? '#1765B5' : '#DCE6F5',
+                    color: result || uploading ? '#ffffff' : '#526584',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -166,10 +166,10 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                 >
                   {step.num}
                 </Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: '#334155', fontSize: '0.78rem' }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#405678', fontSize: '0.78rem' }}>
                   {step.title}
                 </Typography>
-                {idx < 4 && <Typography variant="caption" sx={{ color: '#cbd5e1', mx: 0.5 }}>→</Typography>}
+                {idx < 4 && <Typography variant="caption" sx={{ color: '#D1DEF0', mx: 0.5 }}>→</Typography>}
               </Box>
             ))}
           </Box>
@@ -186,7 +186,7 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
             {/* File Dropzone */}
             <Box
               sx={{
-                border: '2px dashed #cbd5e1',
+                border: '2px dashed #D1DEF0',
                 borderRadius: 1.5,
                 p: 4,
                 textAlign: 'center',
@@ -194,8 +194,8 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease, background-color 0.15s ease',
                 '&:hover': {
-                  borderColor: '#0f2744',
-                  backgroundColor: '#f8fafc',
+                  borderColor: '#1765B5',
+                  backgroundColor: '#EDF2FF',
                 },
               }}
               onClick={() => fileInputRef.current?.click()}
@@ -207,10 +207,10 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
               />
-              <CloudUploadIcon sx={{ fontSize: 44, color: selectedFile ? '#15803d' : '#0f2744', mb: 1 }} />
+              <CloudUploadIcon sx={{ fontSize: 44, color: selectedFile ? '#15803d' : '#1765B5', mb: 1 }} />
               {selectedFile ? (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                  <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                     {selectedFile.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -219,7 +219,7 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                 </Box>
               ) : (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={600} color="#0f172a" sx={{ mb: 0.5 }}>
+                  <Typography variant="subtitle2" fontWeight={600} color="#14264B" sx={{ mb: 0.5 }}>
                     Click or drag question dataset here
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -230,9 +230,9 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
             </Box>
 
             {/* Template Information Card */}
-            <Card variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 1.5, borderColor: '#e2e8f0' }}>
+            <Card variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 1.5, borderColor: '#DCE6F5' }}>
               <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                <Typography variant="subtitle2" fontWeight={600} color="#0f172a" sx={{ mb: 0.5 }}>
+                <Typography variant="subtitle2" fontWeight={600} color="#14264B" sx={{ mb: 0.5 }}>
                   Supported Dataset Columns
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.82rem', mb: 0.5 }}>
@@ -273,11 +273,11 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                 </Typography>
               </Paper>
 
-              <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', backgroundColor: '#f8fafc', borderColor: '#cbd5e1', borderRadius: 1.5 }}>
-                <Typography variant="caption" sx={{ color: '#0f2744', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', backgroundColor: '#EDF2FF', borderColor: '#D1DEF0', borderRadius: 1.5 }}>
+                <Typography variant="caption" sx={{ color: '#1765B5', fontWeight: 600, letterSpacing: '0.04em' }}>
                   EXACT DUPLICATES
                 </Typography>
-                <Typography variant="h5" fontWeight={700} color="#0f2744" sx={{ my: 0.25 }}>
+                <Typography variant="h5" fontWeight={700} color="#1765B5" sx={{ my: 0.25 }}>
                   {result.exactDuplicatesCount}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -311,11 +311,11 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
             </Box>
 
             {/* Report Breakdown Tabs */}
-            <Paper variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 1.5, borderColor: '#e2e8f0' }}>
+            <Paper variant="outlined" sx={{ backgroundColor: '#ffffff', borderRadius: 1.5, borderColor: '#DCE6F5' }}>
               <Tabs
                 value={reportTab}
                 onChange={(_, v) => setReportTab(v)}
-                sx={{ borderBottom: 1, borderColor: '#e2e8f0', px: 2 }}
+                sx={{ borderBottom: 1, borderColor: '#DCE6F5', px: 2 }}
               >
                 <Tab
                   label={`Exact Duplicates (${result.exactDuplicates.length})`}
@@ -360,7 +360,7 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
                                 <Chip
                                   label="Linked Existing Question"
                                   size="small"
-                                  sx={{ backgroundColor: '#f0f4f9', color: '#0f2744', fontWeight: 600, border: '1px solid #cbd5e1' }}
+                                  sx={{ backgroundColor: '#f0f4f9', color: '#1765B5', fontWeight: 600, border: '1px solid #D1DEF0' }}
                                 />
                               </TableCell>
                             </TableRow>
@@ -454,10 +454,10 @@ export const CompanyQuestionUploadDialog: React.FC<CompanyQuestionUploadDialogPr
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+      <DialogActions sx={{ p: 2, backgroundColor: '#ffffff', borderTop: '1px solid #DCE6F5', display: 'flex', justifyContent: 'space-between' }}>
         <Box>
           {result && (
-            <Button variant="text" onClick={handleReset} sx={{ color: '#64748b' }}>
+            <Button variant="text" onClick={handleReset} sx={{ color: '#7182A0' }}>
               Upload Another File
             </Button>
           )}

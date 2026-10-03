@@ -310,7 +310,7 @@ export const AssessmentDetailPage: React.FC = () => {
             onClick={handleGeneratePapers}
             disabled={generating || assessment.status === 'PUBLISHED'}
             sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #318992 0%, #267D86 100%)',
               fontWeight: 600,
             }}
           >
@@ -410,7 +410,7 @@ export const AssessmentDetailPage: React.FC = () => {
           >
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Required Questions</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a' }}>{shortageError.required}</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: '#14264B' }}>{shortageError.required}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Available Questions</Typography>
@@ -456,37 +456,37 @@ export const AssessmentDetailPage: React.FC = () => {
       {/* Metrics Row */}
       <Grid container spacing={2.5} sx={{ mb: 4 }}>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Duration</Typography>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a' }}>{assessment.duration}m</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#14264B' }}>{assessment.duration}m</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Questions / Paper</Typography>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a' }}>{assessment.totalQuestions}</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#14264B' }}>{assessment.totalQuestions}</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Total Marks</Typography>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a' }}>{assessment.totalMarks}</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#14264B' }}>{assessment.totalMarks}</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Passing Threshold</Typography>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a' }}>{assessment.passingPercentage}%</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#14264B' }}>{assessment.passingPercentage}%</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Paper Sets</Typography>
             <Typography variant="h6" sx={{ fontWeight: 800, color: '#0284c7' }}>{assessment.numberOfPapers}</Typography>
           </Paper>
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
-          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
+          <Paper elevation={0} sx={{ p: 2, borderRadius: 2.5, backgroundColor: '#ffffff', border: '1px solid #DCE6F5', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)' }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Assigned Candidates</Typography>
             <Typography variant="h6" sx={{ fontWeight: 800, color: '#16a34a' }}>{assignments.length}</Typography>
           </Paper>
@@ -500,7 +500,7 @@ export const AssessmentDetailPage: React.FC = () => {
           mb: 3,
           borderRadius: 2.5,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
         }}
       >
@@ -531,7 +531,7 @@ export const AssessmentDetailPage: React.FC = () => {
                 elevation={0}
                 sx={{
                   backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: 2.5,
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
                 }}
@@ -575,7 +575,7 @@ export const AssessmentDetailPage: React.FC = () => {
       {mainTab === 1 && (
         <Box>
           {papers.length === 0 ? (
-            <Paper elevation={0} sx={{ p: 6, textAlign: 'center', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 2.5 }}>
+            <Paper elevation={0} sx={{ p: 6, textAlign: 'center', backgroundColor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: 2.5 }}>
               <QuizIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
                 No Examination Papers Generated Yet
@@ -623,7 +623,7 @@ export const AssessmentDetailPage: React.FC = () => {
                         p: 3,
                         borderRadius: 2.5,
                         backgroundColor: '#ffffff',
-                        border: '1px solid #e2e8f0',
+                        border: '1px solid #DCE6F5',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
                       }}
                     >
@@ -639,7 +639,7 @@ export const AssessmentDetailPage: React.FC = () => {
                       </Box>
 
                       <Box sx={{ mb: 2 }}>
-                        <QuestionContentRenderer content={q.questionText} sx={{ fontWeight: 600, color: '#0f172a' }} />
+                        <QuestionContentRenderer content={q.questionText} sx={{ fontWeight: 600, color: '#14264B' }} />
                       </Box>
 
                       {/* Randomized Options Preview */}
@@ -653,10 +653,10 @@ export const AssessmentDetailPage: React.FC = () => {
                                   borderRadius: 1.5,
                                   backgroundColor: opt.isCorrect
                                     ? '#f0fdf4'
-                                    : '#f8fafc',
+                                    : '#EDF2FF',
                                   border: opt.isCorrect
                                     ? '1.5px solid #16a34a'
-                                    : '1px solid #e2e8f0',
+                                    : '1px solid #DCE6F5',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: 1,
@@ -665,7 +665,7 @@ export const AssessmentDetailPage: React.FC = () => {
                                 <Typography variant="caption" sx={{ fontWeight: 700, color: opt.isCorrect ? '#15803d' : 'text.secondary' }}>
                                   {opt.optionOrder}.
                                 </Typography>
-                                <Typography variant="body2" sx={{ flexGrow: 1, color: '#1e293b' }}>
+                                <Typography variant="body2" sx={{ flexGrow: 1, color: '#33466A' }}>
                                   {opt.optionText}
                                 </Typography>
                                 {opt.isCorrect && (
@@ -692,7 +692,7 @@ export const AssessmentDetailPage: React.FC = () => {
           sx={{
             borderRadius: 2.5,
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
             overflow: 'hidden',
           }}

@@ -332,9 +332,9 @@ export const CompaniesPage: React.FC = () => {
             size="small"
             sx={{
               fontWeight: 700,
-              backgroundColor: '#F0F4F9',
-              color: '#0F2744',
-              border: '1px solid #CBD5E1',
+              backgroundColor: '#E4EEFC',
+              color: '#1765B5',
+              border: '1px solid #D1DEF0',
               borderRadius: '4px',
               fontSize: '0.78rem',
               letterSpacing: '0.04em',
@@ -353,7 +353,7 @@ export const CompaniesPage: React.FC = () => {
             variant="body2"
             sx={{
               fontWeight: 700,
-              color: '#0f172a',
+              color: '#14264B',
               cursor: 'pointer',
               '&:hover': { color: '#3b82f6' },
             }}
@@ -365,7 +365,7 @@ export const CompaniesPage: React.FC = () => {
             <Typography
               variant="caption"
               sx={{
-                color: '#64748b',
+                color: '#7182A0',
                 display: '-webkit-box',
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: 'vertical',
@@ -407,8 +407,8 @@ export const CompaniesPage: React.FC = () => {
       minWidth: 120,
       render: (c) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <AssignmentIcon sx={{ fontSize: 16, color: '#475569' }} />
-          <Typography variant="body2" sx={{ fontWeight: 600, color: '#1e293b' }}>
+          <AssignmentIcon sx={{ fontSize: 16, color: '#526584' }} />
+          <Typography variant="body2" sx={{ fontWeight: 600, color: '#33466A' }}>
             {c._count?.assessments ?? 0}
           </Typography>
         </Box>
@@ -422,7 +422,7 @@ export const CompaniesPage: React.FC = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <QuizIcon sx={{ fontSize: 16, color: '#3b82f6' }} />
-            <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: '#33466A' }}>
               {c._count?.questions ?? 0}
             </Typography>
           </Box>
@@ -450,10 +450,10 @@ export const CompaniesPage: React.FC = () => {
             sx={{
               fontWeight: 600,
               fontSize: '0.72rem',
-              backgroundColor: c.isActive ? '#ecfdf5' : '#f1f5f9',
-              color: c.isActive ? '#047857' : '#64748b',
+              backgroundColor: c.isActive ? '#ecfdf5' : '#E7EEFA',
+              color: c.isActive ? '#047857' : '#7182A0',
               border: '1px solid',
-              borderColor: c.isActive ? '#a7f3d0' : '#cbd5e1',
+              borderColor: c.isActive ? '#a7f3d0' : '#D1DEF0',
               borderRadius: '4px',
             }}
           />
@@ -486,7 +486,7 @@ export const CompaniesPage: React.FC = () => {
                 fontWeight: 600,
                 py: 0.4,
                 px: 1,
-                borderColor: '#cbd5e1',
+                borderColor: '#D1DEF0',
               }}
             >
               Intelligence
@@ -515,7 +515,7 @@ export const CompaniesPage: React.FC = () => {
             <IconButton
               size="small"
               onClick={() => navigate(`/admin/questions?companyId=${c.id}`)}
-              sx={{ color: '#475569' }}
+              sx={{ color: '#526584' }}
             >
               <QuizIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -532,7 +532,7 @@ export const CompaniesPage: React.FC = () => {
           </Tooltip>
 
           <Tooltip title="Edit Company Details">
-            <IconButton size="small" onClick={() => handleOpenDialog(c)} sx={{ color: '#475569' }}>
+            <IconButton size="small" onClick={() => handleOpenDialog(c)} sx={{ color: '#526584' }}>
               <EditIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
@@ -566,12 +566,12 @@ export const CompaniesPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.5 }}>
-            <BusinessIcon sx={{ fontSize: 24, color: '#0F2744' }} />
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
+            <BusinessIcon sx={{ fontSize: 24, color: '#1765B5' }} />
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B' }}>
               Company Question Intelligence & Assessment Tracks
             </Typography>
           </Box>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             Corporate recruitment patterns, question bank intelligence, multi-level duplicate protection, and automated test set generation.
           </Typography>
         </Box>
@@ -593,8 +593,8 @@ export const CompaniesPage: React.FC = () => {
             onClick={() => handleOpenDialog()}
             sx={{
               fontWeight: 600,
-              backgroundColor: '#0F2744',
-              '&:hover': { backgroundColor: '#0A1C30' },
+              backgroundColor: '#1765B5',
+              '&:hover': { backgroundColor: '#104B91' },
             }}
           >
             Add Company
@@ -622,14 +622,14 @@ export const CompaniesPage: React.FC = () => {
             sx={{
               p: 2.25,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
               REGISTERED RECRUITERS
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B', mt: 0.5 }}>
               {totalCount}
             </Typography>
             <Typography variant="caption" sx={{ color: '#15803D', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
@@ -645,17 +645,17 @@ export const CompaniesPage: React.FC = () => {
             sx={{
               p: 2.25,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
               ACTIVE PREPARATION TRACKS
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F2744', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#1765B5', mt: 0.5 }}>
               {activeCompaniesCount}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', mt: 0.5, display: 'block' }}>
               Assigned to practice pathways
             </Typography>
           </Paper>
@@ -667,17 +667,17 @@ export const CompaniesPage: React.FC = () => {
             sx={{
               p: 2.25,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
               CONFIGURED ASSESSMENTS
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B', mt: 0.5 }}>
               {totalAssessments}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', mt: 0.5, display: 'block' }}>
               Company-tailored assessments
             </Typography>
           </Paper>
@@ -689,17 +689,17 @@ export const CompaniesPage: React.FC = () => {
             sx={{
               p: 2.25,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
               QUESTION BANK ITEMS
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mt: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: '#14264B', mt: 0.5 }}>
               {totalQuestions}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', mt: 0.5, display: 'block' }}>
               Tagged across company pools
             </Typography>
           </Paper>
@@ -707,7 +707,7 @@ export const CompaniesPage: React.FC = () => {
       </Grid>
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: '#e2e8f0', mb: 2.5 }}>
+      <Box sx={{ borderBottom: 1, borderColor: '#DCE6F5', mb: 2.5 }}>
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
@@ -716,11 +716,11 @@ export const CompaniesPage: React.FC = () => {
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.88rem',
-              color: '#64748b',
+              color: '#7182A0',
               minHeight: 44,
-              '&.Mui-selected': { color: '#0F2744' },
+              '&.Mui-selected': { color: '#1765B5' },
             },
-            '& .MuiTabs-indicator': { backgroundColor: '#0F2744', height: 2 },
+            '& .MuiTabs-indicator': { backgroundColor: '#1765B5', height: 2 },
           }}
         >
           <Tab
@@ -746,16 +746,16 @@ export const CompaniesPage: React.FC = () => {
               p: 2,
               mb: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: 2,
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
               <FlashOnIcon sx={{ fontSize: 18, color: '#f59e0b' }} />
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B' }}>
                 Instant Recruiter Templates
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                 Pre-populate standard IT placement preparation profiles
               </Typography>
             </Box>
@@ -772,12 +772,12 @@ export const CompaniesPage: React.FC = () => {
                     size="small"
                     sx={{
                       fontWeight: 600,
-                      borderColor: alreadyExists ? '#e2e8f0' : '#CBD5E1',
-                      color: alreadyExists ? '#94a3b8' : '#0F2744',
-                      backgroundColor: alreadyExists ? '#f8fafc' : '#F0F4F9',
+                      borderColor: alreadyExists ? '#DCE6F5' : '#D1DEF0',
+                      color: alreadyExists ? '#8293B0' : '#1765B5',
+                      backgroundColor: alreadyExists ? '#EDF2FF' : '#E4EEFC',
                       cursor: alreadyExists ? 'default' : 'pointer',
                       '&:hover': {
-                        backgroundColor: alreadyExists ? '#f8fafc' : '#E2EAF4',
+                        backgroundColor: alreadyExists ? '#EDF2FF' : '#E2EAF4',
                       },
                     }}
                   />
@@ -793,7 +793,7 @@ export const CompaniesPage: React.FC = () => {
               p: 2,
               mb: 2.5,
               backgroundColor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: 2,
             }}
           >
@@ -811,7 +811,7 @@ export const CompaniesPage: React.FC = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: '#94a3b8', fontSize: 20 }} />
+                        <SearchIcon sx={{ color: '#8293B0', fontSize: 20 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -836,8 +836,8 @@ export const CompaniesPage: React.FC = () => {
                         textTransform: 'none',
                         py: 0.6,
                         px: 1.5,
-                        borderColor: '#cbd5e1',
-                        color: activeFilter === status ? '#ffffff' : '#475569',
+                        borderColor: '#D1DEF0',
+                        color: activeFilter === status ? '#ffffff' : '#526584',
                       }}
                     >
                       {status === 'ALL' ? 'All' : status === 'ACTIVE' ? 'Active' : 'Inactive'}
@@ -852,7 +852,7 @@ export const CompaniesPage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: 2,
               overflow: 'hidden',
               backgroundColor: '#ffffff',
@@ -878,8 +878,8 @@ export const CompaniesPage: React.FC = () => {
 
       {/* TAB 1: Recruitment Workflow Guide */}
       {activeTab === 1 && (
-        <Paper elevation={0} sx={{ p: 3, border: '1px solid #e2e8f0', borderRadius: 2, backgroundColor: '#ffffff' }}>
-          <Typography variant="h6" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+        <Paper elevation={0} sx={{ p: 3, border: '1px solid #DCE6F5', borderRadius: 2, backgroundColor: '#ffffff' }}>
+          <Typography variant="h6" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
             Corporate Recruitment & Assessment Engine Pipeline
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -895,13 +895,13 @@ export const CompaniesPage: React.FC = () => {
               { step: '5', title: 'Evaluation & Analytics', desc: 'Real-time proctoring, score calculation, and performance reports', icon: <InsightsIcon sx={{ fontSize: 16 }} /> },
             ].map((st) => (
               <Grid item xs={12} sm={6} md={2.4} key={st.step}>
-                <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', height: '100%', backgroundColor: '#f8fafc' }}>
+                <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', height: '100%', backgroundColor: '#EDF2FF' }}>
                   <Box
                     sx={{
                       width: 28,
                       height: 28,
                       borderRadius: '50%',
-                      backgroundColor: '#0F2744',
+                      backgroundColor: '#1765B5',
                       color: '#ffffff',
                       display: 'flex',
                       alignItems: 'center',
@@ -914,7 +914,7 @@ export const CompaniesPage: React.FC = () => {
                   >
                     {st.step}
                   </Box>
-                  <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                  <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                     {st.title}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
@@ -931,15 +931,15 @@ export const CompaniesPage: React.FC = () => {
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle
           sx={{
-            color: '#0f172a',
+            color: '#14264B',
             fontWeight: 700,
-            borderBottom: '1px solid #e2e8f0',
+            borderBottom: '1px solid #DCE6F5',
             py: 2,
             px: 3,
             bgcolor: '#ffffff',
           }}
         >
-          <Typography variant="h6" fontWeight={700} color="#0f172a">
+          <Typography variant="h6" fontWeight={700} color="#14264B">
             {editingCompany ? `Edit Company — ${editingCompany.name}` : 'Add New Placement Recruiter'}
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -1019,7 +1019,7 @@ export const CompaniesPage: React.FC = () => {
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+        <DialogActions sx={{ p: 2.5, backgroundColor: '#EDF2FF', borderTop: '1px solid #DCE6F5' }}>
           <Button variant="outlined" onClick={() => setDialogOpen(false)} disabled={saving}>
             Cancel
           </Button>
@@ -1049,7 +1049,7 @@ export const CompaniesPage: React.FC = () => {
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
-          <Typography variant="body1" sx={{ color: '#0f172a', mb: 1.5 }}>
+          <Typography variant="body1" sx={{ color: '#14264B', mb: 1.5 }}>
             <strong>{deactivatePromptTarget?.name} ({deactivatePromptTarget?.code})</strong> contains active academic dependencies:
           </Typography>
 
@@ -1066,7 +1066,7 @@ export const CompaniesPage: React.FC = () => {
             Permanently deleting this corporate record would corrupt historical student attempts, audit logs, and analytics. To safely hide this track from students and new assessments without breaking existing data, deactivate the company instead.
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc' }}>
+        <DialogActions sx={{ p: 2.5, backgroundColor: '#EDF2FF' }}>
           <Button variant="outlined" onClick={() => setDeactivatePromptTarget(null)}>
             Cancel
           </Button>

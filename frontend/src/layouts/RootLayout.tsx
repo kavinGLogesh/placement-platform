@@ -36,7 +36,6 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import BusinessIcon from '@mui/icons-material/Business';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import SchoolIcon from '@mui/icons-material/School';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -55,7 +54,7 @@ interface NavSection {
   items: NavItem[];
 }
 
-const SIDEBAR_WIDTH = 256;
+const SIDEBAR_WIDTH = 280;
 const SIDEBAR_COLLAPSED_WIDTH = 68;
 
 export const RootLayout: React.FC = () => {
@@ -86,27 +85,62 @@ export const RootLayout: React.FC = () => {
         {
           title: 'GOVERNANCE',
           items: [
-            { label: 'Executive Dashboard', path: '/admin/dashboard', icon: <DashboardIcon fontSize="small" /> },
-            { label: 'System Health', path: '/admin/health', icon: <HealthAndSafetyIcon fontSize="small" /> },
-            { label: 'Analytics Hub', path: '/admin/analytics', icon: <BarChartIcon fontSize="small" /> },
-            { label: 'Audit Reports', path: '/admin/reports', icon: <DescriptionIcon fontSize="small" /> },
+            {
+              label: 'Executive Dashboard',
+              path: '/admin/dashboard',
+              icon: <DashboardIcon fontSize="small" />,
+            },
+            {
+              label: 'Analytics Hub',
+              path: '/admin/analytics',
+              icon: <BarChartIcon fontSize="small" />,
+            },
+            {
+              label: 'Audit Reports',
+              path: '/admin/reports',
+              icon: <DescriptionIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'CAMPUS DIRECTORY',
           items: [
-            { label: 'Students Directory', path: '/admin/students', icon: <PeopleAltIcon fontSize="small" /> },
-            { label: 'Company Profiles', path: '/admin/companies', icon: <BusinessIcon fontSize="small" /> },
-            { label: 'Departments & Setup', path: '/admin/departments', icon: <AccountBalanceIcon fontSize="small" /> },
+            {
+              label: 'Students Directory',
+              path: '/admin/students',
+              icon: <PeopleAltIcon fontSize="small" />,
+            },
+            {
+              label: 'Company Profiles',
+              path: '/admin/companies',
+              icon: <BusinessIcon fontSize="small" />,
+            },
+            {
+              label: 'Departments & Setup',
+              path: '/admin/departments',
+              icon: <AccountBalanceIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'EVALUATION OVERSIGHT',
           items: [
             { label: 'GD Rounds', path: '/admin/gd', icon: <GroupsIcon fontSize="small" /> },
-            { label: 'Interviews', path: '/admin/interviews', icon: <WorkOutlineIcon fontSize="small" /> },
-            { label: 'Scoring & Results', path: '/admin/results', icon: <FactCheckIcon fontSize="small" /> },
-            { label: 'Attendance Oversight', path: '/admin/attendance', icon: <HowToRegIcon fontSize="small" /> },
+            {
+              label: 'Interviews',
+              path: '/admin/interviews',
+              icon: <WorkOutlineIcon fontSize="small" />,
+            },
+            {
+              label: 'Scoring & Results',
+              path: '/admin/results',
+              icon: <FactCheckIcon fontSize="small" />,
+            },
+            {
+              label: 'Attendance Oversight',
+              path: '/admin/attendance',
+              icon: <HowToRegIcon fontSize="small" />,
+            },
           ],
         },
       ];
@@ -117,33 +151,77 @@ export const RootLayout: React.FC = () => {
         {
           title: 'RECRUITMENT & TESTING',
           items: [
-            { label: 'Dashboard', path: '/admin/dashboard', icon: <DashboardIcon fontSize="small" /> },
-            { label: 'Company Assessment', path: '/admin/companies', icon: <BusinessIcon fontSize="small" /> },
-            { label: 'Assessments', path: '/admin/assessments', icon: <AssignmentIcon fontSize="small" /> },
-            { label: 'Question Bank', path: '/admin/questions', icon: <QuizIcon fontSize="small" /> },
+            {
+              label: 'Dashboard',
+              path: '/admin/dashboard',
+              icon: <DashboardIcon fontSize="small" />,
+            },
+            {
+              label: 'Company Assessment',
+              path: '/admin/companies',
+              icon: <BusinessIcon fontSize="small" />,
+            },
+            {
+              label: 'Assessments',
+              path: '/admin/assessments',
+              icon: <AssignmentIcon fontSize="small" />,
+            },
+            {
+              label: 'Question Bank',
+              path: '/admin/questions',
+              icon: <QuizIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'EVALUATION & DRIVES',
           items: [
             { label: 'GD Rounds', path: '/admin/gd', icon: <GroupsIcon fontSize="small" /> },
-            { label: 'Technical Interviews', path: '/admin/interviews', icon: <WorkOutlineIcon fontSize="small" /> },
-            { label: 'Results & Scoring', path: '/admin/results', icon: <FactCheckIcon fontSize="small" /> },
-            { label: 'Attendance & Follow-up', path: '/admin/attendance', icon: <HowToRegIcon fontSize="small" /> },
+            {
+              label: 'Technical Interviews',
+              path: '/admin/interviews',
+              icon: <WorkOutlineIcon fontSize="small" />,
+            },
+            {
+              label: 'Results & Scoring',
+              path: '/admin/results',
+              icon: <FactCheckIcon fontSize="small" />,
+            },
+            {
+              label: 'Attendance & Follow-up',
+              path: '/admin/attendance',
+              icon: <HowToRegIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'CAMPUS STRUCTURE',
           items: [
-            { label: 'Students Directory', path: '/admin/students', icon: <PeopleAltIcon fontSize="small" /> },
-            { label: 'Institutional Setup', path: '/admin/departments', icon: <AccountBalanceIcon fontSize="small" /> },
+            {
+              label: 'Students Directory',
+              path: '/admin/students',
+              icon: <PeopleAltIcon fontSize="small" />,
+            },
+            {
+              label: 'Institutional Setup',
+              path: '/admin/departments',
+              icon: <AccountBalanceIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'INTELLIGENCE & AUDIT',
           items: [
-            { label: 'Analytics Hub', path: '/admin/analytics', icon: <BarChartIcon fontSize="small" /> },
-            { label: 'Reports & Exports', path: '/admin/reports', icon: <DescriptionIcon fontSize="small" /> },
+            {
+              label: 'Analytics Hub',
+              path: '/admin/analytics',
+              icon: <BarChartIcon fontSize="small" />,
+            },
+            {
+              label: 'Reports & Exports',
+              path: '/admin/reports',
+              icon: <DescriptionIcon fontSize="small" />,
+            },
           ],
         },
       ];
@@ -154,24 +232,52 @@ export const RootLayout: React.FC = () => {
         {
           title: 'MY WORKSPACE',
           items: [
-            { label: 'Dashboard', path: '/student/dashboard', icon: <DashboardIcon fontSize="small" /> },
-            { label: 'My Assessments', path: '/student/tests', icon: <AssignmentIcon fontSize="small" /> },
+            {
+              label: 'Dashboard',
+              path: '/student/dashboard',
+              icon: <DashboardIcon fontSize="small" />,
+            },
+            {
+              label: 'My Assessments',
+              path: '/student/tests',
+              icon: <AssignmentIcon fontSize="small" />,
+            },
             { label: 'GD Rounds', path: '/student/gd', icon: <GroupsIcon fontSize="small" /> },
-            { label: 'Technical Interviews', path: '/student/interviews', icon: <WorkOutlineIcon fontSize="small" /> },
+            {
+              label: 'Technical Interviews',
+              path: '/student/interviews',
+              icon: <WorkOutlineIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'PERFORMANCE & RECORDS',
           items: [
-            { label: 'Results & Feedback', path: '/student/results', icon: <FactCheckIcon fontSize="small" /> },
-            { label: 'Performance Analytics', path: '/student/performance', icon: <InsightsIcon fontSize="small" /> },
-            { label: 'Scorecards & Reports', path: '/student/reports', icon: <DescriptionIcon fontSize="small" /> },
+            {
+              label: 'Results & Feedback',
+              path: '/student/results',
+              icon: <FactCheckIcon fontSize="small" />,
+            },
+            {
+              label: 'Performance Analytics',
+              path: '/student/performance',
+              icon: <InsightsIcon fontSize="small" />,
+            },
+            {
+              label: 'Scorecards & Reports',
+              path: '/student/reports',
+              icon: <DescriptionIcon fontSize="small" />,
+            },
           ],
         },
         {
           title: 'ACCOUNT',
           items: [
-            { label: 'My Profile', path: '/student/profile', icon: <PersonOutlineIcon fontSize="small" /> },
+            {
+              label: 'My Profile',
+              path: '/student/profile',
+              icon: <PersonOutlineIcon fontSize="small" />,
+            },
           ],
         },
       ];
@@ -187,9 +293,7 @@ export const RootLayout: React.FC = () => {
 
     return parts.map((part, index) => {
       const path = '/' + parts.slice(0, index + 1).join('/');
-      const label = part
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const label = part.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       return { label, path };
     });
   }, [location.pathname]);
@@ -207,7 +311,7 @@ export const RootLayout: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         bgcolor: '#ffffff',
-        borderRight: '1px solid #e2e8f0',
+        borderRight: '1px solid #DCE6F5',
       }}
     >
       {/* Brand Header */}
@@ -217,7 +321,7 @@ export const RootLayout: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
-          borderBottom: '1px solid #e2e8f0',
+          borderBottom: '1px solid #DCE6F5',
           minHeight: 64,
         }}
       >
@@ -226,7 +330,7 @@ export const RootLayout: React.FC = () => {
             width: 36,
             height: 36,
             borderRadius: 1.5,
-            bgcolor: '#0f2744',
+            bgcolor: '#1765B5',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
@@ -242,7 +346,7 @@ export const RootLayout: React.FC = () => {
               variant="subtitle2"
               sx={{
                 fontWeight: 700,
-                color: '#0f172a',
+                color: '#14264B',
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
@@ -254,7 +358,7 @@ export const RootLayout: React.FC = () => {
             <Typography
               variant="caption"
               sx={{
-                color: '#64748b',
+                color: '#7182A0',
                 display: 'block',
                 lineHeight: 1.2,
                 fontSize: '0.72rem',
@@ -269,15 +373,15 @@ export const RootLayout: React.FC = () => {
 
       {/* Role Pill Banner */}
       {(!sidebarCollapsed || isMobile) && user && (
-        <Box sx={{ px: 2, py: 1.25, bgcolor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+        <Box sx={{ px: 2, py: 1.25, bgcolor: '#EDF2FF', borderBottom: '1px solid #DCE6F5' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Chip
               label={
                 user.role === 'SUPER_ADMIN'
                   ? 'Super Administrator'
                   : user.role === 'PLACEMENT_ADMIN'
-                  ? 'Placement Admin'
-                  : 'Student Candidate'
+                    ? 'Placement Admin'
+                    : 'Student Candidate'
               }
               size="small"
               sx={{
@@ -287,28 +391,32 @@ export const RootLayout: React.FC = () => {
                 borderRadius: '4px',
                 bgcolor:
                   user.role === 'SUPER_ADMIN'
-                    ? '#f8fafc'
+                    ? '#EDF2FF'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#f0f4f9'
-                    : '#f0fdf4',
+                      ? '#f0f4f9'
+                      : '#f0fdf4',
                 color:
                   user.role === 'SUPER_ADMIN'
-                    ? '#0f2744'
+                    ? '#1765B5'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#0f2744'
-                    : '#15803d',
+                      ? '#1765B5'
+                      : '#15803d',
                 border: '1px solid',
                 borderColor:
                   user.role === 'SUPER_ADMIN'
-                    ? '#cbd5e1'
+                    ? '#D1DEF0'
                     : user.role === 'PLACEMENT_ADMIN'
-                    ? '#cbd5e1'
-                    : '#bbf7d0',
+                      ? '#D1DEF0'
+                      : '#bbf7d0',
               }}
             />
             <Tooltip
               title={
-                isHealthLoading ? 'Connecting to API...' : isHealthError ? 'System API Offline' : 'API Online'
+                isHealthLoading
+                  ? 'Connecting to API...'
+                  : isHealthError
+                    ? 'System API Offline'
+                    : 'API Online'
               }
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -337,7 +445,7 @@ export const RootLayout: React.FC = () => {
                   display: 'block',
                   px: 2.25,
                   mb: 0.5,
-                  color: '#94a3b8',
+                  color: '#8293B0',
                   fontWeight: 700,
                   fontSize: '0.68rem',
                   letterSpacing: '0.06em',
@@ -356,30 +464,32 @@ export const RootLayout: React.FC = () => {
 
                 return (
                   <ListItem key={item.path} disablePadding sx={{ px: 1, mb: 0.25 }}>
-                    <Tooltip title={sidebarCollapsed && !isMobile ? item.label : ''} placement="right">
+                    <Tooltip
+                      title={sidebarCollapsed && !isMobile ? item.label : ''}
+                      placement="right"
+                    >
                       <ListItemButton
                         component={RouterLink}
                         to={item.path}
                         onClick={() => isMobile && setMobileDrawerOpen(false)}
                         sx={{
-                          borderRadius: 1,
-                          py: 0.85,
+                          borderRadius: 999,
+                          py: 1.1,
                           px: sidebarCollapsed && !isMobile ? 1.5 : 1.75,
                           justifyContent: sidebarCollapsed && !isMobile ? 'center' : 'flex-start',
-                          bgcolor: isActive ? '#f0f4f9' : 'transparent',
-                          color: isActive ? '#0f2744' : '#475569',
+                          bgcolor: isActive ? '#1765B5' : 'transparent',
+                          color: isActive ? '#ffffff' : '#526584',
                           fontWeight: isActive ? 600 : 500,
-                          borderLeft: isActive ? '3px solid #0f2744' : '3px solid transparent',
                           '&:hover': {
-                            bgcolor: isActive ? '#e7eef6' : '#f8fafc',
-                            color: '#0f172a',
+                            bgcolor: isActive ? '#104B91' : '#F1F5FC',
+                            color: isActive ? '#ffffff' : '#14264B',
                           },
                         }}
                       >
                         <ListItemIcon
                           sx={{
                             minWidth: sidebarCollapsed && !isMobile ? 'auto' : 32,
-                            color: isActive ? '#0f2744' : '#64748b',
+                            color: isActive ? '#ffffff' : '#7385A2',
                             justifyContent: 'center',
                           }}
                         >
@@ -391,6 +501,7 @@ export const RootLayout: React.FC = () => {
                             primaryTypographyProps={{
                               fontSize: '0.84rem',
                               fontWeight: isActive ? 600 : 500,
+                              color: isActive ? '#ffffff' : '#526584',
                               whiteSpace: 'nowrap',
                               textOverflow: 'ellipsis',
                               overflow: 'hidden',
@@ -403,15 +514,17 @@ export const RootLayout: React.FC = () => {
                 );
               })}
             </List>
-            {sIdx < navSections.length - 1 && <Divider sx={{ my: 1.5, borderColor: '#e2e8f0' }} />}
+            {sIdx < navSections.length - 1 && <Divider sx={{ my: 1.5, borderColor: '#DCE6F5' }} />}
           </Box>
         ))}
       </Box>
 
       {/* User Footer Profile & Sign Out */}
-      <Box sx={{ p: 1.5, borderTop: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-        {(!sidebarCollapsed || isMobile) ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+      <Box sx={{ p: 1.5, borderTop: '1px solid #DCE6F5', bgcolor: '#ffffff' }}>
+        {!sidebarCollapsed || isMobile ? (
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
+          >
             <Box
               component={user?.role === 'STUDENT' ? RouterLink : 'div'}
               to={user?.role === 'STUDENT' ? '/student/profile' : undefined}
@@ -429,7 +542,7 @@ export const RootLayout: React.FC = () => {
                 sx={{
                   width: 32,
                   height: 32,
-                  bgcolor: '#0f2744',
+                  bgcolor: '#1765B5',
                   fontSize: '0.8rem',
                   fontWeight: 600,
                 }}
@@ -442,7 +555,7 @@ export const RootLayout: React.FC = () => {
                   sx={{
                     fontWeight: 600,
                     fontSize: '0.8rem',
-                    color: '#0f172a',
+                    color: '#14264B',
                     lineHeight: 1.2,
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
@@ -451,14 +564,14 @@ export const RootLayout: React.FC = () => {
                 >
                   {user?.email?.split('@')[0]}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem' }}>
+                <Typography variant="caption" sx={{ color: '#8293B0', fontSize: '0.7rem' }}>
                   {user?.role === 'STUDENT' ? 'Candidate' : 'Staff Admin'}
                 </Typography>
               </Box>
             </Box>
 
             <Tooltip title="Sign Out">
-              <IconButton size="small" onClick={handleLogout} sx={{ color: '#64748b' }}>
+              <IconButton size="small" onClick={handleLogout} sx={{ color: '#7182A0' }}>
                 <LogoutIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -466,7 +579,7 @@ export const RootLayout: React.FC = () => {
         ) : (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title="Sign Out">
-              <IconButton size="small" onClick={handleLogout} sx={{ color: '#64748b' }}>
+              <IconButton size="small" onClick={handleLogout} sx={{ color: '#7182A0' }}>
                 <LogoutIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -477,7 +590,7 @@ export const RootLayout: React.FC = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f8fafc' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#EDF2FF' }}>
       {/* Desktop Sidebar */}
       {!isMobile && (
         <Box
@@ -527,7 +640,7 @@ export const RootLayout: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             bgcolor: '#ffffff',
-            borderBottom: '1px solid #e2e8f0',
+            borderBottom: '1px solid #DCE6F5',
             position: 'sticky',
             top: 0,
             zIndex: 1000,
@@ -539,7 +652,7 @@ export const RootLayout: React.FC = () => {
               <IconButton
                 size="small"
                 onClick={() => setMobileDrawerOpen(true)}
-                sx={{ color: '#475569' }}
+                sx={{ color: '#526584' }}
               >
                 <MenuIcon fontSize="small" />
               </IconButton>
@@ -547,9 +660,13 @@ export const RootLayout: React.FC = () => {
               <IconButton
                 size="small"
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                sx={{ color: '#475569' }}
+                sx={{ color: '#526584' }}
               >
-                {sidebarCollapsed ? <ChevronRightIcon fontSize="small" /> : <ChevronLeftIcon fontSize="small" />}
+                {sidebarCollapsed ? (
+                  <ChevronRightIcon fontSize="small" />
+                ) : (
+                  <ChevronLeftIcon fontSize="small" />
+                )}
               </IconButton>
             )}
 
@@ -557,9 +674,9 @@ export const RootLayout: React.FC = () => {
               separator="/"
               sx={{
                 fontSize: '0.825rem',
-                color: '#64748b',
+                color: '#7182A0',
                 display: { xs: 'none', sm: 'flex' },
-                '& .MuiBreadcrumbs-separator': { mx: 0.75, color: '#cbd5e1' },
+                '& .MuiBreadcrumbs-separator': { mx: 0.75, color: '#D1DEF0' },
               }}
             >
               {breadcrumbs.map((crumb, idx) => {
@@ -567,7 +684,7 @@ export const RootLayout: React.FC = () => {
                 return isLast ? (
                   <Typography
                     key={crumb.path}
-                    sx={{ color: '#0f172a', fontWeight: 600, fontSize: '0.825rem' }}
+                    sx={{ color: '#14264B', fontWeight: 600, fontSize: '0.825rem' }}
                   >
                     {crumb.label}
                   </Typography>
@@ -577,7 +694,7 @@ export const RootLayout: React.FC = () => {
                     component={RouterLink}
                     to={crumb.path}
                     underline="hover"
-                    sx={{ color: '#64748b', fontSize: '0.825rem' }}
+                    sx={{ color: '#7182A0', fontSize: '0.825rem' }}
                   >
                     {crumb.label}
                   </Link>
@@ -596,9 +713,9 @@ export const RootLayout: React.FC = () => {
                 height: 24,
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                bgcolor: '#f1f5f9',
-                color: '#475569',
-                border: '1px solid #e2e8f0',
+                bgcolor: '#E7EEFA',
+                color: '#526584',
+                border: '1px solid #DCE6F5',
               }}
             />
 
@@ -625,6 +742,11 @@ export const RootLayout: React.FC = () => {
             maxWidth: 1600,
             width: '100%',
             mx: 'auto',
+            '& .MuiCard-root': {
+              borderRadius: '22px',
+              borderColor: '#DCE6F5',
+              boxShadow: '0 12px 30px rgba(44, 91, 156, 0.06)',
+            },
           }}
         >
           <Outlet />

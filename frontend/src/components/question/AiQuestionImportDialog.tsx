@@ -263,7 +263,7 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+          boxShadow: '0 25px 50px -12px rgba(20, 38, 75, 0.25)',
           overflow: 'hidden',
         },
       }}
@@ -271,7 +271,7 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
       {/* Header */}
       <DialogTitle
         sx={{
-          bgcolor: '#0f172a',
+          bgcolor: '#14264B',
           color: '#ffffff',
           py: 2.25,
           px: 3,
@@ -311,12 +311,12 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
                 }}
               />
             </Box>
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+            <Typography variant="caption" sx={{ color: '#8293B0' }}>
               Multi-format question extractor powered by Google Gemini multimodal intelligence
             </Typography>
           </Box>
         </Box>
-        <IconButton onClick={handleClose} size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#ffffff' } }}>
+        <IconButton onClick={handleClose} size="small" sx={{ color: '#8293B0', '&:hover': { color: '#ffffff' } }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -324,7 +324,7 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
       {/* Progress Bar for Active Tasks */}
       {(analyzing || importing) && <LinearProgress color="info" />}
 
-      <DialogContent sx={{ p: 3, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ p: 3, bgcolor: '#EDF2FF' }}>
         {error && (
           <Alert severity="error" sx={{ mb: 2.5 }} onClose={() => setError(null)}>
             {error}
@@ -342,11 +342,11 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
               sx={{
                 p: 2.5,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: 2.5,
               }}
             >
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1.5 }}>
                 1. Target Recruitment Company Track
               </Typography>
 
@@ -378,12 +378,12 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
               sx={{
                 p: 2.5,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: 2.5,
               }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                   2. Question Document / Exam Paper Upload
                 </Typography>
                 <Button
@@ -415,21 +415,21 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   sx={{
                     border: '2px dashed',
-                    borderColor: dragOver ? 'primary.main' : '#cbd5e1',
+                    borderColor: dragOver ? 'primary.main' : '#D1DEF0',
                     borderRadius: 2.5,
                     p: 3.5,
                     textAlign: 'center',
                     cursor: 'pointer',
-                    bgcolor: dragOver ? '#eff6ff' : '#f8fafc',
+                    bgcolor: dragOver ? '#eff6ff' : '#EDF2FF',
                     transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: 'primary.main',
-                      bgcolor: '#f1f5f9',
+                      bgcolor: '#E7EEFA',
                     },
                   }}
                 >
-                  <CloudUploadIcon sx={{ fontSize: 44, color: '#64748b', mb: 1 }} />
-                  <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                  <CloudUploadIcon sx={{ fontSize: 44, color: '#7182A0', mb: 1 }} />
+                  <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                     Drag and drop your exam document here
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -458,7 +458,7 @@ export const AiQuestionImportDialog: React.FC<AiQuestionImportDialogProps> = ({
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75 }}>
                     {getFileIcon(selectedFile)}
                     <Box>
-                      <Typography variant="body2" fontWeight={700} color="#0f172a">
+                      <Typography variant="body2" fontWeight={700} color="#14264B">
                         {selectedFile.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -545,7 +545,7 @@ Explanation: 0.25 * 400 = 100."
               sx={{
                 p: 2,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -565,7 +565,7 @@ Explanation: 0.25 * 400 = 100."
                     />
                   }
                   label={
-                    <Typography variant="body2" fontWeight={600} color="#0f172a">
+                    <Typography variant="body2" fontWeight={600} color="#14264B">
                       Select All ({selectedIndices.size} of {extractedQuestions.length} selected)
                     </Typography>
                   }
@@ -604,8 +604,8 @@ Explanation: 0.25 * 400 = 100."
                     elevation={0}
                     sx={{
                       p: 2.25,
-                      bgcolor: isSelected ? '#ffffff' : '#f8fafc',
-                      border: isSelected ? '1.5px solid #0284c7' : '1px solid #e2e8f0',
+                      bgcolor: isSelected ? '#ffffff' : '#EDF2FF',
+                      border: isSelected ? '1.5px solid #0284c7' : '1px solid #DCE6F5',
                       borderRadius: 2.5,
                       transition: 'all 0.15s ease',
                       opacity: isSelected ? 1 : 0.6,
@@ -619,7 +619,7 @@ Explanation: 0.25 * 400 = 100."
                           color="primary"
                           size="small"
                         />
-                        <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                        <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                           Question #{idx + 1}
                         </Typography>
                       </Box>
@@ -640,7 +640,7 @@ Explanation: 0.25 * 400 = 100."
 
                     {/* Question text with graphic renderer */}
                     <Box sx={{ pl: 4, mb: 1.5 }}>
-                      <QuestionContentRenderer content={q.questionText} sx={{ fontWeight: 600, color: '#0f172a' }} />
+                      <QuestionContentRenderer content={q.questionText} sx={{ fontWeight: 600, color: '#14264B' }} />
                     </Box>
 
                     {/* Options list if multiple choice */}
@@ -653,8 +653,8 @@ Explanation: 0.25 * 400 = 100."
                                 sx={{
                                   p: 1.25,
                                   borderRadius: 1.5,
-                                  bgcolor: opt.isCorrect ? '#f0fdf4' : '#f8fafc',
-                                  border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                                  bgcolor: opt.isCorrect ? '#f0fdf4' : '#EDF2FF',
+                                  border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #DCE6F5',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: 1,
@@ -663,9 +663,9 @@ Explanation: 0.25 * 400 = 100."
                                 {opt.isCorrect ? (
                                   <CheckCircleIcon sx={{ color: '#16a34a', fontSize: 18 }} />
                                 ) : (
-                                  <RadioButtonUncheckedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
+                                  <RadioButtonUncheckedIcon sx={{ color: '#8293B0', fontSize: 18 }} />
                                 )}
-                                <Typography variant="body2" color="#0f172a" fontWeight={opt.isCorrect ? 700 : 500}>
+                                <Typography variant="body2" color="#14264B" fontWeight={opt.isCorrect ? 700 : 500}>
                                   {opt.optionText}
                                 </Typography>
                               </Box>
@@ -711,7 +711,7 @@ Explanation: 0.25 * 400 = 100."
             >
               <CheckCircleOutlineIcon sx={{ fontSize: 44 }} />
             </Box>
-            <Typography variant="h5" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+            <Typography variant="h5" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
               Questions Successfully Imported!
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 480, mx: 'auto' }}>
@@ -731,7 +731,7 @@ Explanation: 0.25 * 400 = 100."
       </DialogContent>
 
       {/* Footer Actions */}
-      <DialogActions sx={{ p: 2.5, bgcolor: '#ffffff', borderTop: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
+      <DialogActions sx={{ p: 2.5, bgcolor: '#ffffff', borderTop: '1px solid #DCE6F5', justifyContent: 'space-between' }}>
         {step === 0 && (
           <>
             <Button onClick={handleClose} variant="outlined" color="inherit">

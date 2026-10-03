@@ -390,13 +390,13 @@ export const AdminInterviewsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
             CANDIDATE INTERVIEW EVALUATION
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
+          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#14264B' }}>
             Structured Interview Evaluations
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             Conduct Mock, HR, Technical, and Managerial interviews with configurable criteria, strengths, and areas for improvement.
           </Typography>
         </Box>
@@ -408,13 +408,13 @@ export const AdminInterviewsPage: React.FC = () => {
             onClick={() => fetchRounds()}
             disabled={loading}
             sx={{
-              color: '#0F2744',
-              borderColor: '#cbd5e1',
+              color: '#1765B5',
+              borderColor: '#D1DEF0',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
+              '&:hover': { borderColor: '#1765B5', bgcolor: 'rgba(23, 101, 181, 0.04)' },
             }}
           >
             Refresh
@@ -426,13 +426,13 @@ export const AdminInterviewsPage: React.FC = () => {
               startIcon={<AddIcon fontSize="small" />}
               onClick={handleOpenCreate}
               sx={{
-                bgcolor: '#0F2744',
+                bgcolor: '#1765B5',
                 color: '#ffffff',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { bgcolor: '#0A1C30' },
+                '&:hover': { bgcolor: '#104B91' },
               }}
             >
               Create Interview Round
@@ -450,18 +450,18 @@ export const AdminInterviewsPage: React.FC = () => {
       {/* Metric Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               TOTAL INTERVIEW ROUNDS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0f172a' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#14264B' }}>
               {rounds.length}
             </Typography>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               TECHNICAL INTERVIEWS
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0369a1' }}>
@@ -470,8 +470,8 @@ export const AdminInterviewsPage: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               HR / MOCK INTERVIEWS
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#047857' }}>
@@ -480,11 +480,11 @@ export const AdminInterviewsPage: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               TOTAL CANDIDATES EVALUATED
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0F2744' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#1765B5' }}>
               {rounds.reduce((acc, r) => acc + (r.evaluatedCount || 0), 0)}
             </Typography>
           </Card>
@@ -492,7 +492,7 @@ export const AdminInterviewsPage: React.FC = () => {
       </Grid>
 
       {/* Type Filter Tabs */}
-      <Paper elevation={0} sx={{ mb: 3, border: '1px solid #e2e8f0', borderRadius: '8px', bgcolor: '#ffffff' }}>
+      <Paper elevation={0} sx={{ mb: 3, border: '1px solid #DCE6F5', borderRadius: '8px', bgcolor: '#ffffff' }}>
         <Tabs
           value={typeFilter}
           onChange={(_, val) => setTypeFilter(val)}
@@ -505,8 +505,8 @@ export const AdminInterviewsPage: React.FC = () => {
               fontSize: '0.875rem',
               py: 1.5,
               minHeight: 48,
-              color: '#64748b',
-              '&.Mui-selected': { color: '#0F2744', fontWeight: 700 },
+              color: '#7182A0',
+              '&.Mui-selected': { color: '#1765B5', fontWeight: 700 },
             },
           }}
         >
@@ -528,11 +528,11 @@ export const AdminInterviewsPage: React.FC = () => {
             </Box>
           ) : rounds.length === 0 ? (
             <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
-              <WorkIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 1 }} />
-              <Typography variant="h6" sx={{ color: '#475569' }}>
+              <WorkIcon sx={{ fontSize: 48, color: '#8293B0', mb: 1 }} />
+              <Typography variant="h6" sx={{ color: '#526584' }}>
                 No Interview Rounds Found
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#7182A0', mt: 0.5 }}>
                 Create structured Technical, HR, Mock, or Managerial interview rounds for students.
               </Typography>
             </Paper>
@@ -546,14 +546,14 @@ export const AdminInterviewsPage: React.FC = () => {
                     variant="outlined"
                     sx={{
                       borderRadius: 2,
-                      borderColor: isSelected ? '#2563eb' : 'rgba(226, 232, 240, 0.9)',
+                      borderColor: isSelected ? '#318992' : 'rgba(226, 232, 240, 0.9)',
                       boxShadow: isSelected ? '0 0 0 2px rgba(37, 99, 235, 0.2)' : 'none',
                       transition: 'all 0.2s',
                     }}
                   >
                     <CardContent sx={{ pb: 1 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#14264B' }}>
                           {round.title}
                         </Typography>
                         <Chip
@@ -570,13 +570,13 @@ export const AdminInterviewsPage: React.FC = () => {
                           sx={{ fontWeight: 600, fontSize: '0.75rem' }}
                         />
                       </Box>
-                      <Stack direction="row" spacing={2} sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1 }}>
+                      <Stack direction="row" spacing={2} sx={{ color: '#7182A0', fontSize: '0.8rem', mb: 1 }}>
                         <span>📅 {new Date(round.scheduledDate).toLocaleDateString()}</span>
                         <span>⏱ {round.durationMinutes} mins</span>
                         <span>👥 {round.totalParticipants} candidates</span>
                       </Stack>
                       {round.evaluatorName && (
-                        <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: '#526584', display: 'block', mb: 0.5 }}>
                           Interviewer: {round.evaluatorName}
                         </Typography>
                       )}
@@ -585,7 +585,7 @@ export const AdminInterviewsPage: React.FC = () => {
                           <Chip
                             label={`Avg Score: ${round.averageScore}% (${round.evaluatedCount}/${round.totalParticipants} evaluated)`}
                             size="small"
-                            sx={{ backgroundColor: '#f1f5f9', color: '#0f172a', fontWeight: 600 }}
+                            sx={{ backgroundColor: '#E7EEFA', color: '#14264B', fontWeight: 600 }}
                           />
                         </Box>
                       )}
@@ -634,14 +634,14 @@ export const AdminInterviewsPage: React.FC = () => {
             <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#14264B' }}>
                     {selectedRound.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#475569', mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ color: '#526584', mt: 0.5 }}>
                     <strong>Type:</strong> {selectedRound.interviewType} Interview
                   </Typography>
                   {selectedRound.instructions && (
-                    <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0', display: 'block', mt: 0.5 }}>
                       <strong>Instructions:</strong> {selectedRound.instructions}
                     </Typography>
                   )}
@@ -698,7 +698,7 @@ export const AdminInterviewsPage: React.FC = () => {
                   <CircularProgress size={32} />
                 </Box>
               ) : selectedRound.participants.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 4, color: '#64748b' }}>
+                <Box sx={{ textAlign: 'center', py: 4, color: '#7182A0' }}>
                   <Typography variant="body2">No candidates assigned to this interview round yet.</Typography>
                   <Button
                     variant="text"
@@ -712,7 +712,7 @@ export const AdminInterviewsPage: React.FC = () => {
               ) : (
                 <TableContainer>
                   <Table size="small">
-                    <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                    <TableHead sx={{ backgroundColor: '#EDF2FF' }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 600 }}>Candidate</TableCell>
                         <TableCell sx={{ fontWeight: 600 }}>Dept / Reg</TableCell>
@@ -730,13 +730,13 @@ export const AdminInterviewsPage: React.FC = () => {
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                 {part.studentName}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: '#64748b' }}>
+                              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                                 {part.collegeEmail}
                               </Typography>
                             </TableCell>
                             <TableCell>
                               <Typography variant="body2">{part.registerNumber}</Typography>
-                              <Typography variant="caption" sx={{ color: '#64748b' }}>
+                              <Typography variant="caption" sx={{ color: '#7182A0' }}>
                                 {part.departmentName || '—'}
                               </Typography>
                             </TableCell>
@@ -779,12 +779,12 @@ export const AdminInterviewsPage: React.FC = () => {
                                   <Typography variant="body2" sx={{ fontWeight: 700, color: '#16a34a' }}>
                                     {part.evaluation?.percentage}%
                                   </Typography>
-                                  <Typography variant="caption" sx={{ color: '#64748b' }}>
+                                  <Typography variant="caption" sx={{ color: '#7182A0' }}>
                                     {part.evaluation?.totalScore} / {part.evaluation?.maxPossibleMarks}
                                   </Typography>
                                 </Box>
                               ) : (
-                                <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                                <Typography variant="caption" sx={{ color: '#8293B0' }}>
                                   Pending
                                 </Typography>
                               )}
@@ -960,7 +960,7 @@ export const AdminInterviewsPage: React.FC = () => {
 
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
-                  <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                  <TableHead sx={{ backgroundColor: '#EDF2FF' }}>
                     <TableRow>
                       <TableCell sx={{ width: 50 }}>#</TableCell>
                       <TableCell>Criterion Name</TableCell>
@@ -1005,7 +1005,7 @@ export const AdminInterviewsPage: React.FC = () => {
               </TableContainer>
 
               <Box sx={{ mt: 1.5, textAlign: 'right' }}>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: '#14264B' }}>
                   Total Maximum Marks: {criteria.reduce((a, b) => a + (Number(b.maxMarks) || 0), 0)}
                 </Typography>
               </Box>
@@ -1092,10 +1092,10 @@ export const AdminInterviewsPage: React.FC = () => {
               )}
 
               {/* Candidate Info Card */}
-              <Card variant="outlined" sx={{ p: 2, backgroundColor: '#f8fafc' }}>
+              <Card variant="outlined" sx={{ p: 2, backgroundColor: '#EDF2FF' }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={3}>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       CANDIDATE
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -1103,7 +1103,7 @@ export const AdminInterviewsPage: React.FC = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={3}>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       REGISTRATION NO.
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -1111,15 +1111,15 @@ export const AdminInterviewsPage: React.FC = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={3}>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       ROUND TYPE
                     </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#2563eb' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#318992' }}>
                       {selectedRound.interviewType}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={3}>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: '#7182A0' }}>
                       DEPARTMENT
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -1142,13 +1142,13 @@ export const AdminInterviewsPage: React.FC = () => {
               )}
 
               {/* Criterion-Level Scoring Table */}
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#14264B' }}>
                 Criterion Evaluation Marks (Source of Truth Backend Calculation)
               </Typography>
 
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
-                  <TableHead sx={{ backgroundColor: '#f1f5f9' }}>
+                  <TableHead sx={{ backgroundColor: '#E7EEFA' }}>
                     <TableRow>
                       <TableCell sx={{ width: 40 }}>#</TableCell>
                       <TableCell sx={{ width: 220 }}>Criterion</TableCell>

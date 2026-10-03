@@ -34,7 +34,7 @@ export const AdminNavTabs: React.FC = () => {
         overflowX: 'auto',
       }}
     >
-      <Box sx={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, mr: 0.5, whiteSpace: 'nowrap' }}>
+      <Box sx={{ fontSize: '0.75rem', color: '#7182A0', fontWeight: 600, mr: 0.5, whiteSpace: 'nowrap' }}>
         Organization:
       </Box>
       {structureSubNav.map((sub) => {
@@ -51,14 +51,14 @@ export const AdminNavTabs: React.FC = () => {
             sx={{
               fontWeight: isActive ? 600 : 500,
               fontSize: '0.78rem',
-              backgroundColor: isActive ? '#0f2744' : '#ffffff',
-              color: isActive ? '#ffffff' : '#475569',
+              backgroundColor: isActive ? '#1765B5' : '#ffffff',
+              color: isActive ? '#ffffff' : '#526584',
               border: '1px solid',
-              borderColor: isActive ? '#0f2744' : '#cbd5e1',
+              borderColor: isActive ? '#1765B5' : '#D1DEF0',
               borderRadius: '4px',
               height: 26,
               '&:hover': {
-                backgroundColor: isActive ? '#0a1c30' : '#f1f5f9',
+                backgroundColor: isActive ? '#104B91' : '#E7EEFA',
               },
             }}
           />

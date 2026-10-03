@@ -378,7 +378,7 @@ export const AdminStudentPerformancePage: React.FC = () => {
                   ) : performanceProgress.status === 'Decreased' ? (
                     <TrendingDownIcon sx={{ color: '#ef4444', fontSize: 30 }} />
                   ) : (
-                    <HorizontalRuleIcon sx={{ color: '#64748b', fontSize: 30 }} />
+                    <HorizontalRuleIcon sx={{ color: '#7182A0', fontSize: 30 }} />
                   )}
                 </Box>
                 <Typography
@@ -390,7 +390,7 @@ export const AdminStudentPerformancePage: React.FC = () => {
                         ? '#10b981'
                         : performanceProgress.status === 'Decreased'
                         ? '#ef4444'
-                        : '#94a3b8',
+                        : '#8293B0',
                     textAlign: 'center',
                   }}
                 >
@@ -584,10 +584,10 @@ export const AdminStudentPerformancePage: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryChartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
-                    <XAxis dataKey="name" stroke="#94a3b8" />
-                    <YAxis unit="%" domain={[0, 100]} stroke="#94a3b8" />
+                    <XAxis dataKey="name" stroke="#8293B0" />
+                    <YAxis unit="%" domain={[0, 100]} stroke="#8293B0" />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: 8 }}
+                      contentStyle={{ backgroundColor: '#33466A', borderColor: '#405678', borderRadius: 8 }}
                       formatter={(val: any) => [`${val}%`]}
                     />
                     <Legend />

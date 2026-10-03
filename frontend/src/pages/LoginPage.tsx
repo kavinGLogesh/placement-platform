@@ -11,11 +11,8 @@ import {
   CircularProgress,
   InputAdornment,
   IconButton,
-  Chip,
-  Divider,
   FormControlLabel,
   Checkbox,
-  Container,
 } from '@mui/material';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
@@ -27,6 +24,7 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import SchoolIcon from '@mui/icons-material/School';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useAuth } from '../hooks/useAuth.js';
+import campusPhoto from '../assets/vetias-campus-bg.png';
 
 type RoleTab = 'STUDENT' | 'PLACEMENT_ADMIN' | 'SUPER_ADMIN';
 
@@ -95,182 +93,230 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const roleButtonSx = (selected: boolean) => ({
+    minWidth: 0,
+    py: 1,
+    px: { xs: 0.5, sm: 1 },
+    borderRadius: 1,
+    fontSize: { xs: '0.68rem', sm: '0.78rem' },
+    fontWeight: selected ? 700 : 500,
+    color: selected ? '#ffffff' : '#566663',
+    bgcolor: selected ? '#176B66' : 'transparent',
+    boxShadow: 'none',
+    '&:hover': {
+      bgcolor: selected ? '#104F4B' : '#DFE8E4',
+      boxShadow: 'none',
+    },
+  });
+
   return (
     <Box
+      component="main"
       sx={{
-        minHeight: '100vh',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        bgcolor: '#f8fafc',
-        justifyContent: 'center',
-        alignItems: 'center',
-        py: { xs: 4, sm: 6 },
-        px: 2,
+        minHeight: '100dvh',
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: 'minmax(390px, 0.92fr) minmax(500px, 1.08fr)' },
+        bgcolor: '#F4F7F5',
       }}
     >
-      <Container maxWidth="sm">
-        {/* Institutional Branding Header */}
-        <Box sx={{ textAlign: 'center', mb: 3.5 }}>
+      <Box
+        component="section"
+        sx={{
+          minHeight: { xs: 'auto', md: '100dvh' },
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          gap: { xs: 3, md: 4 },
+          px: { xs: 3, sm: 5, lg: 7 },
+          py: { xs: 3, sm: 4, lg: 5 },
+          color: '#ffffff',
+          bgcolor: '#104F4B',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box
             sx={{
-              width: 48,
-              height: 48,
-              borderRadius: 2,
-              bgcolor: '#0F2744',
-              color: '#ffffff',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mb: 1.5,
-              boxShadow: '0 2px 4px rgba(15, 39, 68, 0.2)',
+              width: 42,
+              height: 42,
+              flexShrink: 0,
+              display: 'grid',
+              placeItems: 'center',
+              borderRadius: 1.5,
+              color: '#104F4B',
+              bgcolor: '#ffffff',
             }}
           >
-            <SchoolIcon sx={{ fontSize: 26 }} />
+            <SchoolIcon sx={{ fontSize: 24 }} />
           </Box>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: '#0f172a',
-              letterSpacing: '-0.02em',
-              mb: 0.5,
-            }}
-          >
-            VET Institute of Arts and Science
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.875rem' }}>
-            Career Readiness & Campus Placement Examination Portal
-          </Typography>
+          <Box>
+            <Typography
+              sx={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: 700, lineHeight: 1.2 }}
+            >
+              VET Institute of Arts and Science
+            </Typography>
+            <Typography sx={{ mt: 0.4, color: 'rgba(255,255,255,0.72)', fontSize: '0.72rem' }}>
+              CAREER READINESS & CAMPUS PLACEMENTS
+            </Typography>
+          </Box>
         </Box>
 
-        {/* Primary Login Card */}
+        <Box sx={{ maxWidth: 560, my: { xs: 0, md: 'auto' } }}>
+          <Typography
+            variant="overline"
+            sx={{ color: '#D9A276', fontWeight: 700, letterSpacing: '0.12em' }}
+          >
+            YOUR NEXT CHAPTER STARTS HERE
+          </Typography>
+          <Typography
+            component="h1"
+            sx={{
+              mt: 1,
+              mb: 2,
+              maxWidth: 520,
+              color: '#ffffff',
+              fontSize: { xs: '1.8rem', sm: '2.15rem', lg: '2.8rem' },
+              fontWeight: 750,
+              lineHeight: 1.12,
+            }}
+          >
+            Find your place in what comes next.
+          </Typography>
+          <Typography
+            sx={{
+              maxWidth: 480,
+              color: 'rgba(255,255,255,0.78)',
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              lineHeight: 1.75,
+            }}
+          >
+            One campus for your assessments, placement opportunities, and professional growth.
+          </Typography>
+          <Box
+            component="img"
+            src={campusPhoto}
+            alt="VET Institute campus"
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+              width: '100%',
+              height: { sm: 150, lg: 215 },
+              mt: { sm: 3, lg: 4 },
+              objectFit: 'fill',
+              objectPosition: 'center 55%',
+              borderRadius: 1,
+            }}
+          />
+        </Box>
+
+        <Typography sx={{ color: 'rgba(255,255,255,0.62)', fontSize: '0.72rem' }}>
+          © {new Date().getFullYear()} VET Institute of Arts and Science
+        </Typography>
+      </Box>
+
+      <Box
+        component="section"
+        sx={{
+          minHeight: { xs: 'auto', md: '100dvh' },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { xs: 2, sm: 4, lg: 7 },
+          py: { xs: 4, sm: 5 },
+          // backgroundColor: '#0D3028',
+          // backgroundImage:
+          //   'linear-gradient(rgba(8, 35, 30, 0.38), rgba(8, 35, 30, 0.38)), url("/greenbg.png")',
+          // backgroundSize: 'cover',
+          // backgroundPosition: 'left',
+        }}
+      >
         <Card
           sx={{
-            bgcolor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 2,
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-            overflow: 'hidden',
+            width: '100%',
+            maxWidth: 470,
+            border: '1px solid #E5ECE8',
+            borderRadius: '10px',
+            boxShadow: '0 18px 50px rgba(32, 45, 43, 0.08)',
           }}
         >
-          {/* Card Top Border Accent */}
-          <Box sx={{ height: 3, bgcolor: '#0F2744', width: '100%' }} />
-
-          <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
-                Sign In to Your Account
+          <CardContent sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
+            <Box sx={{ mb: 3.5 }}>
+              <Typography
+                component="h2"
+                sx={{ color: '#202D2B', fontSize: '1.75rem', fontWeight: 750 }}
+              >
+                Welcome back
               </Typography>
-              <Typography variant="body2" color="#64748b" sx={{ fontSize: '0.825rem' }}>
-                Select your institutional role to continue
+              <Typography sx={{ mt: 0.75, color: '#71817E', fontSize: '0.9rem' }}>
+                Sign in to your placement portal
               </Typography>
             </Box>
 
-            {/* Role Selection Segmented Buttons */}
+            <Typography
+              variant="caption"
+              sx={{ display: 'block', mb: 0.75, color: '#566663', fontWeight: 700 }}
+            >
+              SIGN IN AS
+            </Typography>
             <Box
+              role="group"
+              aria-label="Choose account type"
               sx={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 1,
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                gap: 0.5,
                 mb: 3,
                 p: 0.5,
-                bgcolor: '#f1f5f9',
+                bgcolor: '#F4F7F5',
+                border: '1px solid #DFE8E4',
                 borderRadius: 1.5,
-                border: '1px solid #e2e8f0',
               }}
             >
               <Button
                 size="small"
                 onClick={() => handleRoleSelect('STUDENT')}
-                startIcon={<PersonIcon sx={{ fontSize: 16 }} />}
-                sx={{
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  fontWeight: activeRole === 'STUDENT' ? 700 : 500,
-                  fontSize: '0.8rem',
-                  py: 0.75,
-                  bgcolor: activeRole === 'STUDENT' ? '#0F2744' : 'transparent',
-                  color: activeRole === 'STUDENT' ? '#ffffff' : '#475569',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    bgcolor: activeRole === 'STUDENT' ? '#0A1C30' : '#e2e8f0',
-                  },
-                }}
+                startIcon={
+                  <PersonIcon sx={{ display: { xs: 'none', sm: 'inline-flex' }, fontSize: 16 }} />
+                }
+                sx={roleButtonSx(activeRole === 'STUDENT')}
               >
                 Student
               </Button>
-
               <Button
                 size="small"
                 onClick={() => handleRoleSelect('PLACEMENT_ADMIN')}
-                startIcon={<PeopleAltOutlinedIcon sx={{ fontSize: 16 }} />}
-                sx={{
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  fontWeight: activeRole === 'PLACEMENT_ADMIN' ? 700 : 500,
-                  fontSize: '0.8rem',
-                  py: 0.75,
-                  bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0F2744' : 'transparent',
-                  color: activeRole === 'PLACEMENT_ADMIN' ? '#ffffff' : '#475569',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    bgcolor: activeRole === 'PLACEMENT_ADMIN' ? '#0A1C30' : '#e2e8f0',
-                  },
-                }}
+                startIcon={
+                  <PeopleAltOutlinedIcon
+                    sx={{ display: { xs: 'none', sm: 'inline-flex' }, fontSize: 16 }}
+                  />
+                }
+                sx={roleButtonSx(activeRole === 'PLACEMENT_ADMIN')}
               >
                 Placement Admin
               </Button>
-
               <Button
                 size="small"
                 onClick={() => handleRoleSelect('SUPER_ADMIN')}
-                startIcon={<ShieldOutlinedIcon sx={{ fontSize: 16 }} />}
-                sx={{
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  fontWeight: activeRole === 'SUPER_ADMIN' ? 700 : 500,
-                  fontSize: '0.8rem',
-                  py: 0.75,
-                  bgcolor: activeRole === 'SUPER_ADMIN' ? '#0F2744' : 'transparent',
-                  color: activeRole === 'SUPER_ADMIN' ? '#ffffff' : '#475569',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    bgcolor: activeRole === 'SUPER_ADMIN' ? '#0A1C30' : '#e2e8f0',
-                  },
-                }}
+                startIcon={
+                  <ShieldOutlinedIcon
+                    sx={{ display: { xs: 'none', sm: 'inline-flex' }, fontSize: 16 }}
+                  />
+                }
+                sx={roleButtonSx(activeRole === 'SUPER_ADMIN')}
               >
                 Super Admin
               </Button>
             </Box>
 
-            {/* Error Notification */}
             {error && (
-              <Alert
-                severity="error"
-                sx={{
-                  mb: 2.5,
-                  bgcolor: '#fef2f2',
-                  border: '1px solid #fecaca',
-                  color: '#991b1b',
-                  fontSize: '0.82rem',
-                }}
-              >
+              <Alert severity="error" sx={{ mb: 2.5, fontSize: '0.82rem' }}>
                 {error}
               </Alert>
             )}
 
-            {/* Password Notice */}
             {forgotPasswordNotice && (
               <Alert
                 severity="info"
-                sx={{
-                  mb: 2.5,
-                  bgcolor: '#f0f9ff',
-                  border: '1px solid #bae6fd',
-                  color: '#0369a1',
-                  fontSize: '0.82rem',
-                }}
+                sx={{ mb: 2.5, fontSize: '0.82rem' }}
                 onClose={() => setForgotPasswordNotice(false)}
               >
                 For password reset requests, please contact the Placement Cell Administrator at{' '}
@@ -278,63 +324,66 @@ export const LoginPage: React.FC = () => {
               </Alert>
             )}
 
-            {/* Form */}
             <Box component="form" onSubmit={handleSubmit} noValidate>
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: 2.25 }}>
                 <Typography
                   component="label"
+                  htmlFor="email"
                   variant="caption"
-                  sx={{ display: 'block', mb: 0.75, fontWeight: 600, color: '#334155' }}
+                  sx={{ display: 'block', mb: 0.8, color: '#566663', fontWeight: 700 }}
                 >
-                  Institutional Email
+                  EMAIL ADDRESS
                 </Typography>
                 <TextField
                   fullWidth
                   id="email"
                   type="email"
-                  placeholder="e.g. yourname@placement.edu"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <MailOutlineIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
+                        <MailOutlineIcon sx={{ color: '#71817E', fontSize: 19 }} />
                       </InputAdornment>
                     ),
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      height: 42,
-                      fontSize: '0.875rem',
+                      height: 54,
+                      borderRadius: 1.5,
+                      bgcolor: '#F8FAF9',
+                      fontSize: '0.9rem',
                     },
                   }}
                 />
               </Box>
 
               <Box sx={{ mb: 2.5 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 0.8,
+                  }}
+                >
                   <Typography
                     component="label"
+                    htmlFor="password"
                     variant="caption"
-                    sx={{ fontWeight: 600, color: '#334155' }}
+                    sx={{ color: '#566663', fontWeight: 700 }}
                   >
-                    Password
+                    PASSWORD
                   </Typography>
                   <Button
                     variant="text"
                     size="small"
                     onClick={() => setForgotPasswordNotice(true)}
-                    sx={{
-                      p: 0,
-                      minWidth: 'auto',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      color: '#0F2744',
-                      textTransform: 'none',
-                    }}
+                    sx={{ p: 0, minWidth: 'auto', fontSize: '0.75rem', color: '#176B66' }}
                   >
-                    Forgot Password?
+                    Forgot password?
                   </Button>
                 </Box>
                 <TextField
@@ -348,16 +397,17 @@ export const LoginPage: React.FC = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlinedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
+                        <LockOutlinedIcon sx={{ color: '#71817E', fontSize: 19 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           size="small"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
-                          sx={{ color: '#94a3b8' }}
+                          sx={{ color: '#71817E' }}
                         >
                           {showPassword ? (
                             <VisibilityOffOutlinedIcon fontSize="small" />
@@ -370,37 +420,31 @@ export const LoginPage: React.FC = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      height: 42,
-                      fontSize: '0.875rem',
+                      height: 54,
+                      borderRadius: 1.5,
+                      bgcolor: '#F8FAF9',
+                      fontSize: '0.9rem',
                     },
                   }}
                 />
               </Box>
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 3,
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      size="small"
-                      sx={{ color: '#94a3b8', '&.Mui-checked': { color: '#0F2744' } }}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2" sx={{ fontSize: '0.82rem', color: '#475569' }}>
-                      Keep me signed in
-                    </Typography>
-                  }
-                />
-              </Box>
+              <FormControlLabel
+                sx={{ mb: 2.5, ml: -0.5 }}
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    size="small"
+                    sx={{ color: '#8A9995', '&.Mui-checked': { color: '#176B66' } }}
+                  />
+                }
+                label={
+                  <Typography sx={{ color: '#566663', fontSize: '0.82rem' }}>
+                    Keep me signed in
+                  </Typography>
+                }
+              />
 
               <Button
                 type="submit"
@@ -408,76 +452,36 @@ export const LoginPage: React.FC = () => {
                 variant="contained"
                 disabled={isSubmitting}
                 sx={{
-                  height: 42,
-                  bgcolor: '#0F2744',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  textTransform: 'none',
-                  '&:hover': { bgcolor: '#0A1C30' },
+                  height: 54,
+                  borderRadius: 1.5,
+                  bgcolor: '#176B66',
+                  fontWeight: 700,
+                  fontSize: '0.92rem',
+                  '&:hover': { bgcolor: '#104F4B' },
                 }}
               >
-                {isSubmitting ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  'Sign In to Portal'
-                )}
+                {isSubmitting ? <CircularProgress size={20} color="inherit" /> : 'Secure Sign In'}
               </Button>
-            </Box>
-
-            <Divider sx={{ my: 3, borderColor: '#f1f5f9' }} />
-
-            {/* Quick Demo Preset Chips for Easy Evaluation */}
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography
-                variant="caption"
-                sx={{ color: '#64748b', fontWeight: 600, display: 'block', mb: 1.25 }}
-              >
-                Quick Evaluation Presets:
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Chip
-                  label="Student"
-                  size="small"
-                  clickable
-                  onClick={() => handleRoleSelect('STUDENT')}
-                  variant={activeRole === 'STUDENT' ? 'filled' : 'outlined'}
-                  color={activeRole === 'STUDENT' ? 'primary' : 'default'}
-                  sx={{ fontSize: '0.72rem', height: 24, fontWeight: 600 }}
-                />
-                <Chip
-                  label="Placement Admin"
-                  size="small"
-                  clickable
-                  onClick={() => handleRoleSelect('PLACEMENT_ADMIN')}
-                  variant={activeRole === 'PLACEMENT_ADMIN' ? 'filled' : 'outlined'}
-                  color={activeRole === 'PLACEMENT_ADMIN' ? 'primary' : 'default'}
-                  sx={{ fontSize: '0.72rem', height: 24, fontWeight: 600 }}
-                />
-                <Chip
-                  label="Super Admin"
-                  size="small"
-                  clickable
-                  onClick={() => handleRoleSelect('SUPER_ADMIN')}
-                  variant={activeRole === 'SUPER_ADMIN' ? 'filled' : 'outlined'}
-                  color={activeRole === 'SUPER_ADMIN' ? 'primary' : 'default'}
-                  sx={{ fontSize: '0.72rem', height: 24, fontWeight: 600 }}
-                />
-              </Box>
             </Box>
           </CardContent>
         </Card>
 
-        {/* Institutional Footer */}
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="caption" sx={{ color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75 }}>
-            <CheckCircleOutlineIcon sx={{ fontSize: 14, color: '#059669' }} />
-            Secure Enterprise Authentication • FERPA & ISO 27001 Security Standards
-          </Typography>
-          <Typography variant="caption" sx={{ color: '#cbd5e1', display: 'block', mt: 0.5 }}>
-            © {new Date().getFullYear()} VET Institute of Arts and Science. All rights reserved.
+        <Box
+          sx={{
+            mt: 2.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.75,
+            color: '#71817E',
+          }}
+        >
+          <CheckCircleOutlineIcon sx={{ fontSize: 15, color: '#15803d' }} />
+          <Typography variant="caption" sx={{ textAlign: 'center' }}>
+            Secure access to the VET campus placement portal
           </Typography>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };

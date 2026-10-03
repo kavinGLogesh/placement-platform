@@ -739,7 +739,7 @@ export const AdminGdPage: React.FC = () => {
             p: 2.5,
             mb: 2.5,
             bgcolor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: '8px',
           }}
         >
@@ -750,11 +750,11 @@ export const AdminGdPage: React.FC = () => {
                   size="small"
                   startIcon={<ArrowBackIcon />}
                   onClick={handleBackToRounds}
-                  sx={{ textTransform: 'none', color: '#0F2744', fontWeight: 700, p: 0, minWidth: 'auto', mr: 1 }}
+                  sx={{ textTransform: 'none', color: '#1765B5', fontWeight: 700, p: 0, minWidth: 'auto', mr: 1 }}
                 >
                   All GD Rounds
                 </Button>
-                <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+                <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
                   / EVALUATION SHEET WORKSPACE
                 </Typography>
                 <Chip
@@ -770,14 +770,14 @@ export const AdminGdPage: React.FC = () => {
                   sx={{ fontWeight: 700, fontSize: '0.75rem', height: 22 }}
                 />
               </Stack>
-              <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#0f172a' }}>
+              <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#14264B' }}>
                 {selectedRound.title}
               </Typography>
-              <Typography variant="body2" sx={{ color: '#475569', mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: '#526584', mt: 0.5 }}>
                 <strong>Discussion Topic:</strong> {selectedRound.topic}
               </Typography>
               {selectedRound.instructions && (
-                <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.25 }}>
+                <Typography variant="caption" sx={{ color: '#7182A0', display: 'block', mt: 0.25 }}>
                   <strong>Guidelines:</strong> {selectedRound.instructions}
                 </Typography>
               )}
@@ -792,7 +792,7 @@ export const AdminGdPage: React.FC = () => {
                     size="small"
                     startIcon={<TuneIcon />}
                     onClick={handleOpenCategoryManager}
-                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#cbd5e1', color: '#0F2744' }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#D1DEF0', color: '#1765B5' }}
                   >
                     Manage Categories
                   </Button>
@@ -801,7 +801,7 @@ export const AdminGdPage: React.FC = () => {
                     size="small"
                     startIcon={<PersonAddIcon />}
                     onClick={() => handleOpenAssign(selectedRound)}
-                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#cbd5e1', color: '#0F2744' }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#D1DEF0', color: '#1765B5' }}
                   >
                     Assign Students
                   </Button>
@@ -810,7 +810,7 @@ export const AdminGdPage: React.FC = () => {
                     size="small"
                     startIcon={<HowToRegIcon />}
                     onClick={handleMarkAllPresent}
-                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#cbd5e1' }}
+                    sx={{ textTransform: 'none', fontWeight: 600, borderColor: '#D1DEF0' }}
                   >
                     Mark All Present
                   </Button>
@@ -847,7 +847,7 @@ export const AdminGdPage: React.FC = () => {
           </Box>
 
           {/* Metrics Overview Ribbon */}
-          <Box sx={{ mt: 2.5, pt: 2, borderTop: '1px solid #f1f5f9', display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Box sx={{ mt: 2.5, pt: 2, borderTop: '1px solid #E7EEFA', display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
             <Chip
               label={`Categories: ${selectedRound.criteria.length} columns`}
               size="small"
@@ -858,7 +858,7 @@ export const AdminGdPage: React.FC = () => {
               label={`Total Max Marks: ${totalPossibleRoundMarks}`}
               size="small"
               variant="outlined"
-              sx={{ fontWeight: 700, borderColor: '#0F2744', color: '#0F2744' }}
+              sx={{ fontWeight: 700, borderColor: '#1765B5', color: '#1765B5' }}
             />
             <Chip
               label={`Assigned Students: ${selectedRound.participants.length}`}
@@ -876,7 +876,7 @@ export const AdminGdPage: React.FC = () => {
               <Chip
                 label={`Round Average: ${selectedRound.averageScore}%`}
                 size="small"
-                sx={{ bgcolor: '#0F2744', color: '#ffffff', fontWeight: 700 }}
+                sx={{ bgcolor: '#1765B5', color: '#ffffff', fontWeight: 700 }}
               />
             )}
           </Box>
@@ -889,7 +889,7 @@ export const AdminGdPage: React.FC = () => {
         )}
 
         {/* Hierarchy Filters (Department → Course → Class → Section → Search) */}
-        <Paper variant="outlined" sx={{ p: 1.75, mb: 2.5, backgroundColor: '#f8fafc', borderRadius: 2 }}>
+        <Paper variant="outlined" sx={{ p: 1.75, mb: 2.5, backgroundColor: '#EDF2FF', borderRadius: 2 }}>
           <Grid container spacing={1.5} alignItems="center">
             <Grid item xs={12} sm={6} md={2.4}>
               <FormControl size="small" fullWidth>
@@ -981,7 +981,7 @@ export const AdminGdPage: React.FC = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon fontSize="small" sx={{ color: '#94a3b8' }} />
+                      <SearchIcon fontSize="small" sx={{ color: '#8293B0' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (partDeptFilter || partCourseFilter || partClassFilter || partSectionFilter || partSearch) && (
@@ -1002,19 +1002,19 @@ export const AdminGdPage: React.FC = () => {
           variant="outlined"
           sx={{
             borderRadius: 2,
-            border: '1px solid #cbd5e1',
+            border: '1px solid #D1DEF0',
             overflow: 'hidden',
             backgroundColor: '#ffffff',
           }}
         >
-          <Box sx={{ p: 1.5, bgcolor: '#0F2744', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ p: 1.5, bgcolor: '#1765B5', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={1} alignItems="center">
               <TableChartIcon fontSize="small" />
               <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                 EVALUATION SPREADSHEET (Students × Configured Categories)
               </Typography>
             </Stack>
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+            <Typography variant="caption" sx={{ color: '#8293B0' }}>
               Showing {filteredParticipants.length} of {selectedRound.participants.length} assigned students • Keyboard navigation supported
             </Typography>
           </Box>
@@ -1024,12 +1024,12 @@ export const AdminGdPage: React.FC = () => {
               <CircularProgress />
             </Box>
           ) : selectedRound.participants.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 8, color: '#64748b' }}>
-              <GroupsIcon sx={{ fontSize: 48, color: '#cbd5e1', mb: 1 }} />
-              <Typography variant="h6" sx={{ color: '#475569' }}>
+            <Box sx={{ textAlign: 'center', py: 8, color: '#7182A0' }}>
+              <GroupsIcon sx={{ fontSize: 48, color: '#D1DEF0', mb: 1 }} />
+              <Typography variant="h6" sx={{ color: '#526584' }}>
                 No Students Assigned to this GD Round
               </Typography>
-              <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5, mb: 2 }}>
+              <Typography variant="body2" sx={{ color: '#7182A0', mt: 0.5, mb: 2 }}>
                 Target students using the department, course, class, and section hierarchy to begin evaluation.
               </Typography>
               <Button variant="contained" startIcon={<PersonAddIcon />} onClick={() => handleOpenAssign(selectedRound)}>
@@ -1047,11 +1047,11 @@ export const AdminGdPage: React.FC = () => {
                         position: 'sticky',
                         left: 0,
                         zIndex: 10,
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         width: 44,
                         textAlign: 'center',
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       #
@@ -1061,10 +1061,10 @@ export const AdminGdPage: React.FC = () => {
                         position: 'sticky',
                         left: 44,
                         zIndex: 10,
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         minWidth: 170,
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Student Name
@@ -1074,10 +1074,10 @@ export const AdminGdPage: React.FC = () => {
                         position: 'sticky',
                         left: 214,
                         zIndex: 10,
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         minWidth: 120,
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Register No
@@ -1087,10 +1087,10 @@ export const AdminGdPage: React.FC = () => {
                         position: 'sticky',
                         left: 334,
                         zIndex: 10,
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         minWidth: 150,
-                        borderRight: '2px solid #cbd5e1',
+                        borderRight: '2px solid #D1DEF0',
                       }}
                     >
                       Hierarchy
@@ -1098,11 +1098,11 @@ export const AdminGdPage: React.FC = () => {
 
                     <TableCell
                       sx={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         textAlign: 'center',
                         minWidth: 110,
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Attendance
@@ -1113,14 +1113,14 @@ export const AdminGdPage: React.FC = () => {
                       <TableCell
                         key={crit.id}
                         sx={{
-                          backgroundColor: '#f1f5f9',
+                          backgroundColor: '#E7EEFA',
                           fontWeight: 700,
                           textAlign: 'center',
                           minWidth: 110,
-                          borderRight: '1px solid #e2e8f0',
+                          borderRight: '1px solid #DCE6F5',
                         }}
                       >
-                        <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', color: '#0f172a' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', color: '#14264B' }}>
                           {crit.name}
                         </Typography>
                         <Chip
@@ -1130,7 +1130,7 @@ export const AdminGdPage: React.FC = () => {
                             height: 18,
                             fontSize: '0.65rem',
                             fontWeight: 700,
-                            backgroundColor: '#e2e8f0',
+                            backgroundColor: '#DCE6F5',
                           }}
                         />
                       </TableCell>
@@ -1139,41 +1139,41 @@ export const AdminGdPage: React.FC = () => {
                     {/* Calculated Columns */}
                     <TableCell
                       sx={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         textAlign: 'center',
                         minWidth: 95,
-                        borderLeft: '2px solid #cbd5e1',
-                        borderRight: '1px solid #e2e8f0',
+                        borderLeft: '2px solid #D1DEF0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Total
                     </TableCell>
                     <TableCell
                       sx={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         textAlign: 'center',
                         minWidth: 80,
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Score %
                     </TableCell>
                     <TableCell
                       sx={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         textAlign: 'center',
                         minWidth: 95,
-                        borderRight: '1px solid #e2e8f0',
+                        borderRight: '1px solid #DCE6F5',
                       }}
                     >
                       Status
                     </TableCell>
                     <TableCell
                       sx={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: '#E7EEFA',
                         fontWeight: 700,
                         minWidth: 200,
                       }}
@@ -1207,8 +1207,8 @@ export const AdminGdPage: React.FC = () => {
                             backgroundColor: '#ffffff',
                             textAlign: 'center',
                             fontWeight: 600,
-                            color: '#64748b',
-                            borderRight: '1px solid #e2e8f0',
+                            color: '#7182A0',
+                            borderRight: '1px solid #DCE6F5',
                           }}
                         >
                           {rowIdx + 1}
@@ -1221,13 +1221,13 @@ export const AdminGdPage: React.FC = () => {
                             left: 44,
                             zIndex: 5,
                             backgroundColor: '#ffffff',
-                            borderRight: '1px solid #e2e8f0',
+                            borderRight: '1px solid #DCE6F5',
                           }}
                         >
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#14264B' }}>
                             {part.studentName}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                          <Typography variant="caption" sx={{ color: '#7182A0', display: 'block' }}>
                             {part.collegeEmail}
                           </Typography>
                         </TableCell>
@@ -1239,10 +1239,10 @@ export const AdminGdPage: React.FC = () => {
                             left: 214,
                             zIndex: 5,
                             backgroundColor: '#ffffff',
-                            borderRight: '1px solid #e2e8f0',
+                            borderRight: '1px solid #DCE6F5',
                           }}
                         >
-                          <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#1e293b' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', color: '#33466A' }}>
                             {part.registerNumber}
                           </Typography>
                         </TableCell>
@@ -1254,19 +1254,19 @@ export const AdminGdPage: React.FC = () => {
                             left: 334,
                             zIndex: 5,
                             backgroundColor: '#ffffff',
-                            borderRight: '2px solid #cbd5e1',
+                            borderRight: '2px solid #D1DEF0',
                           }}
                         >
-                          <Typography variant="caption" sx={{ fontWeight: 600, color: '#334155', display: 'block' }}>
+                          <Typography variant="caption" sx={{ fontWeight: 600, color: '#405678', display: 'block' }}>
                             {part.departmentName || '—'}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748b' }}>
+                          <Typography variant="caption" sx={{ color: '#7182A0' }}>
                             {part.className || '—'} {part.sectionName ? `• Sec ${part.sectionName}` : ''}
                           </Typography>
                         </TableCell>
 
                         {/* Attendance Toggle */}
-                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #e2e8f0' }}>
+                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #DCE6F5' }}>
                           <Chip
                             label={part.attendance}
                             size="small"
@@ -1311,7 +1311,7 @@ export const AdminGdPage: React.FC = () => {
                               sx={{
                                 textAlign: 'center',
                                 p: 1,
-                                borderRight: '1px solid #e2e8f0',
+                                borderRight: '1px solid #DCE6F5',
                               }}
                             >
                               <TextField
@@ -1355,17 +1355,17 @@ export const AdminGdPage: React.FC = () => {
                         <TableCell
                           sx={{
                             textAlign: 'center',
-                            borderLeft: '2px solid #cbd5e1',
-                            borderRight: '1px solid #e2e8f0',
+                            borderLeft: '2px solid #D1DEF0',
+                            borderRight: '1px solid #DCE6F5',
                             fontWeight: 800,
-                            color: '#0f172a',
+                            color: '#14264B',
                           }}
                         >
                           {rowSum} / {totalPossibleRoundMarks}
                         </TableCell>
 
                         {/* Percentage Calculated Column */}
-                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #e2e8f0' }}>
+                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #DCE6F5' }}>
                           <Typography
                             variant="body2"
                             sx={{
@@ -1378,7 +1378,7 @@ export const AdminGdPage: React.FC = () => {
                         </TableCell>
 
                         {/* Status Column */}
-                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #e2e8f0' }}>
+                        <TableCell sx={{ textAlign: 'center', borderRight: '1px solid #DCE6F5' }}>
                           {isEvaluated ? (
                             <Chip label="Evaluated" size="small" color="success" sx={{ height: 20, fontSize: '0.7rem' }} />
                           ) : isDraft ? (
@@ -1412,8 +1412,8 @@ export const AdminGdPage: React.FC = () => {
           <Box
             sx={{
               p: 2,
-              bgcolor: '#f8fafc',
-              borderTop: '1px solid #e2e8f0',
+              bgcolor: '#EDF2FF',
+              borderTop: '1px solid #DCE6F5',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -1421,7 +1421,7 @@ export const AdminGdPage: React.FC = () => {
               gap: 2,
             }}
           >
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               Backend is the authoritative calculation source for final scores and reports. Marks permanently mapped via Student ID + Criterion ID.
             </Typography>
 
@@ -1454,7 +1454,7 @@ export const AdminGdPage: React.FC = () => {
 
         {/* Category Management Dialog */}
         <Dialog open={categoryModalOpen} onClose={() => setCategoryModalOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle sx={{ fontWeight: 800, bgcolor: '#0F2744', color: '#ffffff' }}>
+          <DialogTitle sx={{ fontWeight: 800, bgcolor: '#1765B5', color: '#ffffff' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h6" fontWeight={800}>
                 Configure GD Evaluation Categories
@@ -1465,7 +1465,7 @@ export const AdminGdPage: React.FC = () => {
             </Box>
           </DialogTitle>
           <DialogContent dividers sx={{ p: 2.5 }}>
-            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+            <Typography variant="body2" sx={{ color: '#7182A0', mb: 2 }}>
               Add, edit, or configure maximum marks for evaluation categories. Changes immediately update the sheet columns and recalculate total maximum marks.
             </Typography>
 
@@ -1477,7 +1477,7 @@ export const AdminGdPage: React.FC = () => {
 
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
-                <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                   <TableRow>
                     <TableCell sx={{ width: 40, fontWeight: 700 }}>#</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Category Name</TableCell>
@@ -1527,7 +1527,7 @@ export const AdminGdPage: React.FC = () => {
               <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={handleAddCategoryRow}>
                 Add Category
               </Button>
-              <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F2744' }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: '#1765B5' }}>
                 Total Maximum Marks: {editingCriteria.reduce((acc, c) => acc + (Number(c.maxMarks) || 0), 0)}
               </Typography>
             </Box>
@@ -1594,13 +1594,13 @@ export const AdminGdPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+          <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
             QUALITATIVE EVALUATION SUITE
           </Typography>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#0f172a' }}>
+          <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ mb: 0.5, color: '#14264B' }}>
             Group Discussion (GD) Rounds
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: '#7182A0' }}>
             Open any GD round to launch its integrated Excel-style Overall Evaluation Sheet. Configure categories, track attendance, and record marks.
           </Typography>
         </Box>
@@ -1612,13 +1612,13 @@ export const AdminGdPage: React.FC = () => {
             onClick={() => fetchRounds()}
             disabled={loading}
             sx={{
-              color: '#0F2744',
-              borderColor: '#cbd5e1',
+              color: '#1765B5',
+              borderColor: '#D1DEF0',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
+              '&:hover': { borderColor: '#1765B5', bgcolor: 'rgba(23, 101, 181, 0.04)' },
             }}
           >
             Refresh
@@ -1630,13 +1630,13 @@ export const AdminGdPage: React.FC = () => {
               startIcon={<AddIcon fontSize="small" />}
               onClick={handleOpenCreate}
               sx={{
-                bgcolor: '#0F2744',
+                bgcolor: '#1765B5',
                 color: '#ffffff',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { bgcolor: '#0A1C30' },
+                '&:hover': { bgcolor: '#104B91' },
               }}
             >
               Create GD Round
@@ -1654,18 +1654,18 @@ export const AdminGdPage: React.FC = () => {
       {/* Metric Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               TOTAL GD ROUNDS
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0f172a' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#14264B' }}>
               {rounds.length}
             </Typography>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               ACTIVE / SCHEDULED
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0369a1' }}>
@@ -1674,8 +1674,8 @@ export const AdminGdPage: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               TOTAL EVALUATED
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#047857' }}>
@@ -1684,11 +1684,11 @@ export const AdminGdPage: React.FC = () => {
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+          <Card elevation={0} sx={{ p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
+            <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600 }}>
               AVG GD PERFORMANCE
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#0F2744' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: '#1765B5' }}>
               {(() => {
                 const evaluatedRounds = rounds.filter((r) => r.averageScore !== null);
                 if (evaluatedRounds.length === 0) return '—';
@@ -1703,7 +1703,7 @@ export const AdminGdPage: React.FC = () => {
       </Grid>
 
       {/* Status Tabs */}
-      <Paper elevation={0} sx={{ mb: 3, border: '1px solid #e2e8f0', borderRadius: '8px', bgcolor: '#ffffff' }}>
+      <Paper elevation={0} sx={{ mb: 3, border: '1px solid #DCE6F5', borderRadius: '8px', bgcolor: '#ffffff' }}>
         <Tabs
           value={statusTab}
           onChange={(_, val) => setStatusTab(val)}
@@ -1716,8 +1716,8 @@ export const AdminGdPage: React.FC = () => {
               fontSize: '0.875rem',
               py: 1.5,
               minHeight: 48,
-              color: '#64748b',
-              '&.Mui-selected': { color: '#0F2744', fontWeight: 700 },
+              color: '#7182A0',
+              '&.Mui-selected': { color: '#1765B5', fontWeight: 700 },
             },
           }}
         >
@@ -1735,11 +1735,11 @@ export const AdminGdPage: React.FC = () => {
         </Box>
       ) : rounds.length === 0 ? (
         <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
-          <GroupsIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 1 }} />
-          <Typography variant="h6" sx={{ color: '#475569' }}>
+          <GroupsIcon sx={{ fontSize: 48, color: '#8293B0', mb: 1 }} />
+          <Typography variant="h6" sx={{ color: '#526584' }}>
             No Group Discussion Rounds Found
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#7182A0', mt: 0.5 }}>
             Create a new GD round to evaluate student communication, confidence, and leadership.
           </Typography>
         </Paper>
@@ -1758,13 +1758,13 @@ export const AdminGdPage: React.FC = () => {
                   transition: 'all 0.2s',
                   '&:hover': {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-                    borderColor: '#cbd5e1',
+                    borderColor: '#D1DEF0',
                   },
                 }}
               >
                 <CardContent sx={{ pb: 1.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#14264B' }}>
                       {round.title}
                     </Typography>
                     <Chip
@@ -1780,10 +1780,10 @@ export const AdminGdPage: React.FC = () => {
                       sx={{ fontWeight: 700, fontSize: '0.75rem', height: 22 }}
                     />
                   </Box>
-                  <Typography variant="body2" sx={{ color: '#334155', fontWeight: 500, mb: 1.5 }}>
+                  <Typography variant="body2" sx={{ color: '#405678', fontWeight: 500, mb: 1.5 }}>
                     Topic: {round.topic}
                   </Typography>
-                  <Stack direction="row" spacing={2} sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1 }}>
+                  <Stack direction="row" spacing={2} sx={{ color: '#7182A0', fontSize: '0.8rem', mb: 1 }}>
                     <span>📅 {new Date(round.scheduledDate).toLocaleDateString()}</span>
                     <span>⏱ {round.durationMinutes} mins</span>
                     <span>👥 {round.totalParticipants} students</span>
@@ -1799,7 +1799,7 @@ export const AdminGdPage: React.FC = () => {
                       <Chip
                         label={`Avg: ${round.averageScore}% (${round.evaluatedCount}/${round.totalParticipants})`}
                         size="small"
-                        sx={{ backgroundColor: '#f1f5f9', color: '#0f172a', fontWeight: 600, fontSize: '0.7rem' }}
+                        sx={{ backgroundColor: '#E7EEFA', color: '#14264B', fontWeight: 600, fontSize: '0.7rem' }}
                       />
                     )}
                   </Box>
@@ -1812,11 +1812,11 @@ export const AdminGdPage: React.FC = () => {
                     startIcon={<TableChartIcon />}
                     onClick={() => handleOpenEvaluationSheet(round)}
                     sx={{
-                      bgcolor: '#0F2744',
+                      bgcolor: '#1765B5',
                       color: '#ffffff',
                       textTransform: 'none',
                       fontWeight: 700,
-                      '&:hover': { bgcolor: '#0A1C30' },
+                      '&:hover': { bgcolor: '#104B91' },
                     }}
                   >
                     Open Evaluation Sheet
@@ -1983,7 +1983,7 @@ export const AdminGdPage: React.FC = () => {
 
               <TableContainer component={Paper} variant="outlined">
                 <Table size="small">
-                  <TableHead sx={{ backgroundColor: '#f8fafc' }}>
+                  <TableHead sx={{ backgroundColor: '#EDF2FF' }}>
                     <TableRow>
                       <TableCell sx={{ width: 50 }}>#</TableCell>
                       <TableCell>Criterion Name</TableCell>
@@ -2028,7 +2028,7 @@ export const AdminGdPage: React.FC = () => {
               </TableContainer>
 
               <Box sx={{ mt: 1.5, textAlign: 'right' }}>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: '#14264B' }}>
                   Total Maximum Marks: {criteria.reduce((a, b) => a + (Number(b.maxMarks) || 0), 0)}
                 </Typography>
               </Box>

@@ -142,10 +142,10 @@ export const AdminAnalyticsPage: React.FC = () => {
         }}
       >
         <div>
-          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
             INSTITUTIONAL INTELLIGENCE & BENCHMARKS
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             Analytics, Placement Funnel & Performance Hub
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -164,10 +164,10 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Box>
 
       {/* Filter Toolbar */}
-      <Card elevation={0} sx={{ mb: 3, p: 2, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+      <Card elevation={0} sx={{ mb: 3, p: 2, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterAltIcon sx={{ color: '#0F2744', fontSize: 18 }} />
-          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+          <FilterAltIcon sx={{ color: '#1765B5', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#14264B">
             Authoritative Filters
           </Typography>
         </Box>
@@ -247,10 +247,10 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Card>
 
       {/* 1. Placement Funnel Visualizer */}
-      <Card elevation={0} sx={{ mb: 3.5, p: 2.5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+      <Card elevation={0} sx={{ mb: 3.5, p: 2.5, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-          <LayersIcon sx={{ color: '#0F2744', fontSize: 20 }} />
-          <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+          <LayersIcon sx={{ color: '#1765B5', fontSize: 20 }} />
+          <Typography variant="subtitle1" fontWeight={700} color="#14264B">
             End-to-End Placement Pipeline Funnel
           </Typography>
         </Box>
@@ -266,12 +266,12 @@ export const AdminAnalyticsPage: React.FC = () => {
           <Grid container spacing={1.5}>
             {funnel.stages.map((st, index) => {
               const colors = [
-                '#0F2744',
+                '#1765B5',
                 '#0284c7',
                 '#15803D',
                 '#059669',
-                '#64748b',
-                '#94a3b8',
+                '#7182A0',
+                '#8293B0',
               ];
               const color = colors[index % colors.length];
 
@@ -282,9 +282,9 @@ export const AdminAnalyticsPage: React.FC = () => {
                     sx={{
                       p: 1.75,
                       height: '100%',
-                      bgcolor: st.isImplemented ? '#f8fafc' : '#ffffff',
+                      bgcolor: st.isImplemented ? '#EDF2FF' : '#ffffff',
                       border: '1px solid',
-                      borderColor: st.isImplemented ? '#cbd5e1' : '#f1f5f9',
+                      borderColor: st.isImplemented ? '#D1DEF0' : '#E7EEFA',
                       borderTop: `3px solid ${color}`,
                       borderRadius: '6px',
                       display: 'flex',
@@ -294,13 +294,13 @@ export const AdminAnalyticsPage: React.FC = () => {
                   >
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
-                        <Typography variant="caption" fontWeight={700} color="#1e293b">
+                        <Typography variant="caption" fontWeight={700} color="#33466A">
                           {index + 1}. {st.stage}
                         </Typography>
                         {!st.isImplemented ? (
-                          <Chip label="Future" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#f1f5f9', color: '#94a3b8', borderRadius: '3px' }} />
+                          <Chip label="Future" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#E7EEFA', color: '#8293B0', borderRadius: '3px' }} />
                         ) : (
-                          <Chip label="Active" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#F0F4F9', color: '#0F2744', borderRadius: '3px' }} />
+                          <Chip label="Active" size="small" sx={{ height: 16, fontSize: '0.62rem', bgcolor: '#E4EEFC', color: '#1765B5', borderRadius: '3px' }} />
                         )}
                       </Box>
                       <Typography variant="h5" fontWeight={700} sx={{ color, my: 0.5 }}>
@@ -313,7 +313,7 @@ export const AdminAnalyticsPage: React.FC = () => {
                           height: 4,
                           borderRadius: '2px',
                           mb: 0.75,
-                          bgcolor: '#e2e8f0',
+                          bgcolor: '#DCE6F5',
                           '& .MuiLinearProgress-bar': { bgcolor: color },
                         }}
                       />
@@ -343,10 +343,10 @@ export const AdminAnalyticsPage: React.FC = () => {
       <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
         {/* Department Comparison Chart */}
         <Grid item xs={12} lg={6}>
-          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <SchoolIcon sx={{ color: '#0F2744', fontSize: 18 }} />
-              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+              <SchoolIcon sx={{ color: '#1765B5', fontSize: 18 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                 Department Performance Comparison
               </Typography>
             </Box>
@@ -362,15 +362,15 @@ export const AdminAnalyticsPage: React.FC = () => {
               <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={deptChartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 12 }} />
-                    <YAxis unit="%" domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 12 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E7EEFA" />
+                    <XAxis dataKey="name" stroke="#7182A0" tick={{ fontSize: 12 }} />
+                    <YAxis unit="%" domain={[0, 100]} stroke="#7182A0" tick={{ fontSize: 12 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#D1DEF0', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
                       formatter={(val: any) => [`${val}%`]}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0F2744" radius={[3, 3, 0, 0]} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#1765B5" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="passRate" name="Pass Rate %" fill="#15803D" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="participation" name="Participation %" fill="#0284c7" radius={[3, 3, 0, 0]} />
                   </BarChart>
@@ -384,10 +384,10 @@ export const AdminAnalyticsPage: React.FC = () => {
 
         {/* Category Accuracy Chart */}
         <Grid item xs={12} lg={6}>
-          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+          <Card elevation={0} sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <CategoryIcon sx={{ color: '#0F2744', fontSize: 18 }} />
-              <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+              <CategoryIcon sx={{ color: '#1765B5', fontSize: 18 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                 Assessment Component Accuracy
               </Typography>
             </Box>
@@ -403,16 +403,16 @@ export const AdminAnalyticsPage: React.FC = () => {
               <Box sx={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryChartData} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis type="number" unit="%" domain={[0, 100]} stroke="#64748b" tick={{ fontSize: 12 }} />
-                    <YAxis dataKey="category" type="category" width={110} stroke="#64748b" tick={{ fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E7EEFA" />
+                    <XAxis type="number" unit="%" domain={[0, 100]} stroke="#7182A0" tick={{ fontSize: 12 }} />
+                    <YAxis dataKey="category" type="category" width={110} stroke="#7182A0" tick={{ fontSize: 11 }} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
+                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#D1DEF0', borderRadius: 6, fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}
                       formatter={(val: any) => [`${val}%`]}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     <Bar dataKey="accuracy" name="Accuracy %" fill="#b45309" radius={[0, 3, 3, 0]} />
-                    <Bar dataKey="avgScore" name="Avg Score %" fill="#0F2744" radius={[0, 3, 3, 0]} />
+                    <Bar dataKey="avgScore" name="Avg Score %" fill="#1765B5" radius={[0, 3, 3, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </Box>
@@ -424,10 +424,10 @@ export const AdminAnalyticsPage: React.FC = () => {
       </Grid>
 
       {/* 3. Topic Strengths and Weaknesses Matrix */}
-      <Card elevation={0} sx={{ mb: 4, p: 2.5, bgcolor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+      <Card elevation={0} sx={{ mb: 4, p: 2.5, bgcolor: '#ffffff', border: '1px solid #DCE6F5', borderRadius: '8px' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
           <Box>
-            <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+            <Typography variant="subtitle1" fontWeight={700} color="#14264B">
               Topic Strengths & Weaknesses Matrix
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -442,27 +442,27 @@ export const AdminAnalyticsPage: React.FC = () => {
         </Box>
 
         {topicAnalytics?.topics && topicAnalytics.topics.length > 0 ? (
-          <TableContainer sx={{ border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+          <TableContainer sx={{ border: '1px solid #DCE6F5', borderRadius: '6px' }}>
             <Table size="small">
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
+              <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Topic Name</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Component</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Questions Answered</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Correct</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Accuracy</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Average Score</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem' }}>Classification</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Topic Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Component</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Questions Answered</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Correct</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Accuracy</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Average Score</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem' }}>Classification</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {topicAnalytics.topics.map((t) => (
-                  <TableRow key={`${t.category}-${t.topic}`} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                    <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{t.topic}</TableCell>
-                    <TableCell sx={{ color: '#64748b', fontSize: '0.8rem' }}>{t.category}</TableCell>
+                  <TableRow key={`${t.category}-${t.topic}`} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                    <TableCell sx={{ fontWeight: 600, color: '#14264B', fontSize: '0.82rem' }}>{t.topic}</TableCell>
+                    <TableCell sx={{ color: '#7182A0', fontSize: '0.8rem' }}>{t.category}</TableCell>
                     <TableCell sx={{ fontSize: '0.8rem' }}>{t.attemptedCount}</TableCell>
                     <TableCell sx={{ fontSize: '0.8rem' }}>{t.correctCount}</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.82rem' }}>{t.accuracy}%</TableCell>
+                    <TableCell sx={{ fontWeight: 700, color: '#14264B', fontSize: '0.82rem' }}>{t.accuracy}%</TableCell>
                     <TableCell sx={{ fontSize: '0.8rem' }}>{t.averageScore}%</TableCell>
                     <TableCell>
                       <Chip

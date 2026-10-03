@@ -512,7 +512,7 @@ export const StudentAttemptPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#EDF2FF' }}>
       {/* 1. Distraction-Free Header Bar */}
       <Paper
         square
@@ -521,7 +521,7 @@ export const StudentAttemptPage: React.FC = () => {
           py: 1.5,
           px: { xs: 2, md: 4 },
           bgcolor: '#ffffff',
-          borderBottom: '1px solid #e2e8f0',
+          borderBottom: '1px solid #DCE6F5',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -532,14 +532,14 @@ export const StudentAttemptPage: React.FC = () => {
       >
         {/* Assessment Name */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" fontWeight={800} sx={{ color: '#0f172a' }}>
+          <Typography variant="h6" fontWeight={800} sx={{ color: '#14264B' }}>
             {attempt?.assessment?.name || 'Examination'}
           </Typography>
           <Chip
             size="small"
             label={`Section: ${currentQuestion?.category || 'General'}`}
             variant="outlined"
-            sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderColor: '#cbd5e1', color: '#475569', fontWeight: 600 }}
+            sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderColor: '#D1DEF0', color: '#526584', fontWeight: 600 }}
           />
         </Box>
 
@@ -552,7 +552,7 @@ export const StudentAttemptPage: React.FC = () => {
               syncStatus === 'SAVED' ? (
                 <CloudDoneIcon sx={{ color: '#059669 !important' }} />
               ) : syncStatus === 'SYNCING' ? (
-                <SyncIcon sx={{ color: '#2563eb !important', animation: 'spin 1s linear infinite' }} />
+                <SyncIcon sx={{ color: '#318992 !important', animation: 'spin 1s linear infinite' }} />
               ) : (
                 <CloudOffIcon sx={{ color: '#d97706 !important' }} />
               )
@@ -562,7 +562,7 @@ export const StudentAttemptPage: React.FC = () => {
               fontWeight: 600,
               fontSize: '0.75rem',
               bgcolor: syncStatus === 'SAVED' ? '#ecfdf5' : syncStatus === 'SYNCING' ? '#eff6ff' : '#fef3c7',
-              color: syncStatus === 'SAVED' ? '#047857' : syncStatus === 'SYNCING' ? '#1d4ed8' : '#b45309',
+              color: syncStatus === 'SAVED' ? '#047857' : syncStatus === 'SYNCING' ? '#267D86' : '#b45309',
               border: '1px solid',
               borderColor: syncStatus === 'SAVED' ? '#a7f3d0' : syncStatus === 'SYNCING' ? '#bfdbfe' : '#fde68a',
             }}
@@ -582,14 +582,14 @@ export const StudentAttemptPage: React.FC = () => {
                   ? '#fef2f2'
                   : (timeLeftSeconds || 0) < 300
                   ? '#fffbeb'
-                  : '#f1f5f9',
+                  : '#E7EEFA',
               border: '1px solid',
               borderColor:
                 (timeLeftSeconds || 0) < 60
                   ? '#fca5a5'
                   : (timeLeftSeconds || 0) < 300
                   ? '#fde68a'
-                  : '#cbd5e1',
+                  : '#D1DEF0',
             }}
           >
             <TimerIcon
@@ -600,7 +600,7 @@ export const StudentAttemptPage: React.FC = () => {
                     ? '#dc2626'
                     : (timeLeftSeconds || 0) < 300
                     ? '#d97706'
-                    : '#2563eb',
+                    : '#318992',
               }}
             />
             <Typography
@@ -613,7 +613,7 @@ export const StudentAttemptPage: React.FC = () => {
                     ? '#dc2626'
                     : (timeLeftSeconds || 0) < 300
                     ? '#d97706'
-                    : '#0f172a',
+                    : '#14264B',
               }}
             >
               {formatTime(timeLeftSeconds)}
@@ -691,7 +691,7 @@ export const StudentAttemptPage: React.FC = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   bgcolor: '#ffffff',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid #DCE6F5',
                   borderRadius: 2,
                 }}
               >
@@ -735,9 +735,9 @@ export const StudentAttemptPage: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: 2.5,
-                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+                boxShadow: '0 1px 3px rgba(20, 38, 75, 0.04)',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
                 MozUserSelect: 'none',
@@ -747,7 +747,7 @@ export const StudentAttemptPage: React.FC = () => {
               <Box
                 sx={{
                   p: 2.5,
-                  borderBottom: '1px solid #e2e8f0',
+                  borderBottom: '1px solid #DCE6F5',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -755,7 +755,7 @@ export const StudentAttemptPage: React.FC = () => {
                   gap: 1.5,
                 }}
               >
-                <Typography variant="h6" fontWeight={800} color="#0f172a">
+                <Typography variant="h6" fontWeight={800} color="#14264B">
                   Question {currentIndex + 1} of {questions.length}
                 </Typography>
 
@@ -776,7 +776,7 @@ export const StudentAttemptPage: React.FC = () => {
                       sx={{ fontWeight: 600 }}
                     />
                   )}
-                  <Chip size="small" label={currentQuestion.difficulty} sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 600 }} />
+                  <Chip size="small" label={currentQuestion.difficulty} sx={{ bgcolor: '#E7EEFA', color: '#526584', fontWeight: 600 }} />
                 </Box>
               </Box>
 
@@ -807,11 +807,11 @@ export const StudentAttemptPage: React.FC = () => {
                             borderRadius: 2,
                             cursor: 'pointer',
                             bgcolor: isSelected ? '#eff6ff' : '#ffffff',
-                            borderColor: isSelected ? '#2563eb' : '#e2e8f0',
+                            borderColor: isSelected ? '#318992' : '#DCE6F5',
                             transition: 'all 0.15s ease',
                             '&:hover': {
-                              bgcolor: isSelected ? '#dbeafe' : '#f8fafc',
-                              borderColor: isSelected ? '#2563eb' : '#cbd5e1',
+                              bgcolor: isSelected ? '#dbeafe' : '#EDF2FF',
+                              borderColor: isSelected ? '#318992' : '#D1DEF0',
                             },
                           }}
                         >
@@ -819,7 +819,7 @@ export const StudentAttemptPage: React.FC = () => {
                             value={opt.id}
                             control={<Radio color="primary" />}
                             label={
-                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#0f172a', fontWeight: isSelected ? 600 : 400 }}>
+                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#14264B', fontWeight: isSelected ? 600 : 400 }}>
                                 {opt.optionText}
                               </Typography>
                             }
@@ -848,11 +848,11 @@ export const StudentAttemptPage: React.FC = () => {
                             borderRadius: 2,
                             cursor: 'pointer',
                             bgcolor: isSelected ? '#eff6ff' : '#ffffff',
-                            borderColor: isSelected ? '#2563eb' : '#e2e8f0',
+                            borderColor: isSelected ? '#318992' : '#DCE6F5',
                             transition: 'all 0.15s ease',
                             '&:hover': {
-                              bgcolor: isSelected ? '#dbeafe' : '#f8fafc',
-                              borderColor: isSelected ? '#2563eb' : '#cbd5e1',
+                              bgcolor: isSelected ? '#dbeafe' : '#EDF2FF',
+                              borderColor: isSelected ? '#318992' : '#D1DEF0',
                             },
                           }}
                         >
@@ -865,7 +865,7 @@ export const StudentAttemptPage: React.FC = () => {
                               />
                             }
                             label={
-                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#0f172a', fontWeight: isSelected ? 600 : 400 }}>
+                              <Typography variant="body1" sx={{ fontSize: '1.05rem', ml: 1, color: isSelected ? '#1e40af' : '#14264B', fontWeight: isSelected ? 600 : 400 }}>
                                 {opt.optionText}
                               </Typography>
                             }
@@ -898,13 +898,13 @@ export const StudentAttemptPage: React.FC = () => {
                 sx={{
                   p: 2,
                   px: 3,
-                  borderTop: '1px solid #e2e8f0',
+                  borderTop: '1px solid #DCE6F5',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: 1.5,
-                  bgcolor: '#f8fafc',
+                  bgcolor: '#EDF2FF',
                 }}
               >
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -963,13 +963,13 @@ export const StudentAttemptPage: React.FC = () => {
             display: { xs: 'none', lg: 'flex' },
             flexDirection: 'column',
             bgcolor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 2.5,
-            boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
+            boxShadow: '0 1px 3px rgba(20, 38, 75, 0.04)',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0' }}>
-            <Typography variant="subtitle2" fontWeight={800} letterSpacing={0.5} color="#0f172a">
+          <Box sx={{ p: 2, borderBottom: '1px solid #DCE6F5' }}>
+            <Typography variant="subtitle2" fontWeight={800} letterSpacing={0.5} color="#14264B">
               Question Palette
             </Typography>
           </Box>
@@ -985,8 +985,8 @@ export const StudentAttemptPage: React.FC = () => {
                 const isMarked = ans?.isMarkedForReview;
                 const isCurrent = idx === currentIndex;
 
-                let btnBg = '#f1f5f9';
-                let btnColor = '#334155';
+                let btnBg = '#E7EEFA';
+                let btnColor = '#405678';
 
                 if (isAnswered && isMarked) {
                   btnBg = '#d97706'; // Amber: Answered & Marked
@@ -1011,7 +1011,7 @@ export const StudentAttemptPage: React.FC = () => {
                       fontWeight: 800,
                       bgcolor: btnBg,
                       color: btnColor,
-                      border: isCurrent ? '2px solid #2563eb' : '1px solid transparent',
+                      border: isCurrent ? '2px solid #318992' : '1px solid transparent',
                       boxShadow: 'none',
                       '&:hover': {
                         bgcolor: btnBg,
@@ -1025,7 +1025,7 @@ export const StudentAttemptPage: React.FC = () => {
               })}
             </Box>
 
-            <Divider sx={{ mb: 2, borderColor: '#e2e8f0' }} />
+            <Divider sx={{ mb: 2, borderColor: '#DCE6F5' }} />
 
             {/* Legend & Stats */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -1034,7 +1034,7 @@ export const StudentAttemptPage: React.FC = () => {
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#059669' }} />
                   <Typography variant="caption" color="text.secondary">Answered</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700} color="#0f172a">
+                <Typography variant="caption" fontWeight={700} color="#14264B">
                   {answeredCount}
                 </Typography>
               </Box>
@@ -1044,17 +1044,17 @@ export const StudentAttemptPage: React.FC = () => {
                   <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#7c3aed' }} />
                   <Typography variant="caption" color="text.secondary">Marked for Review</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700} color="#0f172a">
+                <Typography variant="caption" fontWeight={700} color="#14264B">
                   {reviewCount}
                 </Typography>
               </Box>
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#cbd5e1' }} />
+                  <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#D1DEF0' }} />
                   <Typography variant="caption" color="text.secondary">Unanswered</Typography>
                 </Box>
-                <Typography variant="caption" fontWeight={700} color="#0f172a">
+                <Typography variant="caption" fontWeight={700} color="#14264B">
                   {unansweredCount}
                 </Typography>
               </Box>
@@ -1073,7 +1073,7 @@ export const StudentAttemptPage: React.FC = () => {
           sx: { borderRadius: 2.5, bgcolor: '#ffffff' },
         }}
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#0f172a', fontWeight: 800 }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#14264B', fontWeight: 800 }}>
           <WarningAmberIcon color="warning" /> Confirm Test Submission
         </DialogTitle>
         <DialogContent>
@@ -1082,12 +1082,12 @@ export const StudentAttemptPage: React.FC = () => {
           </DialogContentText>
 
           {/* Submission Summary Table */}
-          <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8fafc', borderColor: '#e2e8f0', borderRadius: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2, bgcolor: '#EDF2FF', borderColor: '#DCE6F5', borderRadius: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2" color="text.secondary">
                 Total Questions:
               </Typography>
-              <Typography variant="body2" fontWeight={700} color="#0f172a">
+              <Typography variant="body2" fontWeight={700} color="#14264B">
                 {questions.length}
               </Typography>
             </Box>
@@ -1154,7 +1154,7 @@ export const StudentAttemptPage: React.FC = () => {
           {lastViolationReason.title}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: '#0f172a', fontWeight: 500, mb: 2 }}>
+          <DialogContentText sx={{ color: '#14264B', fontWeight: 500, mb: 2 }}>
             {lastViolationReason.message}
           </DialogContentText>
           <Box sx={{ p: 2, bgcolor: '#fef2f2', borderRadius: 2, border: '1px solid #fecaca', mb: 1 }}>

@@ -198,22 +198,22 @@ export const StudentDetailPage: React.FC = () => {
             startIcon={<ArrowBackIcon fontSize="small" />}
             onClick={() => navigate('/admin/students')}
             sx={{
-              color: '#0F2744',
-              borderColor: '#cbd5e1',
+              color: '#1765B5',
+              borderColor: '#D1DEF0',
               borderRadius: '6px',
               textTransform: 'none',
               fontWeight: 600,
               fontSize: '0.8125rem',
-              '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
+              '&:hover': { borderColor: '#1765B5', bgcolor: 'rgba(23, 101, 181, 0.04)' },
             }}
           >
             All Students
           </Button>
           <div>
-            <Typography variant="overline" color="#0F2744" fontWeight={700} letterSpacing={1.2}>
+            <Typography variant="overline" color="#1765B5" fontWeight={700} letterSpacing={1.2}>
               CANDIDATE DOSSIER
             </Typography>
-            <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#0f172a' }}>
+            <Typography variant="h4" fontWeight={800} letterSpacing="-0.02em" sx={{ color: '#14264B' }}>
               {student?.name || 'Loading Student...'}
             </Typography>
           </div>
@@ -227,13 +227,13 @@ export const StudentDetailPage: React.FC = () => {
               startIcon={<LaunchIcon fontSize="small" />}
               onClick={() => navigate(`/admin/students/${student.id}/performance`)}
               sx={{
-                color: '#0F2744',
-                borderColor: '#cbd5e1',
+                color: '#1765B5',
+                borderColor: '#D1DEF0',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { borderColor: '#0F2744', bgcolor: 'rgba(15, 39, 68, 0.04)' },
+                '&:hover': { borderColor: '#1765B5', bgcolor: 'rgba(23, 101, 181, 0.04)' },
               }}
             >
               Full Analytics Drilldown
@@ -246,13 +246,13 @@ export const StudentDetailPage: React.FC = () => {
               startIcon={<EditIcon fontSize="small" />}
               onClick={() => setEditDialogOpen(true)}
               sx={{
-                bgcolor: '#0F2744',
+                bgcolor: '#1765B5',
                 color: '#ffffff',
                 borderRadius: '6px',
                 textTransform: 'none',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                '&:hover': { bgcolor: '#0A1C30' },
+                '&:hover': { bgcolor: '#104B91' },
               }}
             >
               Edit Profile
@@ -269,7 +269,7 @@ export const StudentDetailPage: React.FC = () => {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={32} sx={{ color: '#0F2744' }} />
+          <CircularProgress size={32} sx={{ color: '#1765B5' }} />
         </Box>
       ) : student ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -277,7 +277,7 @@ export const StudentDetailPage: React.FC = () => {
           <Grid container spacing={3}>
             {/* Identity & Basic Details */}
             <Grid item xs={12} md={5}>
-              <Card elevation={0} sx={{ height: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', bgcolor: '#ffffff' }}>
+              <Card elevation={0} sx={{ height: '100%', border: '1px solid #DCE6F5', borderRadius: '8px', bgcolor: '#ffffff' }}>
                 <CardContent sx={{ p: 3.5 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                     <Box
@@ -285,7 +285,7 @@ export const StudentDetailPage: React.FC = () => {
                         width: 52,
                         height: 52,
                         borderRadius: '8px',
-                        bgcolor: '#0F2744',
+                        bgcolor: '#1765B5',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -294,7 +294,7 @@ export const StudentDetailPage: React.FC = () => {
                       <SchoolIcon sx={{ color: '#ffffff', fontSize: 28 }} />
                     </Box>
                     <div>
-                      <Typography variant="h6" fontWeight={700} sx={{ color: '#0f172a' }}>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: '#14264B' }}>
                         {student.name}
                       </Typography>
                       <Chip
@@ -306,7 +306,7 @@ export const StudentDetailPage: React.FC = () => {
                     </div>
                   </Box>
 
-                  <Divider sx={{ my: 2, borderColor: '#e2e8f0' }} />
+                  <Divider sx={{ my: 2, borderColor: '#DCE6F5' }} />
 
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -387,7 +387,7 @@ export const StudentDetailPage: React.FC = () => {
 
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <BusinessIcon fontSize="inherit" /> Department
                         </Typography>
@@ -401,7 +401,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <MenuBookIcon fontSize="inherit" /> Degree Course
                         </Typography>
@@ -415,7 +415,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <ClassIcon fontSize="inherit" /> Academic Class
                         </Typography>
@@ -429,7 +429,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6}>
-                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                      <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <ViewModuleIcon fontSize="inherit" /> Section
                         </Typography>
@@ -443,7 +443,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Grid>
                   </Grid>
 
-                  <Divider sx={{ my: 3, borderColor: '#e2e8f0' }} />
+                  <Divider sx={{ my: 3, borderColor: '#DCE6F5' }} />
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                     <Typography variant="caption" color="text.secondary">
@@ -461,7 +461,7 @@ export const StudentDetailPage: React.FC = () => {
           {/* ================================================================= */}
           {/* SECTION: VERIFIED PLACEMENT RESUME                                */}
           {/* ================================================================= */}
-          <Card sx={{ border: '1px solid #e2e8f0' }}>
+          <Card sx={{ border: '1px solid #DCE6F5' }}>
             <CardContent sx={{ p: 3.5 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                 <PictureAsPdfIcon sx={{ color: '#ef4444', fontSize: 26 }} />
@@ -489,8 +489,8 @@ export const StudentDetailPage: React.FC = () => {
                   sx={{
                     p: 2.5,
                     borderRadius: 2.5,
-                    bgcolor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
+                    bgcolor: '#EDF2FF',
+                    border: '1px solid #DCE6F5',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -566,7 +566,7 @@ export const StudentDetailPage: React.FC = () => {
           {/* ================================================================= */}
           {/* SECTION: STUDENT PERFORMANCE PROGRESS                             */}
           {/* ================================================================= */}
-          <Card sx={{ border: '1px solid #e2e8f0' }}>
+          <Card sx={{ border: '1px solid #DCE6F5' }}>
             <CardContent sx={{ p: 3.5 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -611,7 +611,7 @@ export const StudentDetailPage: React.FC = () => {
                   </Alert>
 
                   {progress.currentTest && (
-                    <Box sx={{ p: 2.5, borderRadius: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', maxWidth: 420 }}>
+                    <Box sx={{ p: 2.5, borderRadius: 2.5, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5', maxWidth: 420 }}>
                       <Typography variant="overline" color="primary.main" fontWeight={700}>
                         Latest Completed Assessment
                       </Typography>
@@ -640,8 +640,8 @@ export const StudentDetailPage: React.FC = () => {
                         sx={{
                           p: 3,
                           borderRadius: 2.5,
-                          bgcolor: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          bgcolor: '#EDF2FF',
+                          border: '1px solid #DCE6F5',
                           height: '100%',
                         }}
                       >
@@ -702,7 +702,7 @@ export const StudentDetailPage: React.FC = () => {
                         ) : progress.status === 'Decreased' ? (
                           <TrendingDownIcon sx={{ color: '#ef4444', fontSize: 32 }} />
                         ) : (
-                          <HorizontalRuleIcon sx={{ color: '#64748b', fontSize: 32 }} />
+                          <HorizontalRuleIcon sx={{ color: '#7182A0', fontSize: 32 }} />
                         )}
                       </Box>
 
@@ -715,7 +715,7 @@ export const StudentDetailPage: React.FC = () => {
                               ? '#10b981'
                               : progress.status === 'Decreased'
                               ? '#ef4444'
-                              : '#64748b',
+                              : '#7182A0',
                           textAlign: 'center',
                         }}
                       >
@@ -784,7 +784,7 @@ export const StudentDetailPage: React.FC = () => {
           {/* SECTION: CATEGORY / PERFORMANCE COMPARISON                        */}
           {/* ================================================================= */}
           {progress?.canCompare && (
-            <Card sx={{ border: '1px solid #e2e8f0' }}>
+            <Card sx={{ border: '1px solid #DCE6F5' }}>
               <CardContent sx={{ p: 3.5 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                   <CompareArrowsIcon color="primary" sx={{ fontSize: 26 }} />
@@ -799,7 +799,7 @@ export const StudentDetailPage: React.FC = () => {
                 {progress.categoryComparison && progress.categoryComparison.length > 0 ? (
                   <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
                     <Table size="small">
-                      <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                      <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                         <TableRow>
                           <TableCell sx={{ fontWeight: 700 }}>Assessment Category</TableCell>
                           <TableCell sx={{ fontWeight: 700 }} align="right">Previous Score</TableCell>
@@ -838,7 +838,7 @@ export const StudentDetailPage: React.FC = () => {
           {/* ================================================================= */}
           {/* SECTION: ASSESSMENT HISTORY                                       */}
           {/* ================================================================= */}
-          <Card sx={{ border: '1px solid #e2e8f0' }}>
+          <Card sx={{ border: '1px solid #DCE6F5' }}>
             <CardContent sx={{ p: 3.5 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -870,7 +870,7 @@ export const StudentDetailPage: React.FC = () => {
               ) : drilldown?.assessmentHistory && drilldown.assessmentHistory.length > 0 ? (
                 <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
                   <Table size="small">
-                    <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                    <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 700 }}>Assessment</TableCell>
                         <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
@@ -921,7 +921,7 @@ export const StudentDetailPage: React.FC = () => {
           {/* ================================================================= */}
           {/* SECTION: HUMAN EVALUATION (GD & STRUCTURED INTERVIEWS)           */}
           {/* ================================================================= */}
-          <Card sx={{ border: '1px solid #e2e8f0' }}>
+          <Card sx={{ border: '1px solid #DCE6F5' }}>
             <CardContent sx={{ p: 3.5 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                 <GroupsIcon sx={{ color: '#16a34a', fontSize: 26 }} />
@@ -936,7 +936,7 @@ export const StudentDetailPage: React.FC = () => {
               <Grid container spacing={3}>
                 {/* GD Summary */}
                 <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                       <Typography variant="subtitle1" fontWeight={700} color="#166534">
                         Group Discussion (GD)
@@ -959,7 +959,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Typography>
                     {drilldown?.humanEvaluation?.gd?.progression && drilldown.humanEvaluation.gd.progression.length > 0 ? (
                       drilldown.humanEvaluation.gd.progression.map((p: any, idx: number) => (
-                        <Box key={idx} sx={{ p: 1, my: 0.5, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                        <Box key={idx} sx={{ p: 1, my: 0.5, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #DCE6F5' }}>
                           <Typography variant="caption" fontWeight={600}>
                             {p.displayText}
                           </Typography>
@@ -975,7 +975,7 @@ export const StudentDetailPage: React.FC = () => {
 
                 {/* Interview Summary */}
                 <Grid item xs={12} md={6}>
-                  <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                       <Typography variant="subtitle1" fontWeight={700} color="#1e40af">
                         Structured Interviews
@@ -998,7 +998,7 @@ export const StudentDetailPage: React.FC = () => {
                     </Typography>
                     {drilldown?.humanEvaluation?.interview?.progression && drilldown.humanEvaluation.interview.progression.length > 0 ? (
                       drilldown.humanEvaluation.interview.progression.map((p: any, idx: number) => (
-                        <Box key={idx} sx={{ p: 1, my: 0.5, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #e2e8f0' }}>
+                        <Box key={idx} sx={{ p: 1, my: 0.5, bgcolor: '#ffffff', borderRadius: 1, border: '1px solid #DCE6F5' }}>
                           <Typography variant="caption" fontWeight={600}>
                             {p.displayText}
                           </Typography>
@@ -1026,14 +1026,14 @@ export const StudentDetailPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 2.5,
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
         <form onSubmit={handleUpdate}>
-          <DialogTitle sx={{ color: '#0f172a', fontWeight: 700, borderBottom: '1px solid #e2e8f0', pb: 2 }}>
+          <DialogTitle sx={{ color: '#14264B', fontWeight: 700, borderBottom: '1px solid #DCE6F5', pb: 2 }}>
             Edit Student Information
           </DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2.5 }}>

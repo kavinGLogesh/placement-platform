@@ -475,7 +475,7 @@ export const QuestionsPage: React.FC = () => {
                   label="Global"
                   size="small"
                   variant="outlined"
-                  sx={{ fontWeight: 500, fontSize: '0.68rem', height: 20, color: '#64748b', borderColor: '#cbd5e1' }}
+                  sx={{ fontWeight: 500, fontSize: '0.68rem', height: 20, color: '#7182A0', borderColor: '#D1DEF0' }}
                 />
               )}
             </Box>
@@ -556,7 +556,7 @@ export const QuestionsPage: React.FC = () => {
                 <Typography variant="caption" sx={{ display: 'block' }}>
                   Status: {ai.status} {ai.isApproved ? '✔ (Approved)' : ''}
                 </Typography>
-                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontStyle: 'italic', color: '#cbd5e1' }}>
+                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontStyle: 'italic', color: '#D1DEF0' }}>
                   Click to inspect full confidence breakdown or override
                 </Typography>
               </Box>
@@ -674,10 +674,10 @@ export const QuestionsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
         <div>
-          <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+          <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
             ASSESSMENT AUTHORING ENGINE
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', mb: 0.5 }}>
             Authoritative Question Bank
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -774,13 +774,13 @@ export const QuestionsPage: React.FC = () => {
           p: 2,
           mb: 2.5,
           backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           borderRadius: '8px',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <FilterListIcon sx={{ color: '#0F2744', fontSize: 18 }} />
-          <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+          <FilterListIcon sx={{ color: '#1765B5', fontSize: 18 }} />
+          <Typography variant="subtitle2" fontWeight={700} color="#14264B">
             Multi-Parameter Question Filter
           </Typography>
         </Box>
@@ -991,34 +991,34 @@ export const QuestionsPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 3,
-            boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1)',
+            boxShadow: '0 20px 25px -5px rgba(20, 38, 75, 0.1)',
           },
         }}
       >
         <form onSubmit={handleSaveQuestion}>
           <DialogTitle
             sx={{
-              color: '#0f172a',
+              color: '#14264B',
               fontWeight: 700,
               fontSize: '1.25rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '1px solid #e2e8f0',
+              borderBottom: '1px solid #DCE6F5',
               pb: 2,
             }}
           >
             <Box>
-              <Typography variant="h6" fontWeight={700} color="#0f172a">
+              <Typography variant="h6" fontWeight={700} color="#14264B">
                 {editingQuestion ? 'Edit Assessment Question' : 'Author New Assessment Question'}
               </Typography>
-              <Typography variant="caption" color="#64748b">
+              <Typography variant="caption" color="#7182A0">
                 Configure question classification, scoring weights, prompt, and answer choices.
               </Typography>
             </Box>
-            <IconButton onClick={() => setDialogOpen(false)} size="small" sx={{ color: '#64748b' }}>
+            <IconButton onClick={() => setDialogOpen(false)} size="small" sx={{ color: '#7182A0' }}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </DialogTitle>
@@ -1035,11 +1035,11 @@ export const QuestionsPage: React.FC = () => {
               sx={{
                 p: 2.5,
                 borderRadius: 2,
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0',
+                backgroundColor: '#EDF2FF',
+                border: '1px solid #DCE6F5',
               }}
             >
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 2 }}>
                 1. Question Classification & Scoring
               </Typography>
               <Grid container spacing={2}>
@@ -1179,7 +1179,7 @@ export const QuestionsPage: React.FC = () => {
             {/* SECTION 2: Question Statement / Prompt */}
             <Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 1 }}>
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                   2. Question Statement / Prompt
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -1260,8 +1260,8 @@ export const QuestionsPage: React.FC = () => {
 
               {/* Live Preview if question prompt contains images */}
               {(formText.includes('![') || formText.includes('<img') || /https?:\/\/\S+\.(?:png|jpe?g|gif|webp|svg)/i.test(formText)) && (
-                <Box sx={{ mt: 1.5, p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px dashed #cbd5e1' }}>
-                  <Typography variant="caption" fontWeight={700} color="#64748b" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
+                <Box sx={{ mt: 1.5, p: 2, bgcolor: '#EDF2FF', borderRadius: 2, border: '1px dashed #D1DEF0' }}>
+                  <Typography variant="caption" fontWeight={700} color="#7182A0" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
                     Live Prompt Preview (Rendered Graphic):
                   </Typography>
                   <QuestionContentRenderer content={formText} />
@@ -1276,16 +1276,16 @@ export const QuestionsPage: React.FC = () => {
                 sx={{
                   p: 2.5,
                   borderRadius: 2,
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
+                  backgroundColor: '#EDF2FF',
+                  border: '1px solid #DCE6F5',
                 }}
               >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                   <Box>
-                    <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                    <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                       3. Options & Correct Answer Selection
                     </Typography>
-                    <Typography variant="caption" color="#64748b">
+                    <Typography variant="caption" color="#7182A0">
                       Mark the correct option using the selector on the left.
                     </Typography>
                   </Box>
@@ -1318,7 +1318,7 @@ export const QuestionsPage: React.FC = () => {
                         alignItems: 'center',
                         gap: 1.5,
                         backgroundColor: opt.isCorrect ? '#f0fdf4' : '#ffffff',
-                        border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                        border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #D1DEF0',
                         borderRadius: 2,
                         transition: 'all 0.15s ease',
                       }}
@@ -1382,7 +1382,7 @@ export const QuestionsPage: React.FC = () => {
             {/* Fill Blank Correct Answer */}
             {formType === 'FILL_BLANK' && (
               <Box>
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
                   3. Exact Correct Answer Key
                 </Typography>
                 <TextField
@@ -1400,7 +1400,7 @@ export const QuestionsPage: React.FC = () => {
             {/* Descriptive Model Criteria */}
             {formType === 'DESCRIPTIVE' && (
               <Box>
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
                   3. Model Answer & Scoring Rubric
                 </Typography>
                 <TextField
@@ -1417,7 +1417,7 @@ export const QuestionsPage: React.FC = () => {
 
             {/* SECTION 4: Explanation */}
             <Box>
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
+              <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1 }}>
                 4. Solution Explanation & Notes
               </Typography>
               <TextField
@@ -1431,7 +1431,7 @@ export const QuestionsPage: React.FC = () => {
               />
             </Box>
           </DialogContent>
-          <DialogActions sx={{ p: 2.5, backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+          <DialogActions sx={{ p: 2.5, backgroundColor: '#EDF2FF', borderTop: '1px solid #DCE6F5' }}>
             <Button onClick={() => setDialogOpen(false)} variant="outlined" color="inherit">
               Cancel
             </Button>
@@ -1451,9 +1451,9 @@ export const QuestionsPage: React.FC = () => {
         PaperProps={{
           sx: {
             backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid #DCE6F5',
             borderRadius: 3,
-            boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1)',
+            boxShadow: '0 20px 25px -5px rgba(20, 38, 75, 0.1)',
           },
         }}
       >
@@ -1461,18 +1461,18 @@ export const QuestionsPage: React.FC = () => {
           <>
             <DialogTitle
               sx={{
-                color: '#0f172a',
+                color: '#14264B',
                 fontWeight: 700,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                borderBottom: '1px solid #e2e8f0',
+                borderBottom: '1px solid #DCE6F5',
                 pb: 2,
               }}
             >
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Chip label={viewQuestion.category.replace('_', ' ')} color="primary" size="small" sx={{ fontWeight: 700 }} />
-                <Chip label={viewQuestion.topic} variant="outlined" size="small" sx={{ fontWeight: 600, color: '#334155', borderColor: '#cbd5e1' }} />
+                <Chip label={viewQuestion.topic} variant="outlined" size="small" sx={{ fontWeight: 600, color: '#405678', borderColor: '#D1DEF0' }} />
                 <Chip
                   label={viewQuestion.difficulty}
                   size="small"
@@ -1492,20 +1492,20 @@ export const QuestionsPage: React.FC = () => {
                     label="Global Question"
                     size="small"
                     variant="outlined"
-                    sx={{ fontWeight: 600, color: '#64748b', borderColor: '#cbd5e1' }}
+                    sx={{ fontWeight: 600, color: '#7182A0', borderColor: '#D1DEF0' }}
                   />
                 )}
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Chip label={`+${viewQuestion.marks} / -${viewQuestion.negativeMarks} Marks`} size="small" sx={{ fontWeight: 700, bgcolor: '#eff6ff', color: '#1d4ed8' }} />
-                <IconButton onClick={() => setViewQuestion(null)} size="small" sx={{ color: '#64748b' }}>
+                <Chip label={`+${viewQuestion.marks} / -${viewQuestion.negativeMarks} Marks`} size="small" sx={{ fontWeight: 700, bgcolor: '#eff6ff', color: '#267D86' }} />
+                <IconButton onClick={() => setViewQuestion(null)} size="small" sx={{ color: '#7182A0' }}>
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </Box>
             </DialogTitle>
             <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 3 }}>
-              <Paper variant="outlined" sx={{ p: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 2 }}>
-                <Typography variant="caption" fontWeight={700} color="#64748b" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
+              <Paper variant="outlined" sx={{ p: 2.5, bgcolor: '#EDF2FF', border: '1px solid #DCE6F5', borderRadius: 2 }}>
+                <Typography variant="caption" fontWeight={700} color="#7182A0" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
                   Question Statement
                 </Typography>
                 <QuestionContentRenderer content={viewQuestion.questionText} />
@@ -1514,7 +1514,7 @@ export const QuestionsPage: React.FC = () => {
               {/* Options Breakdown */}
               {viewQuestion.options.length > 0 && (
                 <Box>
-                  <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1.5 }}>
+                  <Typography variant="subtitle2" fontWeight={700} color="#14264B" sx={{ mb: 1.5 }}>
                     Options & Correctness Evaluation:
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -1528,16 +1528,16 @@ export const QuestionsPage: React.FC = () => {
                           alignItems: 'center',
                           gap: 1.5,
                           bgcolor: opt.isCorrect ? '#f0fdf4' : '#ffffff',
-                          border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #e2e8f0',
+                          border: opt.isCorrect ? '1.5px solid #16a34a' : '1px solid #DCE6F5',
                           borderRadius: 2,
                         }}
                       >
                         {opt.isCorrect ? (
                           <CheckCircleIcon sx={{ color: '#16a34a', fontSize: 20 }} />
                         ) : (
-                          <Box sx={{ width: 18, height: 18, borderRadius: '50%', border: '1px solid #cbd5e1' }} />
+                          <Box sx={{ width: 18, height: 18, borderRadius: '50%', border: '1px solid #D1DEF0' }} />
                         )}
-                        <Typography variant="body2" color="#0f172a" fontWeight={opt.isCorrect ? 700 : 500}>
+                        <Typography variant="body2" color="#14264B" fontWeight={opt.isCorrect ? 700 : 500}>
                           {opt.optionText}
                         </Typography>
                         {opt.isCorrect && (
@@ -1564,27 +1564,27 @@ export const QuestionsPage: React.FC = () => {
               {/* Explanation */}
               {viewQuestion.explanation && (
                 <Box sx={{ p: 2, bgcolor: '#eff6ff', borderRadius: 2, border: '1px solid #bfdbfe' }}>
-                  <Typography variant="caption" color="#1d4ed8" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="caption" color="#267D86" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <HelpOutlineIcon fontSize="inherit" /> Solution Explanation:
                   </Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <QuestionContentRenderer content={viewQuestion.explanation} color="#1e3a8a" variant="body2" />
+                    <QuestionContentRenderer content={viewQuestion.explanation} color="#3B82D0" variant="body2" />
                   </Box>
                 </Box>
               )}
 
-              <Divider sx={{ borderColor: '#e2e8f0' }} />
+              <Divider sx={{ borderColor: '#DCE6F5' }} />
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Typography variant="caption" color="#64748b">
+                <Typography variant="caption" color="#7182A0">
                   Assessment Usages: <strong>{viewQuestion._count?.usages ?? 0} times</strong>
                 </Typography>
-                <Typography variant="caption" color="#64748b">
+                <Typography variant="caption" color="#7182A0">
                   Created: <strong>{new Date(viewQuestion.createdAt).toLocaleDateString()}</strong>
                 </Typography>
               </Box>
             </DialogContent>
-            <DialogActions sx={{ p: 2.5, bgcolor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+            <DialogActions sx={{ p: 2.5, bgcolor: '#EDF2FF', borderTop: '1px solid #DCE6F5' }}>
               <Button onClick={() => setViewQuestion(null)} variant="outlined" color="inherit">
                 Close
               </Button>

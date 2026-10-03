@@ -107,14 +107,14 @@ export const StudentChangePasswordPage: React.FC = () => {
           width: '100%',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           borderRadius: 3,
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           overflow: 'hidden',
         }}
       >
         {/* Card Header Banner */}
         <Box
           sx={{
-            bgcolor: '#1e293b',
+            bgcolor: '#33466A',
             color: '#ffffff',
             px: 3.5,
             py: 3,
@@ -140,7 +140,7 @@ export const StudentChangePasswordPage: React.FC = () => {
             <Typography variant="h6" fontWeight={700}>
               Set Permanent Password
             </Typography>
-            <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+            <Typography variant="body2" sx={{ color: '#8293B0' }}>
               First-time login setup for {user?.email}
             </Typography>
           </Box>
@@ -236,9 +236,9 @@ export const StudentChangePasswordPage: React.FC = () => {
                 mt: 2.5,
                 mb: 3,
                 p: 2,
-                bgcolor: '#f8fafc',
+                bgcolor: '#EDF2FF',
                 borderRadius: 2,
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
               }}
             >
               <Typography variant="caption" fontWeight={700} color="text.secondary" textTransform="uppercase">

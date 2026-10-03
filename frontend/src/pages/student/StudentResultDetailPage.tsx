@@ -100,8 +100,8 @@ export const StudentResultDetailPage: React.FC = () => {
           mb: 4,
           border: '1px solid rgba(255, 255, 255, 0.08)',
           background: isPassed
-            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)'
-            : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 38, 75, 0.95) 100%)'
+            : 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(20, 38, 75, 0.95) 100%)',
         }}
       >
         <CardContent sx={{ p: { xs: 3, md: 4 } }}>

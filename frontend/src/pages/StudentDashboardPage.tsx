@@ -65,7 +65,7 @@ export const StudentDashboardPage: React.FC = () => {
           p: { xs: 2.5, md: 3 },
           borderRadius: '8px',
           bgcolor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #DCE6F5',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -75,8 +75,8 @@ export const StudentDashboardPage: React.FC = () => {
       >
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <SchoolIcon sx={{ fontSize: 18, color: '#0F2744' }} />
-            <Typography variant="overline" sx={{ color: '#0F2744', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <SchoolIcon sx={{ fontSize: 18, color: '#1765B5' }} />
+            <Typography variant="overline" sx={{ color: '#1765B5', fontWeight: 700, letterSpacing: '0.06em' }}>
               CANDIDATE EXAMINATION PORTAL
             </Typography>
             <Chip
@@ -87,13 +87,13 @@ export const StudentDashboardPage: React.FC = () => {
                 fontSize: '0.7rem',
                 fontWeight: 600,
                 borderRadius: '4px',
-                bgcolor: '#F0F4F9',
-                color: '#0F2744',
-                border: '1px solid #CBD5E1',
+                bgcolor: '#E4EEFC',
+                color: '#1765B5',
+                border: '1px solid #D1DEF0',
               }}
             />
           </Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', textTransform: 'capitalize', mb: 0.5 }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', textTransform: 'capitalize', mb: 0.5 }}>
             Welcome back, {studentDisplayName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -136,7 +136,7 @@ export const StudentDashboardPage: React.FC = () => {
 
       {/* KPI Stats Grid */}
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, mb: 3.5, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 5, mb: 3.5, bgcolor: '#ffffff', borderRadius: '8px', border: '1px solid #DCE6F5' }}>
           <CircularProgress size={28} />
         </Box>
       ) : (
@@ -147,14 +147,14 @@ export const StudentDashboardPage: React.FC = () => {
               sx={{
                 p: 2.25,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 AVAILABLE ASSESSMENTS
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0F2744', my: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#1765B5', my: 0.5 }}>
                 {summary.availableAssessments}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -169,14 +169,14 @@ export const StudentDashboardPage: React.FC = () => {
               sx={{
                 p: 2.25,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 COMPLETED TESTS
               </Typography>
-              <Typography variant="h5" fontWeight={700} sx={{ color: '#0f172a', my: 0.5 }}>
+              <Typography variant="h5" fontWeight={700} sx={{ color: '#14264B', my: 0.5 }}>
                 {summary.completedAssessments}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -191,11 +191,11 @@ export const StudentDashboardPage: React.FC = () => {
               sx={{
                 p: 2.25,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 AVERAGE SCORE
               </Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#047857', my: 0.5 }}>
@@ -204,7 +204,7 @@ export const StudentDashboardPage: React.FC = () => {
               <LinearProgress
                 variant="determinate"
                 value={Math.min(100, summary.averageScore)}
-                sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#f1f5f9', '& .MuiLinearProgress-bar': { bgcolor: '#047857' } }}
+                sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#E7EEFA', '& .MuiLinearProgress-bar': { bgcolor: '#047857' } }}
               />
               <Typography variant="caption" color="text.secondary">
                 Across all completed papers
@@ -218,11 +218,11 @@ export const StudentDashboardPage: React.FC = () => {
               sx={{
                 p: 2.25,
                 bgcolor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #DCE6F5',
                 borderRadius: '8px',
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>
+              <Typography variant="caption" sx={{ color: '#7182A0', fontWeight: 600, letterSpacing: '0.04em' }}>
                 QUALIFICATION PASS RATE
               </Typography>
               <Typography variant="h5" fontWeight={700} sx={{ color: '#b45309', my: 0.5 }}>
@@ -231,7 +231,7 @@ export const StudentDashboardPage: React.FC = () => {
               <LinearProgress
                 variant="determinate"
                 value={Math.min(100, summary.passRate)}
-                sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#f1f5f9', '& .MuiLinearProgress-bar': { bgcolor: '#b45309' } }}
+                sx={{ height: 5, borderRadius: '3px', my: 0.75, bgcolor: '#E7EEFA', '& .MuiLinearProgress-bar': { bgcolor: '#b45309' } }}
               />
               <Typography variant="caption" color="text.secondary">
                 {summary.averageAccuracy}% average question accuracy
@@ -251,13 +251,13 @@ export const StudentDashboardPage: React.FC = () => {
               p: 2.5,
               height: '100%',
               bgcolor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                   Available Assessments
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -276,8 +276,8 @@ export const StudentDashboardPage: React.FC = () => {
                     key={test.id}
                     sx={{
                       p: 2,
-                      bgcolor: '#f8fafc',
-                      border: '1px solid #cbd5e1',
+                      bgcolor: '#EDF2FF',
+                      border: '1px solid #D1DEF0',
                       borderRadius: '6px',
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -286,17 +286,17 @@ export const StudentDashboardPage: React.FC = () => {
                       gap: 1.5,
                       transition: 'border-color 0.15s ease',
                       '&:hover': {
-                        borderColor: '#0F2744',
+                        borderColor: '#1765B5',
                         bgcolor: '#ffffff',
                       },
                     }}
                   >
                     <Box sx={{ flex: 1, minWidth: 200 }}>
-                      <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                      <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                         {test.title}
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.75, flexWrap: 'wrap' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#64748b' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#7182A0' }}>
                           <AccessTimeIcon sx={{ fontSize: 15 }} />
                           <Typography variant="caption" fontWeight={600}>
                             {test.durationMinutes} mins
@@ -305,12 +305,12 @@ export const StudentDashboardPage: React.FC = () => {
                         <Chip
                           label={`${test.totalMarks} Marks`}
                           size="small"
-                          sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#ffffff', border: '1px solid #cbd5e1', fontWeight: 600, borderRadius: '3px' }}
+                          sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#ffffff', border: '1px solid #D1DEF0', fontWeight: 600, borderRadius: '3px' }}
                         />
                         <Chip
                           label={`Pass: ${test.passingPercentage}%`}
                           size="small"
-                          sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#ffffff', border: '1px solid #cbd5e1', color: '#047857', fontWeight: 600, borderRadius: '3px' }}
+                          sx={{ height: 20, fontSize: '0.7rem', bgcolor: '#ffffff', border: '1px solid #D1DEF0', color: '#047857', fontWeight: 600, borderRadius: '3px' }}
                         />
                       </Box>
                     </Box>
@@ -328,9 +328,9 @@ export const StudentDashboardPage: React.FC = () => {
                 ))}
               </Box>
             ) : (
-              <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#f8fafc', borderRadius: '6px', border: '1px dashed #cbd5e1' }}>
+              <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#EDF2FF', borderRadius: '6px', border: '1px dashed #D1DEF0' }}>
                 <CheckCircleOutlineIcon sx={{ fontSize: 32, color: '#047857', mb: 1 }} />
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                   You are all caught up!
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
@@ -349,13 +349,13 @@ export const StudentDashboardPage: React.FC = () => {
               p: 2.5,
               height: '100%',
               bgcolor: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid #DCE6F5',
               borderRadius: '8px',
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
-                <Typography variant="subtitle1" fontWeight={700} color="#0f172a">
+                <Typography variant="subtitle1" fontWeight={700} color="#14264B">
                   Recent Results
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -370,28 +370,28 @@ export const StudentDashboardPage: React.FC = () => {
             {dashboardData?.recentResults && dashboardData.recentResults.length > 0 ? (
               <TableContainer>
                 <Table size="small">
-                  <TableHead sx={{ bgcolor: '#f8fafc' }}>
+                  <TableHead sx={{ bgcolor: '#EDF2FF' }}>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Assessment</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Score</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Accuracy</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 700, color: '#475569', fontSize: '0.78rem', py: 1.25 }} align="right">Action</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Assessment</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Score</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Accuracy</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: '#526584', fontSize: '0.78rem', py: 1.25 }} align="right">Action</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {dashboardData.recentResults.map((r) => (
-                      <TableRow key={r.id} hover sx={{ '&:hover': { bgcolor: '#f8fafc' } }}>
-                        <TableCell sx={{ fontWeight: 600, color: '#0f172a', fontSize: '0.82rem' }}>{r.assessmentTitle}</TableCell>
+                      <TableRow key={r.id} hover sx={{ '&:hover': { bgcolor: '#EDF2FF' } }}>
+                        <TableCell sx={{ fontWeight: 600, color: '#14264B', fontSize: '0.82rem' }}>{r.assessmentTitle}</TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={700} color="#0f172a" sx={{ fontSize: '0.82rem' }}>
+                          <Typography variant="body2" fontWeight={700} color="#14264B" sx={{ fontSize: '0.82rem' }}>
                             {r.percentage}%
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             {r.obtainedMarks}/{r.totalMarks} marks
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ color: '#334155', fontWeight: 600, fontSize: '0.82rem' }}>{r.accuracy}%</TableCell>
+                        <TableCell sx={{ color: '#405678', fontWeight: 600, fontSize: '0.82rem' }}>{r.accuracy}%</TableCell>
                         <TableCell>
                           <Chip
                             icon={r.isPassed ? <CheckCircleOutlineIcon sx={{ '&&': { fontSize: 14 } }} /> : <CancelOutlinedIcon sx={{ '&&': { fontSize: 14 } }} />}
@@ -424,9 +424,9 @@ export const StudentDashboardPage: React.FC = () => {
                 </Table>
               </TableContainer>
             ) : (
-              <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#f8fafc', borderRadius: '6px', border: '1px dashed #cbd5e1' }}>
-                <EmojiEventsIcon sx={{ fontSize: 32, color: '#94a3b8', mb: 1 }} />
-                <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+              <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#EDF2FF', borderRadius: '6px', border: '1px dashed #D1DEF0' }}>
+                <EmojiEventsIcon sx={{ fontSize: 32, color: '#8293B0', mb: 1 }} />
+                <Typography variant="subtitle2" fontWeight={700} color="#14264B">
                   No submissions yet
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
