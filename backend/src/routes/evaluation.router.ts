@@ -76,6 +76,12 @@ gdAdminRouter.post(
   evaluationController.submitGdEvaluation
 );
 
+gdAdminRouter.post(
+  '/:id/evaluations/bulk',
+  requireRole(Role.PLACEMENT_ADMIN),
+  evaluationController.bulkEvaluateGd
+);
+
 // =============================================================================
 // INTERVIEW ROUNDS (ADMIN & EVALUATOR)
 // =============================================================================
@@ -140,6 +146,12 @@ interviewAdminRouter.post(
   '/:id/evaluate',
   requireRole(Role.PLACEMENT_ADMIN),
   evaluationController.submitInterviewEvaluation
+);
+
+interviewAdminRouter.post(
+  '/:id/evaluations/bulk',
+  requireRole(Role.PLACEMENT_ADMIN),
+  evaluationController.bulkEvaluateInterview
 );
 
 // =============================================================================

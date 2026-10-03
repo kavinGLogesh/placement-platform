@@ -33,9 +33,16 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CloseIcon from '@mui/icons-material/Close';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { DataTable, Column } from '../../components/management/DataTable.js';
 import { ConfirmDialog } from '../../components/management/ConfirmDialog.js';
+import { AiQuestionImportDialog } from '../../components/question/AiQuestionImportDialog.js';
+import { AiClassificationReviewDialog } from '../../components/question/AiClassificationReviewDialog.js';
 import { questionService } from '../../services/question.service.js';
+import { companyService } from '../../services/company.service.js';
+import { CompanyDto } from '../../types/company.types.js';
+import { QuestionContentRenderer } from '../../components/common/QuestionContentRenderer.js';
 import {
   Question,
   CreateQuestionInput,
@@ -44,6 +51,7 @@ import {
   QuestionDifficulty,
   QuestionType,
   QuestionStatus,
+  AiClassificationStatus,
   CATEGORY_TOPICS_MAP,
   CreateQuestionOptionInput,
 } from '../../types/question.types.js';
@@ -51,6 +59,7 @@ import {
 export const QuestionsPage: React.FC = () => {
   // Data & Pagination
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [companies, setCompanies] = useState<CompanyDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -68,24 +77,36 @@ export const QuestionsPage: React.FC = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<QuestionDifficulty | ''>('');
   const [typeFilter, setTypeFilter] = useState<QuestionType | ''>('');
   const [statusFilter, setStatusFilter] = useState<QuestionStatus | ''>('');
+  const [aiStatusFilter, setAiStatusFilter] = useState<AiClassificationStatus | ''>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // AI Review & Intelligence State
+  const [reviewQuestion, setReviewQuestion] = useState<Question | null>(null);
+  const [classifyingId, setClassifyingId] = useState<string | null>(null);
+  const [batchClassifying, setBatchClassifying] = useState(false);
+  const [detectingMetadata, setDetectingMetadata] = useState(false);
+  const [detectedConfidenceBadge, setDetectedConfidenceBadge] = useState<string | null>(null);
 
   // Detail View Dialog
   const [viewQuestion, setViewQuestion] = useState<Question | null>(null);
 
   // Create / Edit Dialog
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Form State
+  const [formCompanyId, setFormCompanyId] = useState<string>('');
   const [formCategory, setFormCategory] = useState<QuestionCategory>('QUANTITATIVE_APTITUDE');
   const [formTopic, setFormTopic] = useState<string>('Percentage');
   const [formDifficulty, setFormDifficulty] = useState<QuestionDifficulty>('MEDIUM');
   const [formType, setFormType] = useState<QuestionType>('SINGLE_CHOICE');
   const [formText, setFormText] = useState<string>('');
+  const [showImageHelper, setShowImageHelper] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
   const [formMarks, setFormMarks] = useState<number>(1.0);
   const [formNegativeMarks, setFormNegativeMarks] = useState<number>(0.0);
   const [formCorrectAnswer, setFormCorrectAnswer] = useState<string>('');
@@ -116,6 +137,7 @@ export const QuestionsPage: React.FC = () => {
         difficulty: difficultyFilter || undefined,
         questionType: typeFilter || undefined,
         status: statusFilter || undefined,
+        aiStatus: aiStatusFilter || undefined,
         companyId: companyFilter || undefined,
         sortBy: sortBy as 'createdAt' | 'marks' | 'difficulty' | 'questionType' | 'category',
         sortOrder,
@@ -128,11 +150,30 @@ export const QuestionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, search, categoryFilter, topicFilter, difficultyFilter, typeFilter, statusFilter, companyFilter, sortBy, sortOrder]);
+  }, [page, rowsPerPage, search, categoryFilter, topicFilter, difficultyFilter, typeFilter, statusFilter, aiStatusFilter, companyFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
+
+  useEffect(() => {
+    companyService
+      .getCompanies({ limit: 100 })
+      .then((res) => {
+        if (res && res.data) {
+          setCompanies(res.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load companies:', err);
+      });
+  }, []);
+
+  useEffect(() => {
+    setCompanyFilter(urlCompanyId);
+  }, [urlCompanyId]);
+
+  const currentFilteredCompany = companies.find((c) => c.id === companyFilter);
 
   // Dynamic available topics based on chosen category
   const filterTopics = categoryFilter ? CATEGORY_TOPICS_MAP[categoryFilter] : [];
@@ -160,8 +201,12 @@ export const QuestionsPage: React.FC = () => {
 
   const handleOpenDialog = (q?: Question) => {
     setFormError(null);
+    setShowImageHelper(false);
+    setImageUrlInput('');
+    setDetectedConfidenceBadge(null);
     if (q) {
       setEditingQuestion(q);
+      setFormCompanyId(q.companyId || '');
       setFormCategory(q.category);
       setFormTopic(q.topic);
       setFormDifficulty(q.difficulty);
@@ -181,6 +226,7 @@ export const QuestionsPage: React.FC = () => {
       );
     } else {
       setEditingQuestion(null);
+      setFormCompanyId(companyFilter || '');
       const defaultCat: QuestionCategory = categoryFilter || 'QUANTITATIVE_APTITUDE';
       const defaultTopic = CATEGORY_TOPICS_MAP[defaultCat][0] || 'Percentage';
       setFormCategory(defaultCat);
@@ -235,6 +281,7 @@ export const QuestionsPage: React.FC = () => {
     setSaving(true);
     try {
       const payload: CreateQuestionInput = {
+        companyId: formCompanyId ? formCompanyId : null,
         category: formCategory,
         topic: formTopic,
         difficulty: formDifficulty,
@@ -307,6 +354,62 @@ export const QuestionsPage: React.FC = () => {
     }
   };
 
+  const handleQuickClassify = async (questionId: string) => {
+    setClassifyingId(questionId);
+    try {
+      const updated = await questionService.classifyQuestion(questionId);
+      setQuestions((prev) => prev.map((q) => (q.id === questionId ? updated : q)));
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Classification failed';
+      setError(msg);
+    } finally {
+      setClassifyingId(null);
+    }
+  };
+
+  const handleBatchClassify = async () => {
+    if (questions.length === 0) return;
+    setBatchClassifying(true);
+    try {
+      const ids = questions.map((q) => q.id);
+      await questionService.batchClassifyQuestions(ids);
+      await fetchQuestions();
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Batch classification failed';
+      setError(msg);
+    } finally {
+      setBatchClassifying(false);
+    }
+  };
+
+  const handleAutoDetectMetadata = async () => {
+    if (!formText.trim()) return;
+    setDetectingMetadata(true);
+    try {
+      const res = await questionService.autoDetectClassification({
+        questionText: formText.trim(),
+        options: formOptions.filter((o) => o.optionText.trim()),
+        correctAnswer: formCorrectAnswer.trim() || undefined,
+        explanation: formExplanation.trim() || undefined,
+      });
+
+      setFormCategory(res.category);
+      setFormTopic(res.topic);
+      setFormDifficulty(res.difficulty);
+      setFormType(res.questionType);
+      setDetectedConfidenceBadge(
+        `AI Identified: ${res.category.replace(/_/g, ' ')} → ${res.topic} (${res.difficulty}) with ${Math.round(
+          (res.confidence.overall || 0.8) * 100
+        )}% confidence. ${res.reasoning || ''}`
+      );
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : 'Auto-detect failed';
+      setFormError(msg);
+    } finally {
+      setDetectingMetadata(false);
+    }
+  };
+
   const columns: Column<Question>[] = [
     {
       id: 'questionText',
@@ -337,30 +440,143 @@ export const QuestionsPage: React.FC = () => {
     },
     {
       id: 'category',
-      label: 'Category & Topic',
-      minWidth: 180,
+      label: 'Category & Track',
+      minWidth: 200,
       sortable: true,
-      render: (q) => (
-        <div>
-          <Chip
-            label={q.category.replace('_', ' ')}
-            size="small"
-            color={
-              q.category === 'TECHNICAL_MCQ'
-                ? 'primary'
-                : q.category === 'CODING'
-                  ? 'secondary'
-                  : q.category === 'QUANTITATIVE_APTITUDE'
-                    ? 'info'
-                    : 'default'
+      render: (q) => {
+        const companyName = q.company?.name || companies.find((c) => c.id === q.companyId)?.name;
+        return (
+          <div>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5, flexWrap: 'wrap' }}>
+              <Chip
+                label={q.category.replace('_', ' ')}
+                size="small"
+                color={
+                  q.category === 'TECHNICAL_MCQ'
+                    ? 'primary'
+                    : q.category === 'CODING'
+                      ? 'secondary'
+                      : q.category === 'QUANTITATIVE_APTITUDE'
+                        ? 'info'
+                        : 'default'
+                }
+                sx={{ fontWeight: 700, fontSize: '0.7rem', height: 20 }}
+              />
+              {companyName ? (
+                <Chip
+                  label={companyName}
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                  sx={{ fontWeight: 600, fontSize: '0.68rem', height: 20 }}
+                />
+              ) : (
+                <Chip
+                  label="Global"
+                  size="small"
+                  variant="outlined"
+                  sx={{ fontWeight: 500, fontSize: '0.68rem', height: 20, color: '#64748b', borderColor: '#cbd5e1' }}
+                />
+              )}
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {q.topic}
+            </Typography>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'aiClassification',
+      label: 'AI Intelligence',
+      minWidth: 160,
+      render: (q) => {
+        const ai = q.aiClassification;
+        const isClassifying = classifyingId === q.id;
+
+        if (isClassifying) {
+          return (
+            <Chip
+              size="small"
+              icon={<CircularProgress size={12} color="inherit" />}
+              label="Analyzing..."
+              sx={{ bgcolor: '#e0f2fe', color: '#0369a1', fontWeight: 600, fontSize: '0.7rem' }}
+            />
+          );
+        }
+
+        if (!ai) {
+          return (
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<AutoAwesomeIcon sx={{ fontSize: '13px !important', color: '#0284c7' }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleQuickClassify(q.id);
+              }}
+              sx={{ fontSize: '0.72rem', textTransform: 'none', py: 0.2, color: '#0284c7', fontWeight: 600 }}
+            >
+              Classify
+            </Button>
+          );
+        }
+
+        const confPercent = Math.round(ai.overallConfidence * 100);
+        let color: 'success' | 'warning' | 'info' | 'error' = 'info';
+        let label = ai.status as string;
+
+        if (ai.status === 'CLASSIFIED') {
+          color = 'success';
+          label = `AI: ${confPercent}%`;
+        } else if (ai.status === 'NEEDS_REVIEW') {
+          color = 'warning';
+          label = `Review (${confPercent}%)`;
+        } else if (ai.status === 'AI_FAILED') {
+          color = 'error';
+          label = 'AI Failed';
+        } else {
+          color = 'info';
+          label = 'AI Pending';
+        }
+
+        return (
+          <Tooltip
+            title={
+              <Box sx={{ p: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', color: '#38bdf8' }}>
+                  AI Semantic Intelligence
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block' }}>
+                  Topic: {ai.suggestedTopic} ({Math.round(ai.topicConfidence * 100)}%)
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block' }}>
+                  Difficulty: {ai.suggestedDifficulty} ({Math.round(ai.difficultyConfidence * 100)}%)
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block' }}>
+                  Status: {ai.status} {ai.isApproved ? '✔ (Approved)' : ''}
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontStyle: 'italic', color: '#cbd5e1' }}>
+                  Click to inspect full confidence breakdown or override
+                </Typography>
+              </Box>
             }
-            sx={{ fontWeight: 700, fontSize: '0.7rem', height: 20, mb: 0.5 }}
-          />
-          <Typography variant="body2" color="text.secondary">
-            {q.topic}
-          </Typography>
-        </div>
-      ),
+          >
+            <Chip
+              label={label}
+              size="small"
+              color={color}
+              variant={ai.status === 'CLASSIFIED' ? 'filled' : 'outlined'}
+              icon={<AutoAwesomeIcon sx={{ fontSize: '13px !important' }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                setReviewQuestion(q);
+              }}
+              sx={{ fontWeight: 700, fontSize: '0.7rem', height: 22, cursor: 'pointer' }}
+            />
+          </Tooltip>
+        );
+      },
     },
     {
       id: 'difficulty',
@@ -428,6 +644,11 @@ export const QuestionsPage: React.FC = () => {
       align: 'right',
       render: (q) => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Tooltip title="AI Intelligence & Review">
+            <IconButton size="small" onClick={() => setReviewQuestion(q)} sx={{ color: '#0284c7' }}>
+              <AutoAwesomeIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="View Question Details">
             <IconButton size="small" onClick={() => setViewQuestion(q)} sx={{ color: 'secondary.light' }}>
               <VisibilityIcon fontSize="small" />
@@ -474,6 +695,33 @@ export const QuestionsPage: React.FC = () => {
             Refresh
           </Button>
           <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={batchClassifying ? <CircularProgress size={14} color="inherit" /> : <AutoAwesomeIcon />}
+            onClick={handleBatchClassify}
+            disabled={loading || batchClassifying || questions.length === 0}
+            sx={{ fontWeight: 600 }}
+          >
+            {batchClassifying ? 'Classifying...' : 'Batch AI Classify'}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<AutoAwesomeIcon sx={{ color: '#0284c7' }} />}
+            onClick={() => setImportDialogOpen(true)}
+            sx={{
+              fontWeight: 600,
+              borderColor: '#38bdf8',
+              bgcolor: '#f0f9ff',
+              '&:hover': {
+                borderColor: '#0284c7',
+                bgcolor: '#e0f2fe',
+              },
+            }}
+          >
+            Import Question
+          </Button>
+          <Button
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
@@ -498,16 +746,24 @@ export const QuestionsPage: React.FC = () => {
             <Button
               color="inherit"
               size="small"
+              variant="outlined"
+              sx={{ bgcolor: 'rgba(255, 255, 255, 0.8)', borderColor: 'rgba(0,0,0,0.15)' }}
               onClick={() => {
                 setCompanyFilter('');
                 setSearchParams({});
+                setPage(0);
               }}
             >
-              Clear Filter
+              Clear Filter (Show All)
             </Button>
           }
         >
-          Filtering Question Bank by Company Track ID: <strong>{companyFilter}</strong>
+          Filtering Question Bank by Company Track:{' '}
+          <strong>
+            {currentFilteredCompany
+              ? `${currentFilteredCompany.name} (${currentFilteredCompany.code})`
+              : companyFilter}
+          </strong>
         </Alert>
       )}
 
@@ -530,7 +786,30 @@ export const QuestionsPage: React.FC = () => {
         </Box>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Company Track</InputLabel>
+              <Select
+                value={companyFilter}
+                label="Company Track"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCompanyFilter(val);
+                  setSearchParams(val ? { companyId: val } : {});
+                  setPage(0);
+                }}
+              >
+                <MenuItem value="">All Companies (Global)</MenuItem>
+                {companies.map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.name} ({c.code})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl size="small" fullWidth>
               <InputLabel>Category</InputLabel>
               <Select
@@ -551,7 +830,7 @@ export const QuestionsPage: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl size="small" fullWidth>
               <InputLabel>Topic</InputLabel>
               <Select
@@ -573,7 +852,7 @@ export const QuestionsPage: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4} md={2}>
+          <Grid item xs={12} sm={4} md={1.7}>
             <FormControl size="small" fullWidth>
               <InputLabel>Difficulty</InputLabel>
               <Select
@@ -592,7 +871,7 @@ export const QuestionsPage: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4} md={2}>
+          <Grid item xs={12} sm={4} md={1.7}>
             <FormControl size="small" fullWidth>
               <InputLabel>Question Type</InputLabel>
               <Select
@@ -613,7 +892,7 @@ export const QuestionsPage: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4} md={1.6}>
+          <Grid item xs={12} sm={4} md={1.4}>
             <FormControl size="small" fullWidth>
               <InputLabel>Status</InputLabel>
               <Select
@@ -633,7 +912,27 @@ export const QuestionsPage: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} md={1.6}>
+          <Grid item xs={12} sm={4} md={1.6}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>AI Intelligence</InputLabel>
+              <Select
+                value={aiStatusFilter}
+                label="AI Intelligence"
+                onChange={(e) => {
+                  setAiStatusFilter(e.target.value as AiClassificationStatus | '');
+                  setPage(0);
+                }}
+              >
+                <MenuItem value="">All AI Statuses</MenuItem>
+                <MenuItem value="CLASSIFIED">Classified</MenuItem>
+                <MenuItem value="NEEDS_REVIEW">Needs Review</MenuItem>
+                <MenuItem value="AI_PENDING">AI Pending</MenuItem>
+                <MenuItem value="AI_FAILED">AI Failed</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} md={1.2}>
             <Button
               variant="outlined"
               color="inherit"
@@ -646,6 +945,9 @@ export const QuestionsPage: React.FC = () => {
                 setDifficultyFilter('');
                 setTypeFilter('');
                 setStatusFilter('');
+                setAiStatusFilter('');
+                setCompanyFilter('');
+                setSearchParams({});
                 setPage(0);
               }}
             >
@@ -744,6 +1046,26 @@ export const QuestionsPage: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     select
+                    label="Company Track Association"
+                    fullWidth
+                    value={formCompanyId}
+                    onChange={(e) => setFormCompanyId(e.target.value)}
+                    helperText="Assign to a company track or leave General (Global Bank)"
+                  >
+                    <MenuItem value="">
+                      <em>General / Global (All Companies)</em>
+                    </MenuItem>
+                    {companies.map((c) => (
+                      <MenuItem key={c.id} value={c.id}>
+                        {c.name} ({c.code})
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    select
                     label="Category"
                     required
                     fullWidth
@@ -779,7 +1101,7 @@ export const QuestionsPage: React.FC = () => {
                   </TextField>
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <TextField
                     select
                     label="Difficulty"
@@ -794,7 +1116,7 @@ export const QuestionsPage: React.FC = () => {
                   </TextField>
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <TextField
                     select
                     label="Question Type"
@@ -811,7 +1133,7 @@ export const QuestionsPage: React.FC = () => {
                   </TextField>
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <TextField
                     select
                     label="Status"
@@ -856,9 +1178,75 @@ export const QuestionsPage: React.FC = () => {
 
             {/* SECTION 2: Question Statement / Prompt */}
             <Box>
-              <Typography variant="subtitle2" fontWeight={700} color="#0f172a" sx={{ mb: 1 }}>
-                2. Question Statement / Prompt
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 1 }}>
+                <Typography variant="subtitle2" fontWeight={700} color="#0f172a">
+                  2. Question Statement / Prompt
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="secondary"
+                    startIcon={detectingMetadata ? <CircularProgress size={14} color="inherit" /> : <AutoAwesomeIcon />}
+                    onClick={handleAutoDetectMetadata}
+                    disabled={detectingMetadata || !formText.trim()}
+                    sx={{ textTransform: 'none', py: 0.3, fontWeight: 700 }}
+                  >
+                    {detectingMetadata ? 'Detecting Concept...' : 'AI Auto-Detect'}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<AddPhotoAlternateIcon />}
+                    onClick={() => setShowImageHelper(!showImageHelper)}
+                    sx={{ textTransform: 'none', py: 0.3 }}
+                  >
+                    {showImageHelper ? 'Hide Image Tool' : 'Insert Image / Diagram'}
+                  </Button>
+                </Box>
+              </Box>
+
+              {detectedConfidenceBadge && (
+                <Alert severity="success" sx={{ mb: 1.5, py: 0.5, fontSize: '0.85rem' }} onClose={() => setDetectedConfidenceBadge(null)}>
+                  {detectedConfidenceBadge}
+                </Alert>
+              )}
+
+              {showImageHelper && (
+                <Paper variant="outlined" sx={{ p: 2, mb: 1.5, bgcolor: '#f0f9ff', borderColor: '#bae6fd' }}>
+                  <Typography variant="caption" fontWeight={700} color="#0369a1" sx={{ display: 'block', mb: 1 }}>
+                    Attach Diagram / Image to Question (Supports URL or markdown):
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      placeholder="Paste Image URL (e.g. https://... or hosted image link)"
+                      value={imageUrlInput}
+                      onChange={(e) => setImageUrlInput(e.target.value)}
+                    />
+                    <Button
+                      variant="contained"
+                      size="small"
+                      disabled={!imageUrlInput.trim()}
+                      onClick={() => {
+                        const trimmed = imageUrlInput.trim();
+                        if (trimmed) {
+                          const tag = `\n\n![Question Diagram](${trimmed})\n`;
+                          setFormText((prev) => prev + tag);
+                          setImageUrlInput('');
+                        }
+                      }}
+                    >
+                      Insert
+                    </Button>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }}>
+                    Tip: You can also directly paste <code>![Image description](https://url)</code> or an image URL anywhere in the question text.
+                  </Typography>
+                </Paper>
+              )}
+
               <TextField
                 label="Question Text"
                 required
@@ -867,8 +1255,18 @@ export const QuestionsPage: React.FC = () => {
                 rows={3}
                 value={formText}
                 onChange={(e) => setFormText(e.target.value)}
-                placeholder="Enter the complete question prompt, code snippet, or scenario..."
+                placeholder="Enter the complete question prompt, code snippet, scenario, or diagram..."
               />
+
+              {/* Live Preview if question prompt contains images */}
+              {(formText.includes('![') || formText.includes('<img') || /https?:\/\/\S+\.(?:png|jpe?g|gif|webp|svg)/i.test(formText)) && (
+                <Box sx={{ mt: 1.5, p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px dashed #cbd5e1' }}>
+                  <Typography variant="caption" fontWeight={700} color="#64748b" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
+                    Live Prompt Preview (Rendered Graphic):
+                  </Typography>
+                  <QuestionContentRenderer content={formText} />
+                </Box>
+              )}
             </Box>
 
             {/* SECTION 3: Dynamic Options Management */}
@@ -1081,6 +1479,22 @@ export const QuestionsPage: React.FC = () => {
                   color={viewQuestion.difficulty === 'EASY' ? 'success' : viewQuestion.difficulty === 'MEDIUM' ? 'warning' : 'error'}
                   sx={{ fontWeight: 700 }}
                 />
+                {viewQuestion.company ? (
+                  <Chip
+                    label={`Company: ${viewQuestion.company.name} (${viewQuestion.company.code})`}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                    sx={{ fontWeight: 700 }}
+                  />
+                ) : (
+                  <Chip
+                    label="Global Question"
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, color: '#64748b', borderColor: '#cbd5e1' }}
+                  />
+                )}
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Chip label={`+${viewQuestion.marks} / -${viewQuestion.negativeMarks} Marks`} size="small" sx={{ fontWeight: 700, bgcolor: '#eff6ff', color: '#1d4ed8' }} />
@@ -1094,9 +1508,7 @@ export const QuestionsPage: React.FC = () => {
                 <Typography variant="caption" fontWeight={700} color="#64748b" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 1 }}>
                   Question Statement
                 </Typography>
-                <Typography variant="body1" fontWeight={600} color="#0f172a" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-                  {viewQuestion.questionText}
-                </Typography>
+                <QuestionContentRenderer content={viewQuestion.questionText} />
               </Paper>
 
               {/* Options Breakdown */}
@@ -1155,9 +1567,9 @@ export const QuestionsPage: React.FC = () => {
                   <Typography variant="caption" color="#1d4ed8" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <HelpOutlineIcon fontSize="inherit" /> Solution Explanation:
                   </Typography>
-                  <Typography variant="body2" color="#1e3a8a" sx={{ mt: 0.5, lineHeight: 1.6 }}>
-                    {viewQuestion.explanation}
-                  </Typography>
+                  <Box sx={{ mt: 0.5 }}>
+                    <QuestionContentRenderer content={viewQuestion.explanation} color="#1e3a8a" variant="body2" />
+                  </Box>
                 </Box>
               )}
 
@@ -1180,6 +1592,30 @@ export const QuestionsPage: React.FC = () => {
           </>
         )}
       </Dialog>
+
+      {/* AI Question Import Dialog */}
+      <AiQuestionImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        onSuccess={() => {
+          fetchQuestions();
+        }}
+        companies={companies}
+        defaultCompanyId={companyFilter}
+      />
+
+      {/* AI Classification Review & Approval Dialog */}
+      <AiClassificationReviewDialog
+        open={Boolean(reviewQuestion)}
+        question={reviewQuestion}
+        onClose={() => setReviewQuestion(null)}
+        onSuccess={(updated) => {
+          setQuestions((prev) => prev.map((q) => (q.id === updated.id ? updated : q)));
+          if (viewQuestion?.id === updated.id) {
+            setViewQuestion(updated);
+          }
+        }}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDialog

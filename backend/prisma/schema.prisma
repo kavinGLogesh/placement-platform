@@ -55,6 +55,7 @@ model User {
   interviewRoundsEvaluated InterviewRound[]       @relation("InterviewEvaluator")
   interviewRoundsCreated   InterviewRound[]       @relation("InterviewCreator")
   interviewEvaluations     InterviewEvaluation[]
+  approvedQuestionClassifications QuestionAiClassification[] @relation("ApprovedClassifications")
 
   @@map("users")
 }
@@ -292,6 +293,7 @@ model Question {
   companyQuestions  CompanyQuestion[]
   duplicateCandidatesAsOriginal QuestionDuplicateCandidate[] @relation("OriginalQuestionDuplicates")
   duplicateCandidatesAsCandidate QuestionDuplicateCandidate[] @relation("CandidateQuestionDuplicates")
+  aiClassification              QuestionAiClassification?
 
   @@index([companyId])
   @@index([exactHash])
@@ -349,6 +351,45 @@ model QuestionDuplicateCandidate {
   @@index([candidateQuestionId])
   @@index([status])
   @@map("question_duplicate_candidates")
+}
+
+enum AiClassificationStatus {
+  AI_PENDING
+  CLASSIFIED
+  NEEDS_REVIEW
+  AI_FAILED
+}
+
+model QuestionAiClassification {
+  id                    String                 @id @default(uuid())
+  questionId            String                 @unique
+  suggestedCategory     QuestionCategory
+  suggestedTopic        String                 @db.VarChar(191)
+  suggestedDifficulty   QuestionDifficulty
+  suggestedQuestionType QuestionType
+  categoryConfidence    Float                  @default(0.0)
+  topicConfidence       Float                  @default(0.0)
+  difficultyConfidence  Float                  @default(0.0)
+  typeConfidence        Float                  @default(0.0)
+  overallConfidence     Float                  @default(0.0)
+  reasoning             String?                @db.Text
+  status                AiClassificationStatus @default(AI_PENDING)
+  rawAiResponse         String?                @db.Text
+  errorMessage          String?                @db.Text
+  modelName             String?                @db.VarChar(64)
+  isApproved            Boolean                @default(false)
+  approvedAt            DateTime?
+  approvedById          String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  question              Question               @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  approvedBy            User?                  @relation("ApprovedClassifications", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@index([questionId])
+  @@index([status])
+  @@index([isApproved])
+  @@map("question_ai_classifications")
 }
 
 model QuestionOption {
@@ -746,6 +787,7 @@ enum AttendanceStatus {
 
 enum EvaluationStatus {
   PENDING
+  DRAFT
   EVALUATED
 }
 

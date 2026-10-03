@@ -37,6 +37,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { useParams, useNavigate } from 'react-router-dom';
 import { attemptService } from '../../services/attempt.service.js';
+import { QuestionContentRenderer } from '../../components/common/QuestionContentRenderer.js';
 import {
   AssessmentAttemptDto,
   SanitizedPaperQuestionDto,
@@ -781,9 +782,9 @@ export const StudentAttemptPage: React.FC = () => {
 
               {/* Question Content & Options */}
               <CardContent sx={{ flexGrow: 1, p: { xs: 2.5, md: 4 }, overflowY: 'auto' }}>
-                <Typography variant="body1" sx={{ fontSize: '1.15rem', fontWeight: 500, lineHeight: 1.6, mb: 4, color: '#0f172a' }}>
-                  {currentQuestion.questionText}
-                </Typography>
+                <Box sx={{ mb: 4 }}>
+                  <QuestionContentRenderer content={currentQuestion.questionText} sx={{ fontSize: '1.15rem', fontWeight: 500 }} />
+                </Box>
 
                 {/* Single Choice / True False: Radio Group */}
                 {(currentQuestion.questionType === 'SINGLE_CHOICE' ||

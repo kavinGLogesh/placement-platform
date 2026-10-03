@@ -2,7 +2,7 @@ export type GdRoundStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELL
 export type InterviewType = 'MOCK' | 'HR' | 'TECHNICAL' | 'MANAGERIAL';
 export type InterviewRoundStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'PENDING';
-export type EvaluationStatus = 'COMPLETED' | 'DRAFT';
+export type EvaluationStatus = 'COMPLETED' | 'DRAFT' | 'EVALUATED' | 'PENDING';
 
 export interface CriterionConfig {
   id?: string;
@@ -78,8 +78,14 @@ export interface GdParticipantDto {
   studentName: string;
   registerNumber: string;
   collegeEmail: string;
+  departmentId?: string;
   departmentName?: string;
+  courseId?: string;
   courseName?: string;
+  classId?: string;
+  className?: string;
+  sectionId?: string;
+  sectionName?: string;
   attendance: AttendanceStatus;
   evaluation: GdEvaluationDto | null;
   createdAt: string;
@@ -266,4 +272,49 @@ export interface SubmitInterviewEvaluationInput {
     score: number;
     comment?: string;
   }>;
+}
+
+// =============================================================================
+// BULK EVALUATION TYPES
+// =============================================================================
+
+export interface BulkStudentEvaluationScoreInput {
+  criterionId: string;
+  score: number;
+  comment?: string;
+}
+
+export interface BulkStudentEvaluationItemInput {
+  studentId: string;
+  participantId?: string;
+  scores: BulkStudentEvaluationScoreInput[];
+  feedback?: string;
+  strengths?: string;
+  areasForImprovement?: string;
+  overallFeedback?: string;
+}
+
+export interface BulkEvaluationRequestDto {
+  evaluations: BulkStudentEvaluationItemInput[];
+  isDraft?: boolean;
+}
+
+export interface BulkEvaluationSingleResultDto {
+  studentId: string;
+  participantId: string;
+  evaluationId: string;
+  totalScore: number;
+  maxPossibleMarks: number;
+  percentage: number;
+  status: EvaluationStatus;
+  studentName?: string;
+  registerNumber?: string;
+}
+
+export interface BulkEvaluationResultDto {
+  roundId: string;
+  roundTitle: string;
+  isDraft: boolean;
+  totalProcessed: number;
+  results: BulkEvaluationSingleResultDto[];
 }

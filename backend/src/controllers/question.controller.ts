@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { QuestionService, questionService } from '../services/question.service.js';
+import { geminiQuestionParserService } from '../services/gemini-question-parser.service.js';
 import { sendSuccess } from '../utils/response.util.js';
 import { QuestionQueryFilters, QuestionStatus } from '../types/question.types.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -29,6 +30,7 @@ export class QuestionController {
         difficulty: req.query.difficulty as QuestionQueryFilters['difficulty'],
         questionType: req.query.questionType as QuestionQueryFilters['questionType'],
         status: req.query.status as QuestionQueryFilters['status'],
+        aiStatus: req.query.aiStatus as QuestionQueryFilters['aiStatus'],
         sortBy: req.query.sortBy as QuestionQueryFilters['sortBy'],
         sortOrder: req.query.sortOrder as QuestionQueryFilters['sortOrder'],
       };
@@ -101,10 +103,99 @@ export class QuestionController {
     }
   };
 
+  bulkCreateQuestions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { questions } = req.body;
+      if (!Array.isArray(questions) || questions.length === 0) {
+        throw new AppError('Questions array is required and must not be empty', 400);
+      }
+      const createdById = req.user?.sub;
+      const result = await this.service.bulkCreateQuestions(questions, createdById);
+      sendSuccess(res, `Bulk questions processed: ${result.created.length} created, ${result.failed.length} failed.`, result, 201);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  aiAnalyzeDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const apiKey = req.body.apiKey || (req.headers['x-gemini-key'] as string);
+      const text = req.body.text;
+      const targetCompanyId = req.body.companyId;
+      const file = req.file;
+
+      const result = await geminiQuestionParserService.analyzeDocument({
+        file,
+        text,
+        apiKey,
+        targetCompanyId,
+      });
+
+      sendSuccess(res, `AI extraction completed: ${result.totalParsed} questions parsed`, result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getCategories = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const map = this.service.getCategoryTopicsMap();
       sendSuccess(res, 'Category-topics mapping retrieved', map);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ===========================================================================
+  // AI INTELLIGENT CLASSIFICATION ENDPOINTS
+  // ===========================================================================
+
+  classifyQuestion = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = String(req.params.id);
+      const result = await this.service.classifyQuestion(id);
+      sendSuccess(res, 'Question classified successfully by AI', result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  autoDetectClassification = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await this.service.autoDetectClassification(req.body);
+      sendSuccess(res, 'AI classification generated successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  batchClassifyQuestions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { questionIds } = req.body;
+      const result = await this.service.batchClassifyQuestions(questionIds);
+      sendSuccess(res, `Batch classification completed: ${result.classified} classified, ${result.needsReview} needs review, ${result.failed} failed.`, result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  reviewClassification = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = String(req.params.id);
+      const adminId = req.user?.sub || 'admin';
+      const result = await this.service.reviewClassification(id, req.body, adminId);
+      sendSuccess(res, 'Classification review applied successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getQuestionsNeedingReview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const result = await this.service.getQuestionsNeedingReview(page, limit);
+      sendSuccess(res, 'Questions needing review retrieved successfully', result);
     } catch (error) {
       next(error);
     }

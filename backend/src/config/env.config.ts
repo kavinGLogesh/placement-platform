@@ -17,6 +17,7 @@ export interface EnvConfig {
   JWT_EXPIRES_IN: string;
   JWT_REFRESH_SECRET: string;
   JWT_REFRESH_EXPIRES_IN: string;
+  GEMINI_API_KEY?: string;
 }
 
 export const env: EnvConfig = {
@@ -34,4 +35,5 @@ export const env: EnvConfig = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'dev_super_secret_jwt_refresh_key_2026_placement',
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
 };

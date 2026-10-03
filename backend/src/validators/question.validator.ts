@@ -222,7 +222,7 @@ export const validateUpdateQuestion = (req: Request, _res: Response, next: NextF
 
 export const validateQuestionQuery = (req: Request, _res: Response, next: NextFunction): void => {
   try {
-    const { page, limit, sortBy, sortOrder, category, difficulty, questionType, status } = req.query;
+    const { page, limit, sortBy, sortOrder, category, difficulty, questionType, status, aiStatus } = req.query;
 
     if (page && (isNaN(Number(page)) || Number(page) < 1)) {
       throw new AppError('Page must be a positive integer >= 1', 400);
@@ -254,6 +254,11 @@ export const validateQuestionQuery = (req: Request, _res: Response, next: NextFu
 
     if (status && !VALID_STATUSES.includes(status as QuestionStatus)) {
       throw new AppError(`Invalid status filter '${status}'`, 400);
+    }
+
+    const VALID_AI_STATUSES = ['AI_PENDING', 'CLASSIFIED', 'NEEDS_REVIEW', 'AI_FAILED'];
+    if (aiStatus && !VALID_AI_STATUSES.includes(String(aiStatus))) {
+      throw new AppError(`Invalid aiStatus filter '${aiStatus}'. Allowed: ${VALID_AI_STATUSES.join(', ')}`, 400);
     }
 
     next();

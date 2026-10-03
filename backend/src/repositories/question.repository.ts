@@ -9,6 +9,10 @@ import {
   QuestionStatus,
   QuestionOptionDto,
   QuestionCategory,
+  QuestionAiClassificationDto,
+  AiClassifyResult,
+  AdminReviewClassificationDto,
+  AiClassificationStatus,
 } from '../types/question.types.js';
 import { PaginatedResult } from '../types/management.types.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -17,6 +21,7 @@ import { generateExactQuestionHash } from '../utils/duplicate-detector.util.js';
 class InMemoryQuestionStore {
   public questions: Map<string, QuestionDto> = new Map();
   public usages: Map<string, QuestionUsageDto> = new Map();
+  public aiClassifications: Map<string, QuestionAiClassificationDto> = new Map();
   private initialized = false;
 
   async initialize(): Promise<void> {
@@ -345,6 +350,7 @@ export class QuestionRepository {
         company: { select: { id: true, name: true, code: true } },
         companyQuestions: true,
         createdBy: { select: { id: true, email: true } },
+        aiClassification: true,
         _count: { select: { usages: true } },
       },
     });
@@ -386,6 +392,9 @@ export class QuestionRepository {
       }
       if (filters.status) {
         list = list.filter((q) => q.status === filters.status);
+      }
+      if (filters.aiStatus) {
+        list = list.filter((q) => q.aiClassification?.status === filters.aiStatus);
       }
       if (filters.search) {
         const s = filters.search.toLowerCase();
@@ -449,6 +458,9 @@ export class QuestionRepository {
     if (filters.difficulty) whereClause.difficulty = filters.difficulty;
     if (filters.questionType) whereClause.questionType = filters.questionType;
     if (filters.status) whereClause.status = filters.status;
+    if (filters.aiStatus) {
+      whereClause.aiClassification = { status: filters.aiStatus };
+    }
 
     if (filters.search) {
       const searchConditions = [
@@ -482,6 +494,7 @@ export class QuestionRepository {
           company: { select: { id: true, name: true, code: true } },
           companyQuestions: true,
           createdBy: { select: { id: true, email: true } },
+          aiClassification: true,
           _count: { select: { usages: true } },
         },
       }),
@@ -566,6 +579,7 @@ export class QuestionRepository {
         options: { orderBy: { optionOrder: 'asc' } },
         company: { select: { id: true, name: true, code: true } },
         createdBy: { select: { id: true, email: true } },
+        aiClassification: true,
         _count: { select: { usages: true } },
       },
     });
@@ -751,6 +765,264 @@ export class QuestionRepository {
     });
     return created;
   }
+
+  // ===========================================================================
+  // 8. AI CLASSIFICATION MANAGEMENT
+  // ===========================================================================
+  async upsertAiClassification(
+    questionId: string,
+    result: AiClassifyResult,
+    isApproved = false,
+    approvedById?: string
+  ): Promise<QuestionAiClassificationDto> {
+    const question = await this.findQuestionById(questionId);
+    if (!question) {
+      throw new AppError('Question not found for AI classification', 404);
+    }
+
+    const now = new Date();
+    const id = `aic-${questionId}`;
+
+    const classificationData: QuestionAiClassificationDto = {
+      id,
+      questionId,
+      suggestedCategory: result.category,
+      suggestedTopic: result.topic,
+      suggestedDifficulty: result.difficulty,
+      suggestedQuestionType: result.questionType,
+      categoryConfidence: result.confidence.category,
+      topicConfidence: result.confidence.topic,
+      difficultyConfidence: result.confidence.difficulty,
+      typeConfidence: result.confidence.questionType,
+      overallConfidence: result.confidence.overall || 0.8,
+      reasoning: result.reasoning || null,
+      status: result.status,
+      rawAiResponse: result.rawAiResponse || null,
+      errorMessage: null,
+      modelName: result.modelName || 'SemanticConceptClassifier',
+      isApproved,
+      approvedAt: isApproved ? now : null,
+      approvedById: isApproved ? approvedById || null : null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (process.env.NODE_ENV === 'test') {
+      this.memStore.aiClassifications.set(questionId, classificationData);
+      const updatedQ: QuestionDto = {
+        ...question,
+        aiClassification: classificationData,
+      };
+      this.memStore.questions.set(questionId, updatedQ);
+      return classificationData;
+    }
+
+    const upserted = await prisma.questionAiClassification.upsert({
+      where: { questionId },
+      create: {
+        questionId,
+        suggestedCategory: result.category,
+        suggestedTopic: result.topic,
+        suggestedDifficulty: result.difficulty,
+        suggestedQuestionType: result.questionType,
+        categoryConfidence: result.confidence.category,
+        topicConfidence: result.confidence.topic,
+        difficultyConfidence: result.confidence.difficulty,
+        typeConfidence: result.confidence.questionType,
+        overallConfidence: result.confidence.overall || 0.8,
+        reasoning: result.reasoning,
+        status: result.status,
+        rawAiResponse: result.rawAiResponse,
+        errorMessage: null,
+        modelName: result.modelName || 'SemanticConceptClassifier',
+        isApproved,
+        approvedAt: isApproved ? now : null,
+        approvedById: isApproved ? approvedById : null,
+      },
+      update: {
+        suggestedCategory: result.category,
+        suggestedTopic: result.topic,
+        suggestedDifficulty: result.difficulty,
+        suggestedQuestionType: result.questionType,
+        categoryConfidence: result.confidence.category,
+        topicConfidence: result.confidence.topic,
+        difficultyConfidence: result.confidence.difficulty,
+        typeConfidence: result.confidence.questionType,
+        overallConfidence: result.confidence.overall || 0.8,
+        reasoning: result.reasoning,
+        status: result.status,
+        rawAiResponse: result.rawAiResponse,
+        errorMessage: null,
+        modelName: result.modelName || 'SemanticConceptClassifier',
+        isApproved,
+        approvedAt: isApproved ? now : null,
+        approvedById: isApproved ? approvedById : null,
+      },
+    });
+
+    return upserted as unknown as QuestionAiClassificationDto;
+  }
+
+  async approveAiClassification(
+    questionId: string,
+    payload: AdminReviewClassificationDto,
+    adminId: string
+  ): Promise<QuestionDto> {
+    const question = await this.findQuestionById(questionId);
+    if (!question) {
+      throw new AppError('Question not found', 404);
+    }
+
+    const now = new Date();
+
+    if (payload.action === 'SEND_TO_REVIEW') {
+      if (process.env.NODE_ENV === 'test') {
+        if (question.aiClassification) {
+          question.aiClassification.status = 'NEEDS_REVIEW';
+          question.aiClassification.isApproved = false;
+        }
+        return question;
+      }
+
+      await prisma.questionAiClassification.updateMany({
+        where: { questionId },
+        data: {
+          status: 'NEEDS_REVIEW',
+          isApproved: false,
+        },
+      });
+      return (await this.findQuestionById(questionId))!;
+    }
+
+    let finalCategory = question.category;
+    let finalTopic = question.topic;
+    let finalDifficulty = question.difficulty;
+    let finalType = question.questionType;
+
+    if (payload.action === 'ACCEPT_AI' || (payload.action as string) === 'ACCEPT' || payload.action === 'APPROVE') {
+      if (!question.aiClassification) {
+        throw new AppError('No AI classification found to accept for this question', 400);
+      }
+      finalCategory = question.aiClassification.suggestedCategory;
+      finalTopic = question.aiClassification.suggestedTopic;
+      finalDifficulty = question.aiClassification.suggestedDifficulty;
+      finalType = question.aiClassification.suggestedQuestionType;
+    } else if (payload.action === 'OVERRIDE') {
+      if (!payload.category || !payload.topic) {
+        throw new AppError('Category and Topic are required when overriding classification', 400);
+      }
+      finalCategory = payload.category;
+      finalTopic = payload.topic.trim();
+      if (payload.difficulty) finalDifficulty = payload.difficulty;
+      if (payload.questionType) finalType = payload.questionType;
+    }
+
+    if (process.env.NODE_ENV === 'test') {
+      const isOverride = payload.action === 'OVERRIDE';
+      const updatedAi: QuestionAiClassificationDto = question.aiClassification
+        ? {
+            ...question.aiClassification,
+            status: 'CLASSIFIED',
+            isApproved: true,
+            approvedAt: now,
+            approvedById: adminId,
+            reviewedCategory: isOverride ? finalCategory : question.aiClassification.reviewedCategory,
+            reviewedTopic: isOverride ? finalTopic : question.aiClassification.reviewedTopic,
+            reviewedDifficulty: isOverride ? finalDifficulty : question.aiClassification.reviewedDifficulty,
+            reviewedQuestionType: isOverride ? finalType : question.aiClassification.reviewedQuestionType,
+            notes: payload.notes || question.aiClassification.notes,
+          }
+        : {
+            id: `aic-${questionId}`,
+            questionId,
+            suggestedCategory: finalCategory,
+            suggestedTopic: finalTopic,
+            suggestedDifficulty: finalDifficulty,
+            suggestedQuestionType: finalType,
+            reviewedCategory: isOverride ? finalCategory : null,
+            reviewedTopic: isOverride ? finalTopic : null,
+            reviewedDifficulty: isOverride ? finalDifficulty : null,
+            reviewedQuestionType: isOverride ? finalType : null,
+            categoryConfidence: 1.0,
+            topicConfidence: 1.0,
+            difficultyConfidence: 1.0,
+            typeConfidence: 1.0,
+            overallConfidence: 1.0,
+            status: 'CLASSIFIED',
+            isApproved: true,
+            approvedAt: now,
+            approvedById: adminId,
+            notes: payload.notes || null,
+            createdAt: now,
+            updatedAt: now,
+          };
+
+      const updatedQ: QuestionDto = {
+        ...question,
+        category: finalCategory,
+        topic: finalTopic,
+        difficulty: finalDifficulty,
+        questionType: finalType,
+        aiClassification: updatedAi,
+        updatedAt: now,
+      };
+
+      this.memStore.questions.set(questionId, updatedQ);
+      this.memStore.aiClassifications.set(questionId, updatedAi);
+      return updatedQ;
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Update Question record with approved final classification
+      await tx.question.update({
+        where: { id: questionId },
+        data: {
+          category: finalCategory,
+          topic: finalTopic,
+          difficulty: finalDifficulty,
+          questionType: finalType,
+        },
+      });
+
+      // 2. Mark AI classification as approved
+      await tx.questionAiClassification.upsert({
+        where: { questionId },
+        create: {
+          questionId,
+          suggestedCategory: finalCategory,
+          suggestedTopic: finalTopic,
+          suggestedDifficulty: finalDifficulty,
+          suggestedQuestionType: finalType,
+          categoryConfidence: 1.0,
+          topicConfidence: 1.0,
+          difficultyConfidence: 1.0,
+          typeConfidence: 1.0,
+          overallConfidence: 1.0,
+          status: 'CLASSIFIED',
+          isApproved: true,
+          approvedAt: now,
+          approvedById: adminId,
+        },
+        update: {
+          status: 'CLASSIFIED',
+          isApproved: true,
+          approvedAt: now,
+          approvedById: adminId,
+        },
+      });
+    });
+
+    return (await this.findQuestionById(questionId))!;
+  }
+
+  async findQuestionsNeedingReview(page = 1, limit = 10): Promise<PaginatedResult<QuestionDto>> {
+    return this.findQuestions({
+      page,
+      limit,
+      aiStatus: 'NEEDS_REVIEW' as AiClassificationStatus,
+    });
+  }
 }
 
 export const questionRepository = new QuestionRepository();
+

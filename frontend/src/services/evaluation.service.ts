@@ -11,6 +11,8 @@ import {
   SubmitGdEvaluationInput,
   SubmitInterviewEvaluationInput,
   AttendanceStatus,
+  BulkEvaluationRequestDto,
+  BulkEvaluationResultDto,
 } from '../types/evaluation.types.js';
 
 interface ApiResponse<T> {
@@ -76,6 +78,11 @@ export const evaluationService = {
     return res.data.data;
   },
 
+  async bulkEvaluateGd(roundId: string, payload: BulkEvaluationRequestDto): Promise<BulkEvaluationResultDto> {
+    const res = await apiClient.post<ApiResponse<BulkEvaluationResultDto>>(`/gd/${roundId}/evaluations/bulk`, payload);
+    return res.data.data;
+  },
+
   // ===========================================================================
   // INTERVIEW ROUNDS (ADMIN & EVALUATOR)
   // ===========================================================================
@@ -138,6 +145,17 @@ export const evaluationService = {
     payload: SubmitInterviewEvaluationInput
   ): Promise<InterviewEvaluationDto> {
     const res = await apiClient.post<ApiResponse<InterviewEvaluationDto>>(`/interviews/${roundId}/evaluate`, payload);
+    return res.data.data;
+  },
+
+  async bulkEvaluateInterview(
+    roundId: string,
+    payload: BulkEvaluationRequestDto
+  ): Promise<BulkEvaluationResultDto> {
+    const res = await apiClient.post<ApiResponse<BulkEvaluationResultDto>>(
+      `/interviews/${roundId}/evaluations/bulk`,
+      payload
+    );
     return res.data.data;
   },
 

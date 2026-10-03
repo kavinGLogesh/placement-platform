@@ -2,7 +2,7 @@ export type GdRoundStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELL
 export type InterviewType = 'MOCK' | 'HR' | 'TECHNICAL' | 'MANAGERIAL';
 export type InterviewRoundStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'PENDING';
-export type EvaluationStatus = 'PENDING' | 'EVALUATED';
+export type EvaluationStatus = 'PENDING' | 'DRAFT' | 'EVALUATED';
 
 export interface CriterionConfig {
   id?: string;
@@ -66,6 +66,7 @@ export interface UpdateGdRoundDto {
   departmentId?: string | null;
   courseId?: string | null;
   batchYear?: number | null;
+  criteria?: CriterionConfig[];
 }
 
 export interface CriterionScoreInput {
@@ -192,8 +193,14 @@ export interface GdParticipantDto {
   studentName: string;
   registerNumber: string;
   collegeEmail: string;
+  departmentId?: string;
   departmentName?: string;
+  courseId?: string;
   courseName?: string;
+  classId?: string;
+  className?: string;
+  sectionId?: string;
+  sectionName?: string;
   attendance: AttendanceStatus;
   evaluation?: GdEvaluationDto | null;
   createdAt: string | Date;
@@ -334,3 +341,52 @@ export interface StudentHumanEvaluationSummaryDto {
     }>;
   };
 }
+
+// -----------------------------------------------------------------------------
+// Bulk Evaluation DTOs
+// -----------------------------------------------------------------------------
+
+export interface BulkStudentEvaluationScoreInput {
+  criterionId: string;
+  score: number;
+  comment?: string;
+}
+
+export interface BulkStudentEvaluationItemInput {
+  studentId: string;
+  participantId?: string;
+  feedback?: string;
+  strengths?: string;
+  areasForImprovement?: string;
+  overallFeedback?: string;
+  criterionScores?: BulkStudentEvaluationScoreInput[];
+  scores?: BulkStudentEvaluationScoreInput[];
+}
+
+export interface BulkEvaluationRequestDto {
+  isDraft?: boolean;
+  evaluations: BulkStudentEvaluationItemInput[];
+}
+
+export interface BulkEvaluationSingleResultDto {
+  studentId: string;
+  participantId: string;
+  studentName: string;
+  registerNumber: string;
+  totalScore: number;
+  maxPossibleMarks: number;
+  percentage: number;
+  status: EvaluationStatus;
+  criterionScoresCount: number;
+}
+
+export interface BulkEvaluationResultDto {
+  roundId: string;
+  roundType: 'GD' | 'INTERVIEW';
+  status: EvaluationStatus;
+  evaluatedCount: number;
+  totalProcessed?: number;
+  isDraft: boolean;
+  results: BulkEvaluationSingleResultDto[];
+}
+

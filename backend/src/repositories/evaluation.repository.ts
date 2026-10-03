@@ -1,4 +1,5 @@
 import { prisma } from '../config/prisma.config.js';
+import { AppError } from '../middleware/errorHandler.js';
 import {
   CreateGdRoundDto,
   UpdateGdRoundDto,
@@ -11,6 +12,7 @@ import {
   InterviewRoundDto,
   InterviewParticipantDto,
   InterviewEvaluationDto,
+  BulkEvaluationResultDto,
 } from '../types/evaluation.types.js';
 import { managementRepository } from './management.repository.js';
 import { userRepository } from './user.repository.js';
@@ -200,8 +202,14 @@ export class EvaluationRepository {
                 name: true,
                 registerNumber: true,
                 collegeEmail: true,
-                department: { select: { name: true } },
-                course: { select: { name: true } },
+                departmentId: true,
+                courseId: true,
+                classId: true,
+                sectionId: true,
+                department: { select: { name: true, code: true } },
+                course: { select: { name: true, code: true } },
+                class: { select: { name: true } },
+                section: { select: { name: true } },
               },
             },
             evaluation: {
@@ -242,8 +250,14 @@ export class EvaluationRepository {
                 name: true,
                 registerNumber: true,
                 collegeEmail: true,
-                department: { select: { name: true } },
-                course: { select: { name: true } },
+                departmentId: true,
+                courseId: true,
+                classId: true,
+                sectionId: true,
+                department: { select: { name: true, code: true } },
+                course: { select: { name: true, code: true } },
+                class: { select: { name: true } },
+                section: { select: { name: true } },
               },
             },
             evaluation: {
@@ -274,23 +288,129 @@ export class EvaluationRepository {
         updatedAt: new Date(),
       };
       this.memStore.gdRounds.set(id, updated);
+
+      if (dto.criteria && Array.isArray(dto.criteria)) {
+        const existingCriteria = this.memStore.gdCriteria.get(id) || [];
+        const existingMap = new Map(existingCriteria.map((c: any) => [c.id, c]));
+        const incomingIds = new Set<string>();
+        const updatedList: any[] = [];
+
+        for (const crit of dto.criteria) {
+          if (crit.id && existingMap.has(crit.id)) {
+            incomingIds.add(crit.id);
+            updatedList.push({
+              id: crit.id,
+              roundId: id,
+              name: crit.name,
+              maxMarks: crit.maxMarks,
+              order: crit.order,
+              createdAt: existingMap.get(crit.id)!.createdAt,
+            });
+          } else {
+            const newId = crit.id || `crit-gd-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+            incomingIds.add(newId);
+            updatedList.push({
+              id: newId,
+              roundId: id,
+              name: crit.name,
+              maxMarks: crit.maxMarks,
+              order: crit.order,
+              createdAt: new Date(),
+            });
+          }
+        }
+
+        // Check if any deleted criterion has scores
+        for (const existingCrit of existingCriteria) {
+          if (!incomingIds.has(existingCrit.id)) {
+            let hasScores = false;
+            for (const scores of this.memStore.gdCriterionScores.values()) {
+              if (scores.some((s) => s.criterionId === existingCrit.id)) {
+                hasScores = true;
+                break;
+              }
+            }
+            if (hasScores) {
+              throw new AppError(
+                `Cannot remove category '${existingCrit.name}' because it already has submitted evaluations`,
+                400
+              );
+            }
+          }
+        }
+
+        this.memStore.gdCriteria.set(id, updatedList);
+      }
+
       return this.formatGdRoundInMemory(id);
     }
 
-    await prisma.gdRound.update({
-      where: { id },
-      data: {
-        ...(dto.title !== undefined && { title: dto.title }),
-        ...(dto.topic !== undefined && { topic: dto.topic }),
-        ...(dto.instructions !== undefined && { instructions: dto.instructions }),
-        ...(dto.scheduledDate !== undefined && { scheduledDate: new Date(dto.scheduledDate) }),
-        ...(dto.durationMinutes !== undefined && { durationMinutes: dto.durationMinutes }),
-        ...(dto.status !== undefined && { status: dto.status }),
-        ...(dto.evaluatorId !== undefined && { evaluatorId: dto.evaluatorId }),
-        ...(dto.departmentId !== undefined && { departmentId: dto.departmentId }),
-        ...(dto.courseId !== undefined && { courseId: dto.courseId }),
-        ...(dto.batchYear !== undefined && { batchYear: dto.batchYear }),
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.gdRound.update({
+        where: { id },
+        data: {
+          ...(dto.title !== undefined && { title: dto.title }),
+          ...(dto.topic !== undefined && { topic: dto.topic }),
+          ...(dto.instructions !== undefined && { instructions: dto.instructions }),
+          ...(dto.scheduledDate !== undefined && { scheduledDate: new Date(dto.scheduledDate) }),
+          ...(dto.durationMinutes !== undefined && { durationMinutes: dto.durationMinutes }),
+          ...(dto.status !== undefined && { status: dto.status }),
+          ...(dto.evaluatorId !== undefined && { evaluatorId: dto.evaluatorId }),
+          ...(dto.departmentId !== undefined && { departmentId: dto.departmentId }),
+          ...(dto.courseId !== undefined && { courseId: dto.courseId }),
+          ...(dto.batchYear !== undefined && { batchYear: dto.batchYear }),
+        },
+      });
+
+      if (dto.criteria && Array.isArray(dto.criteria)) {
+        const existingCriteria = await tx.gdCriterion.findMany({
+          where: { roundId: id },
+        });
+        const existingMap = new Map(existingCriteria.map((c) => [c.id, c]));
+        const incomingIds = new Set<string>();
+
+        for (const crit of dto.criteria) {
+          if (crit.id && existingMap.has(crit.id)) {
+            incomingIds.add(crit.id);
+            await tx.gdCriterion.update({
+              where: { id: crit.id },
+              data: {
+                name: crit.name,
+                maxMarks: crit.maxMarks,
+                order: crit.order,
+              },
+            });
+          } else {
+            const created = await tx.gdCriterion.create({
+              data: {
+                roundId: id,
+                name: crit.name,
+                maxMarks: crit.maxMarks,
+                order: crit.order,
+              },
+            });
+            incomingIds.add(created.id);
+          }
+        }
+
+        // Handle criteria removal
+        for (const existingCrit of existingCriteria) {
+          if (!incomingIds.has(existingCrit.id)) {
+            const scoreCount = await tx.gdCriterionScore.count({
+              where: { criterionId: existingCrit.id },
+            });
+            if (scoreCount > 0) {
+              throw new AppError(
+                `Cannot remove category '${existingCrit.name}' because it already has submitted evaluations`,
+                400
+              );
+            }
+            await tx.gdCriterion.delete({
+              where: { id: existingCrit.id },
+            });
+          }
+        }
+      }
     });
 
     return (await this.getGdRoundById(id))!;
@@ -554,6 +674,219 @@ export class EvaluationRepository {
     });
 
     return (await this.getGdEvaluationByParticipantId(params.participantId))!;
+  }
+
+  async bulkSaveGdEvaluations(params: {
+    roundId: string;
+    evaluatorId: string;
+    isDraft: boolean;
+    evaluations: Array<{
+      studentId: string;
+      participantId?: string;
+      feedback?: string;
+      criterionScores: Array<{
+        criterionId: string;
+        score: number;
+        maxMarks: number;
+        comment?: string;
+      }>;
+      totalScore: number;
+      maxPossibleMarks: number;
+      percentage: number;
+    }>;
+  }): Promise<BulkEvaluationResultDto> {
+    const status = params.isDraft ? 'DRAFT' : 'EVALUATED';
+
+    if (process.env.NODE_ENV === 'test') {
+      const results: any[] = [];
+      const round = this.memStore.gdRounds.get(params.roundId);
+      if (round && !params.isDraft && round.status === 'SCHEDULED') {
+        round.status = 'IN_PROGRESS';
+        round.updatedAt = new Date();
+      }
+
+      for (const item of params.evaluations) {
+        let part = Array.from(this.memStore.gdParticipants.values()).find(
+          (p: any) => p.roundId === params.roundId && p.studentId === item.studentId
+        );
+
+        if (!part) {
+          const partId = `part-gd-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+          part = {
+            id: partId,
+            roundId: params.roundId,
+            studentId: item.studentId,
+            attendance: params.isDraft ? 'PENDING' : 'PRESENT',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          this.memStore.gdParticipants.set(partId, part);
+        } else if (!params.isDraft) {
+          part.attendance = 'PRESENT';
+          part.updatedAt = new Date();
+        }
+
+        const existingEval = this.memStore.gdEvaluations.get(part.id);
+        const evalId = existingEval?.id || `eval-gd-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
+        const evalRecord = {
+          id: evalId,
+          participantId: part.id,
+          evaluatorId: params.evaluatorId,
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          feedback: item.feedback || null,
+          status,
+          evaluatedAt: new Date(),
+          createdAt: existingEval?.createdAt || new Date(),
+          updatedAt: new Date(),
+        };
+        this.memStore.gdEvaluations.set(part.id, evalRecord);
+
+        const scoreRecords = item.criterionScores.map((cs, idx) => ({
+          id: `cs-gd-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+          evaluationId: evalId,
+          criterionId: cs.criterionId,
+          score: cs.score,
+          maxMarks: cs.maxMarks,
+          comment: cs.comment || null,
+        }));
+        this.memStore.gdCriterionScores.set(evalId, scoreRecords);
+
+        const student = managementRepository.memStore.students.get(item.studentId);
+        results.push({
+          studentId: item.studentId,
+          participantId: part.id,
+          studentName: student?.name || 'Student',
+          registerNumber: student?.registerNumber || '',
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          status,
+          criterionScoresCount: item.criterionScores.length,
+        });
+      }
+
+      return {
+        roundId: params.roundId,
+        roundType: 'GD',
+        status,
+        evaluatedCount: results.length,
+        totalProcessed: results.length,
+        isDraft: params.isDraft,
+        results,
+      };
+    }
+
+    // Prisma DB Transaction
+    const results = await prisma.$transaction(async (tx) => {
+      if (!params.isDraft) {
+        const round = await tx.gdRound.findUnique({ where: { id: params.roundId } });
+        if (round && round.status === 'SCHEDULED') {
+          await tx.gdRound.update({
+            where: { id: params.roundId },
+            data: { status: 'IN_PROGRESS' },
+          });
+        }
+      }
+
+      const batchResults: any[] = [];
+
+      for (const item of params.evaluations) {
+        let participant = await tx.gdParticipant.findUnique({
+          where: {
+            roundId_studentId: {
+              roundId: params.roundId,
+              studentId: item.studentId,
+            },
+          },
+          include: {
+            student: { select: { id: true, name: true, registerNumber: true } },
+          },
+        });
+
+        if (!participant) {
+          participant = await tx.gdParticipant.create({
+            data: {
+              roundId: params.roundId,
+              studentId: item.studentId,
+              attendance: params.isDraft ? 'PENDING' : 'PRESENT',
+            },
+            include: {
+              student: { select: { id: true, name: true, registerNumber: true } },
+            },
+          });
+        } else if (!params.isDraft && participant.attendance === 'PENDING') {
+          await tx.gdParticipant.update({
+            where: { id: participant.id },
+            data: { attendance: 'PRESENT' },
+          });
+        }
+
+        const evalRecord = await tx.gdEvaluation.upsert({
+          where: { participantId: participant.id },
+          update: {
+            evaluatorId: params.evaluatorId,
+            totalScore: item.totalScore,
+            maxPossibleMarks: item.maxPossibleMarks,
+            percentage: item.percentage,
+            feedback: item.feedback,
+            status,
+            evaluatedAt: new Date(),
+          },
+          create: {
+            participantId: participant.id,
+            evaluatorId: params.evaluatorId,
+            totalScore: item.totalScore,
+            maxPossibleMarks: item.maxPossibleMarks,
+            percentage: item.percentage,
+            feedback: item.feedback,
+            status,
+          },
+        });
+
+        await tx.gdCriterionScore.deleteMany({
+          where: { evaluationId: evalRecord.id },
+        });
+
+        if (item.criterionScores.length > 0) {
+          await tx.gdCriterionScore.createMany({
+            data: item.criterionScores.map((cs) => ({
+              evaluationId: evalRecord.id,
+              criterionId: cs.criterionId,
+              score: cs.score,
+              maxMarks: cs.maxMarks,
+              comment: cs.comment,
+            })),
+          });
+        }
+
+        batchResults.push({
+          studentId: item.studentId,
+          participantId: participant.id,
+          studentName: participant.student?.name || 'Student',
+          registerNumber: participant.student?.registerNumber || '',
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          status,
+          criterionScoresCount: item.criterionScores.length,
+        });
+      }
+
+      return batchResults;
+    });
+
+    return {
+      roundId: params.roundId,
+      roundType: 'GD',
+      status,
+      evaluatedCount: results.length,
+      totalProcessed: results.length,
+      isDraft: params.isDraft,
+      results,
+    };
   }
 
   async getGdEvaluationByParticipantId(participantId: string): Promise<GdEvaluationDto | null> {
@@ -1145,6 +1478,227 @@ export class EvaluationRepository {
     return (await this.getInterviewEvaluationByParticipantId(params.participantId))!;
   }
 
+  async bulkSaveInterviewEvaluations(params: {
+    roundId: string;
+    evaluatorId: string;
+    isDraft: boolean;
+    evaluations: Array<{
+      studentId: string;
+      participantId?: string;
+      strengths?: string;
+      areasForImprovement?: string;
+      overallFeedback?: string;
+      criterionScores: Array<{
+        criterionId: string;
+        score: number;
+        maxMarks: number;
+        comment?: string;
+      }>;
+      totalScore: number;
+      maxPossibleMarks: number;
+      percentage: number;
+    }>;
+  }): Promise<BulkEvaluationResultDto> {
+    const status = params.isDraft ? 'DRAFT' : 'EVALUATED';
+
+    if (process.env.NODE_ENV === 'test') {
+      const results: any[] = [];
+      const round = this.memStore.interviewRounds.get(params.roundId);
+      if (round && !params.isDraft && round.status === 'SCHEDULED') {
+        round.status = 'IN_PROGRESS';
+        round.updatedAt = new Date();
+      }
+
+      for (const item of params.evaluations) {
+        let part = Array.from(this.memStore.interviewParticipants.values()).find(
+          (p: any) => p.roundId === params.roundId && p.studentId === item.studentId
+        );
+
+        if (!part) {
+          const partId = `part-int-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+          part = {
+            id: partId,
+            roundId: params.roundId,
+            studentId: item.studentId,
+            attendance: params.isDraft ? 'PENDING' : 'PRESENT',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          this.memStore.interviewParticipants.set(partId, part);
+        } else if (!params.isDraft) {
+          part.attendance = 'PRESENT';
+          part.updatedAt = new Date();
+        }
+
+        const existingEval = this.memStore.interviewEvaluations.get(part.id);
+        const evalId = existingEval?.id || `eval-int-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
+        const evalRecord = {
+          id: evalId,
+          participantId: part.id,
+          evaluatorId: params.evaluatorId,
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          strengths: item.strengths || null,
+          areasForImprovement: item.areasForImprovement || null,
+          overallFeedback: item.overallFeedback || null,
+          status,
+          evaluatedAt: new Date(),
+          createdAt: existingEval?.createdAt || new Date(),
+          updatedAt: new Date(),
+        };
+        this.memStore.interviewEvaluations.set(part.id, evalRecord);
+
+        const scoreRecords = item.criterionScores.map((cs, idx) => ({
+          id: `cs-int-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+          evaluationId: evalId,
+          criterionId: cs.criterionId,
+          score: cs.score,
+          maxMarks: cs.maxMarks,
+          comment: cs.comment || null,
+        }));
+        this.memStore.interviewCriterionScores.set(evalId, scoreRecords);
+
+        const student = managementRepository.memStore.students.get(item.studentId);
+        results.push({
+          studentId: item.studentId,
+          participantId: part.id,
+          studentName: student?.name || 'Student',
+          registerNumber: student?.registerNumber || '',
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          status,
+          criterionScoresCount: item.criterionScores.length,
+        });
+      }
+
+      return {
+        roundId: params.roundId,
+        roundType: 'INTERVIEW',
+        status,
+        evaluatedCount: results.length,
+        totalProcessed: results.length,
+        isDraft: params.isDraft,
+        results,
+      };
+    }
+
+    // Prisma DB Transaction
+    const results = await prisma.$transaction(async (tx) => {
+      if (!params.isDraft) {
+        const round = await tx.interviewRound.findUnique({ where: { id: params.roundId } });
+        if (round && round.status === 'SCHEDULED') {
+          await tx.interviewRound.update({
+            where: { id: params.roundId },
+            data: { status: 'IN_PROGRESS' },
+          });
+        }
+      }
+
+      const batchResults: any[] = [];
+
+      for (const item of params.evaluations) {
+        let participant = await tx.interviewParticipant.findUnique({
+          where: {
+            roundId_studentId: {
+              roundId: params.roundId,
+              studentId: item.studentId,
+            },
+          },
+          include: {
+            student: { select: { id: true, name: true, registerNumber: true } },
+          },
+        });
+
+        if (!participant) {
+          participant = await tx.interviewParticipant.create({
+            data: {
+              roundId: params.roundId,
+              studentId: item.studentId,
+              attendance: params.isDraft ? 'PENDING' : 'PRESENT',
+            },
+            include: {
+              student: { select: { id: true, name: true, registerNumber: true } },
+            },
+          });
+        } else if (!params.isDraft && participant.attendance === 'PENDING') {
+          await tx.interviewParticipant.update({
+            where: { id: participant.id },
+            data: { attendance: 'PRESENT' },
+          });
+        }
+
+        const evalRecord = await tx.interviewEvaluation.upsert({
+          where: { participantId: participant.id },
+          update: {
+            evaluatorId: params.evaluatorId,
+            totalScore: item.totalScore,
+            maxPossibleMarks: item.maxPossibleMarks,
+            percentage: item.percentage,
+            strengths: item.strengths,
+            areasForImprovement: item.areasForImprovement,
+            overallFeedback: item.overallFeedback,
+            status,
+            evaluatedAt: new Date(),
+          },
+          create: {
+            participantId: participant.id,
+            evaluatorId: params.evaluatorId,
+            totalScore: item.totalScore,
+            maxPossibleMarks: item.maxPossibleMarks,
+            percentage: item.percentage,
+            strengths: item.strengths,
+            areasForImprovement: item.areasForImprovement,
+            overallFeedback: item.overallFeedback,
+            status,
+          },
+        });
+
+        await tx.interviewCriterionScore.deleteMany({
+          where: { evaluationId: evalRecord.id },
+        });
+
+        if (item.criterionScores.length > 0) {
+          await tx.interviewCriterionScore.createMany({
+            data: item.criterionScores.map((cs) => ({
+              evaluationId: evalRecord.id,
+              criterionId: cs.criterionId,
+              score: cs.score,
+              maxMarks: cs.maxMarks,
+              comment: cs.comment,
+            })),
+          });
+        }
+
+        batchResults.push({
+          studentId: item.studentId,
+          participantId: participant.id,
+          studentName: participant.student?.name || 'Student',
+          registerNumber: participant.student?.registerNumber || '',
+          totalScore: item.totalScore,
+          maxPossibleMarks: item.maxPossibleMarks,
+          percentage: item.percentage,
+          status,
+          criterionScoresCount: item.criterionScores.length,
+        });
+      }
+
+      return batchResults;
+    });
+
+    return {
+      roundId: params.roundId,
+      roundType: 'INTERVIEW',
+      status,
+      evaluatedCount: results.length,
+      totalProcessed: results.length,
+      isDraft: params.isDraft,
+      results,
+    };
+  }
+
   async getInterviewEvaluationByParticipantId(participantId: string): Promise<InterviewEvaluationDto | null> {
     if (process.env.NODE_ENV === 'test') {
       return this.formatInterviewEvaluationInMemory(participantId);
@@ -1243,6 +1797,11 @@ export class EvaluationRepository {
           totalScoreSum += formattedEval.percentage;
         }
 
+        const dept = student?.departmentId ? managementRepository.memStore.departments.get(student.departmentId) : null;
+        const course = student?.courseId ? managementRepository.memStore.courses.get(student.courseId) : null;
+        const cls = student?.classId ? managementRepository.memStore.classes.get(student.classId) : null;
+        const sec = student?.sectionId ? managementRepository.memStore.sections.get(student.sectionId) : null;
+
         participants.push({
           id: p.id,
           roundId: p.roundId,
@@ -1250,8 +1809,14 @@ export class EvaluationRepository {
           studentName: student?.name || 'Unknown Student',
           registerNumber: student?.registerNumber || '',
           collegeEmail: student?.collegeEmail || '',
-          departmentName: student?.department?.name,
-          courseName: student?.course?.name,
+          departmentId: student?.departmentId,
+          departmentName: dept?.name || student?.department?.name,
+          courseId: student?.courseId,
+          courseName: course?.name || student?.course?.name,
+          classId: student?.classId,
+          className: cls?.name || student?.class?.name,
+          sectionId: student?.sectionId,
+          sectionName: sec?.name || student?.section?.name,
           attendance: p.attendance,
           evaluation: formattedEval,
           createdAt: p.createdAt,
@@ -1452,8 +2017,14 @@ export class EvaluationRepository {
         studentName: p.student?.name || '',
         registerNumber: p.student?.registerNumber || '',
         collegeEmail: p.student?.collegeEmail || '',
-        departmentName: p.student?.department?.name,
-        courseName: p.student?.course?.name,
+        departmentId: p.student?.departmentId,
+        departmentName: p.student?.department?.name || p.student?.department?.code,
+        courseId: p.student?.courseId,
+        courseName: p.student?.course?.name || p.student?.course?.code,
+        classId: p.student?.classId,
+        className: p.student?.class?.name,
+        sectionId: p.student?.sectionId,
+        sectionName: p.student?.section?.name,
         attendance: p.attendance,
         evaluation,
         createdAt: p.createdAt,

@@ -99,6 +99,44 @@ export interface CreateQuestionOptionInput {
   isCorrect: boolean;
 }
 
+export type AiClassificationStatus =
+  | 'AI_PENDING'
+  | 'CLASSIFIED'
+  | 'NEEDS_REVIEW'
+  | 'AI_FAILED';
+
+export interface ConfidenceScores {
+  category: number;
+  topic: number;
+  difficulty: number;
+  questionType: number;
+  overall?: number;
+}
+
+export interface QuestionAiClassification {
+  id: string;
+  questionId: string;
+  suggestedCategory: QuestionCategory;
+  suggestedTopic: string;
+  suggestedDifficulty: QuestionDifficulty;
+  suggestedQuestionType: QuestionType;
+  categoryConfidence: number;
+  topicConfidence: number;
+  difficultyConfidence: number;
+  typeConfidence: number;
+  overallConfidence: number;
+  reasoning?: string | null;
+  status: AiClassificationStatus;
+  rawAiResponse?: string | null;
+  errorMessage?: string | null;
+  modelName?: string | null;
+  isApproved: boolean;
+  approvedAt?: string | null;
+  approvedById?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Question {
   id: string;
   companyId?: string | null;
@@ -118,6 +156,7 @@ export interface Question {
   options: QuestionOption[];
   createdBy?: { id: string; email: string } | null;
   company?: { id: string; name: string; code: string; logoUrl?: string | null } | null;
+  aiClassification?: QuestionAiClassification | null;
   _count?: {
     usages: number;
   };
@@ -136,6 +175,7 @@ export interface CreateQuestionInput {
   explanation?: string;
   status?: QuestionStatus;
   options?: CreateQuestionOptionInput[];
+  autoClassify?: boolean;
 }
 
 export interface UpdateQuestionInput {
@@ -162,7 +202,49 @@ export interface QuestionFilters {
   difficulty?: QuestionDifficulty;
   questionType?: QuestionType;
   status?: QuestionStatus;
+  aiStatus?: AiClassificationStatus;
   companyId?: string | null;
   sortBy?: 'createdAt' | 'marks' | 'difficulty' | 'questionType' | 'category';
   sortOrder?: 'asc' | 'desc';
+}
+
+export interface AdminReviewClassificationInput {
+  action: 'APPROVE' | 'ACCEPT_AI' | 'ACCEPT' | 'OVERRIDE' | 'SEND_TO_REVIEW';
+  category?: QuestionCategory;
+  topic?: string;
+  difficulty?: QuestionDifficulty;
+  questionType?: QuestionType;
+  notes?: string;
+}
+
+export interface AiDetectInput {
+  questionText: string;
+  options?: Array<{ optionText: string; isCorrect?: boolean }>;
+  correctAnswer?: string | null;
+  explanation?: string | null;
+}
+
+export interface AiDetectResult {
+  category: QuestionCategory;
+  topic: string;
+  difficulty: QuestionDifficulty;
+  questionType: QuestionType;
+  confidence: ConfidenceScores;
+  reasoning: string;
+  status: AiClassificationStatus;
+  modelName?: string;
+}
+
+export interface BatchClassifyResponse {
+  totalRequested: number;
+  processed: number;
+  classified: number;
+  needsReview: number;
+  failed: number;
+  results: Array<{
+    questionId: string;
+    status: AiClassificationStatus;
+    classification?: AiDetectResult;
+    error?: string;
+  }>;
 }

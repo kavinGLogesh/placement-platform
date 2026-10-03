@@ -13,6 +13,7 @@ import {
   DEFAULT_GD_CRITERIA,
   DEFAULT_INTERVIEW_CRITERIA,
   CriterionConfig,
+  BulkEvaluationRequestDto,
 } from '../types/evaluation.types.js';
 
 const VALID_INTERVIEW_TYPES: InterviewType[] = ['MOCK', 'HR', 'TECHNICAL', 'MANAGERIAL'];
@@ -163,6 +164,35 @@ export function validateUpdateGdRound(body: any): UpdateGdRoundDto {
   }
   if (body.batchYear !== undefined) {
     dto.batchYear = body.batchYear ? parseInt(String(body.batchYear), 10) : null;
+  }
+
+  if (body.criteria !== undefined) {
+    if (!Array.isArray(body.criteria) || body.criteria.length === 0) {
+      throw new AppError('Criteria must be a non-empty array', 400);
+    }
+    const seenNames = new Set<string>();
+    dto.criteria = body.criteria.map((c: any, index: number) => {
+      if (!c.name || typeof c.name !== 'string' || !c.name.trim()) {
+        throw new AppError(`Criterion at position ${index + 1} must have a valid name`, 400);
+      }
+      const cleanName = c.name.trim();
+      const lower = cleanName.toLowerCase();
+      if (seenNames.has(lower)) {
+        throw new AppError(`Duplicate criterion name '${cleanName}' is not allowed in the same GD Round`, 400);
+      }
+      seenNames.add(lower);
+
+      const maxMarks = c.maxMarks !== undefined ? parseFloat(String(c.maxMarks)) : 10;
+      if (isNaN(maxMarks) || maxMarks <= 0 || maxMarks > 100) {
+        throw new AppError(`Criterion '${cleanName}' max marks must be a positive number up to 100`, 400);
+      }
+      return {
+        id: c.id ? String(c.id).trim() : undefined,
+        name: cleanName,
+        maxMarks,
+        order: c.order !== undefined ? parseInt(String(c.order), 10) : index + 1,
+      };
+    });
   }
 
   return dto;
@@ -446,3 +476,146 @@ export function validateSubmitInterviewEvaluation(
     criterionScores: validatedScores,
   };
 }
+
+export function validateBulkEvaluationInput(
+  body: any,
+  round: {
+    id: string;
+    status: string;
+    criteria: Array<{ id: string; name: string; maxMarks: number }>;
+  },
+  roundType: 'GD' | 'INTERVIEW'
+): BulkEvaluationRequestDto {
+  if (!body || typeof body !== 'object') {
+    throw new AppError('Evaluation request body is required', 400);
+  }
+
+  const isDraft = Boolean(body.isDraft);
+
+  if (!isDraft && (round.status === 'COMPLETED' || round.status === 'CANCELLED')) {
+    throw new AppError(
+      `Cannot submit final evaluations for a round with status '${round.status}'`,
+      400
+    );
+  }
+
+  if (!Array.isArray(body.evaluations) || body.evaluations.length === 0) {
+    throw new AppError('The "evaluations" field must be a non-empty array', 400);
+  }
+
+  if (body.evaluations.length > 100) {
+    throw new AppError('Bulk evaluation is capped at a maximum of 100 students per batch', 400);
+  }
+
+  const criterionMap = new Map(round.criteria.map((c) => [c.id, c]));
+  const seenStudentIds = new Set<string>();
+
+  const validatedEvaluations = body.evaluations.map((item: any, studentIdx: number) => {
+    if (!item || typeof item !== 'object') {
+      throw new AppError(`Evaluation at index ${studentIdx + 1} must be an object`, 400);
+    }
+
+    const studentId = item.studentId ? String(item.studentId).trim() : '';
+    if (!studentId) {
+      throw new AppError(`Student ID is required at position ${studentIdx + 1}`, 400);
+    }
+
+    if (seenStudentIds.has(studentId)) {
+      throw new AppError(`Duplicate student ID '${studentId}' found in evaluation request`, 400);
+    }
+    seenStudentIds.add(studentId);
+
+    const participantId = item.participantId ? String(item.participantId).trim() : undefined;
+
+    const rawScores = item.scores || item.criterionScores;
+    if (!Array.isArray(rawScores)) {
+      throw new AppError(
+        `scores must be an array for student '${studentId}' at index ${studentIdx + 1}`,
+        400
+      );
+    }
+
+    const seenCriterionIds = new Set<string>();
+    const validatedScores = rawScores.map((scoreItem: any, critIdx: number) => {
+      const criterionId = scoreItem.criterionId ? String(scoreItem.criterionId).trim() : '';
+      if (!criterionId) {
+        throw new AppError(
+          `Criterion ID missing at score position ${critIdx + 1} for student '${studentId}'`,
+          400
+        );
+      }
+
+      const critDef = criterionMap.get(criterionId);
+      if (!critDef) {
+        throw new AppError(
+          `Criterion '${criterionId}' does not belong to this ${roundType} round`,
+          400
+        );
+      }
+
+      if (seenCriterionIds.has(criterionId)) {
+        throw new AppError(
+          `Duplicate score entry for criterion '${critDef.name}' on student '${studentId}'`,
+          400
+        );
+      }
+      seenCriterionIds.add(criterionId);
+
+      const rawScore = scoreItem.score !== undefined && scoreItem.score !== null ? parseFloat(String(scoreItem.score)) : NaN;
+      if (isNaN(rawScore)) {
+        throw new AppError(
+          `Invalid non-numeric score for criterion '${critDef.name}' on student '${studentId}'`,
+          400
+        );
+      }
+
+      if (rawScore < 0) {
+        throw new AppError(
+          `Score for '${critDef.name}' on student '${studentId}' cannot be negative (min: 0)`,
+          400
+        );
+      }
+
+      if (rawScore > critDef.maxMarks) {
+        throw new AppError(
+          `Score (${rawScore}) for '${critDef.name}' on student '${studentId}' cannot exceed maximum allowed marks (${critDef.maxMarks})`,
+          400
+        );
+      }
+
+      return {
+        criterionId,
+        score: rawScore,
+        comment: scoreItem.comment ? String(scoreItem.comment).trim() : undefined,
+      };
+    });
+
+    // In submit mode (non-draft), verify all round criteria have been provided
+    if (!isDraft) {
+      for (const crit of round.criteria) {
+        if (!seenCriterionIds.has(crit.id)) {
+          throw new AppError(
+            `Missing required score for criterion '${crit.name}' on student '${studentId}'`,
+            400
+          );
+        }
+      }
+    }
+
+    return {
+      studentId,
+      participantId,
+      feedback: item.feedback ? String(item.feedback).trim() : undefined,
+      strengths: item.strengths ? String(item.strengths).trim() : undefined,
+      areasForImprovement: item.areasForImprovement ? String(item.areasForImprovement).trim() : undefined,
+      overallFeedback: item.overallFeedback ? String(item.overallFeedback).trim() : undefined,
+      criterionScores: validatedScores,
+    };
+  });
+
+  return {
+    isDraft,
+    evaluations: validatedEvaluations,
+  };
+}
+

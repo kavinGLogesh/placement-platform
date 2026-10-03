@@ -36,6 +36,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { AdminNavTabs } from '../../components/management/AdminNavTabs.js';
 import { assessmentService } from '../../services/assessment.service.js';
+import { QuestionContentRenderer } from '../../components/common/QuestionContentRenderer.js';
 import {
   AssessmentDto,
   AssessmentPaperDto,
@@ -637,9 +638,9 @@ export const AssessmentDetailPage: React.FC = () => {
                         </Typography>
                       </Box>
 
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#0f172a', mb: 2 }}>
-                        {q.questionText}
-                      </Typography>
+                      <Box sx={{ mb: 2 }}>
+                        <QuestionContentRenderer content={q.questionText} sx={{ fontWeight: 600, color: '#0f172a' }} />
+                      </Box>
 
                       {/* Randomized Options Preview */}
                       {q.randomizedOptions && q.randomizedOptions.length > 0 && (

@@ -17,8 +17,10 @@ import {
   InterviewEvaluationDto,
   EvaluationComparisonDto,
   StudentHumanEvaluationSummaryDto,
+  BulkEvaluationResultDto,
 } from '../types/evaluation.types.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { validateBulkEvaluationInput } from '../validators/evaluation.validator.js';
 
 export class EvaluationService {
   constructor(private readonly repo: EvaluationRepository = evaluationRepository) {}
@@ -250,6 +252,74 @@ export class EvaluationService {
     return saved;
   }
 
+  async bulkEvaluateGd(
+    roundId: string,
+    evaluatorUserId: string,
+    isPlacementAdmin: boolean,
+    body: any
+  ): Promise<BulkEvaluationResultDto> {
+    const round = await this.repo.getGdRoundById(roundId);
+    if (!round) {
+      throw new AppError('GD round not found', 404);
+    }
+
+    if (!isPlacementAdmin && round.evaluatorId && round.evaluatorId !== evaluatorUserId) {
+      throw new AppError('Forbidden: You are not the assigned evaluator for this GD round', 403);
+    }
+
+    const validatedPayload = validateBulkEvaluationInput(body, round, 'GD');
+
+    const criteriaMap = new Map((round.criteria || []).map((c) => [c.id, c]));
+    const maxPossibleMarksForRound = (round.criteria || []).reduce(
+      (sum, c) => sum + (Number(c.maxMarks) || 10),
+      0
+    );
+
+    if (!validatedPayload.isDraft && maxPossibleMarksForRound <= 0) {
+      throw new AppError('Maximum possible marks for this round must be greater than zero', 400);
+    }
+
+    const processedEvaluations = validatedPayload.evaluations.map((item) => {
+      let totalScore = 0;
+      const itemScores = item.criterionScores || item.scores || [];
+      const validatedScores = itemScores.map((cs) => {
+        const crit = criteriaMap.get(cs.criterionId);
+        const maxMarks = crit ? Number(crit.maxMarks) || 10 : 10;
+        const score = Math.max(0, Math.min(cs.score, maxMarks));
+        totalScore += score;
+        return {
+          criterionId: cs.criterionId,
+          score,
+          maxMarks,
+          comment: cs.comment,
+        };
+      });
+
+      const maxPossibleMarks = maxPossibleMarksForRound;
+      const percentage =
+        maxPossibleMarks > 0
+          ? Math.round((totalScore / maxPossibleMarks) * 100 * 100) / 100
+          : 0;
+
+      return {
+        studentId: item.studentId,
+        participantId: item.participantId,
+        feedback: item.feedback,
+        criterionScores: validatedScores,
+        totalScore: Math.round(totalScore * 100) / 100,
+        maxPossibleMarks,
+        percentage,
+      };
+    });
+
+    return this.repo.bulkSaveGdEvaluations({
+      roundId,
+      evaluatorId: evaluatorUserId,
+      isDraft: validatedPayload.isDraft || false,
+      evaluations: processedEvaluations,
+    });
+  }
+
   // ===========================================================================
   // INTERVIEW ROUNDS (PLACEMENT ADMIN & EVALUATOR)
   // ===========================================================================
@@ -439,6 +509,76 @@ export class EvaluationService {
     );
 
     return saved;
+  }
+
+  async bulkEvaluateInterview(
+    roundId: string,
+    evaluatorUserId: string,
+    isPlacementAdmin: boolean,
+    body: any
+  ): Promise<BulkEvaluationResultDto> {
+    const round = await this.repo.getInterviewRoundById(roundId);
+    if (!round) {
+      throw new AppError('Interview round not found', 404);
+    }
+
+    if (!isPlacementAdmin && round.evaluatorId && round.evaluatorId !== evaluatorUserId) {
+      throw new AppError('Forbidden: You are not the assigned evaluator for this Interview round', 403);
+    }
+
+    const validatedPayload = validateBulkEvaluationInput(body, round, 'INTERVIEW');
+
+    const criteriaMap = new Map((round.criteria || []).map((c) => [c.id, c]));
+    const maxPossibleMarksForRound = (round.criteria || []).reduce(
+      (sum, c) => sum + (Number(c.maxMarks) || 10),
+      0
+    );
+
+    if (!validatedPayload.isDraft && maxPossibleMarksForRound <= 0) {
+      throw new AppError('Maximum possible marks for this round must be greater than zero', 400);
+    }
+
+    const processedEvaluations = validatedPayload.evaluations.map((item) => {
+      let totalScore = 0;
+      const itemScores = item.criterionScores || item.scores || [];
+      const validatedScores = itemScores.map((cs) => {
+        const crit = criteriaMap.get(cs.criterionId);
+        const maxMarks = crit ? Number(crit.maxMarks) || 10 : 10;
+        const score = Math.max(0, Math.min(cs.score, maxMarks));
+        totalScore += score;
+        return {
+          criterionId: cs.criterionId,
+          score,
+          maxMarks,
+          comment: cs.comment,
+        };
+      });
+
+      const maxPossibleMarks = maxPossibleMarksForRound;
+      const percentage =
+        maxPossibleMarks > 0
+          ? Math.round((totalScore / maxPossibleMarks) * 100 * 100) / 100
+          : 0;
+
+      return {
+        studentId: item.studentId,
+        participantId: item.participantId,
+        strengths: item.strengths,
+        areasForImprovement: item.areasForImprovement,
+        overallFeedback: item.overallFeedback,
+        criterionScores: validatedScores,
+        totalScore: Math.round(totalScore * 100) / 100,
+        maxPossibleMarks,
+        percentage,
+      };
+    });
+
+    return this.repo.bulkSaveInterviewEvaluations({
+      roundId,
+      evaluatorId: evaluatorUserId,
+      isDraft: validatedPayload.isDraft || false,
+      evaluations: processedEvaluations,
+    });
   }
 
   // ===========================================================================

@@ -141,6 +141,28 @@ export class EvaluationController {
     }
   };
 
+  bulkEvaluateGd = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const roundId = String(req.params.id);
+      const evaluatorUserId = req.user?.sub || 'usr-placement-admin-001';
+      const isPlacementAdmin = req.user?.role === 'PLACEMENT_ADMIN';
+
+      const result = await this.service.bulkEvaluateGd(
+        roundId,
+        evaluatorUserId,
+        isPlacementAdmin,
+        req.body
+      );
+
+      const msg = result.isDraft
+        ? `Bulk GD evaluation draft saved for ${result.evaluatedCount} student(s)`
+        : `Bulk GD evaluations submitted successfully for ${result.evaluatedCount} student(s)`;
+      sendSuccess(res, msg, result, result.isDraft ? 200 : 201);
+    } catch (err) {
+      next(err);
+    }
+  };
+
   // ===========================================================================
   // INTERVIEW ROUNDS (ADMIN / EVALUATOR)
   // ===========================================================================
@@ -262,6 +284,28 @@ export class EvaluationController {
         isPlacementAdmin
       );
       sendSuccess(res, 'Interview evaluation recorded successfully', evaluation, 201);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  bulkEvaluateInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const roundId = String(req.params.id);
+      const evaluatorUserId = req.user?.sub || 'usr-placement-admin-001';
+      const isPlacementAdmin = req.user?.role === 'PLACEMENT_ADMIN';
+
+      const result = await this.service.bulkEvaluateInterview(
+        roundId,
+        evaluatorUserId,
+        isPlacementAdmin,
+        req.body
+      );
+
+      const msg = result.isDraft
+        ? `Bulk interview evaluation draft saved for ${result.evaluatedCount} student(s)`
+        : `Bulk interview evaluations submitted successfully for ${result.evaluatedCount} student(s)`;
+      sendSuccess(res, msg, result, result.isDraft ? 200 : 201);
     } catch (err) {
       next(err);
     }

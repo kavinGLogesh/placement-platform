@@ -3,9 +3,10 @@ import {
   QuestionDifficulty,
   QuestionType,
   QuestionStatus,
+  AiClassificationStatus,
 } from '@prisma/client';
 
-export { QuestionCategory, QuestionDifficulty, QuestionType, QuestionStatus };
+export { QuestionCategory, QuestionDifficulty, QuestionType, QuestionStatus, AiClassificationStatus };
 
 // =============================================================================
 // Authoritative Category -> Topics Master Matrix
@@ -77,6 +78,74 @@ export const CATEGORY_TOPICS_MAP: Record<QuestionCategory, readonly string[]> = 
   ] as const,
 };
 
+/**
+ * Normalizes input or AI suggested topic string to the exact canonical topic name from CATEGORY_TOPICS_MAP
+ */
+export function canonicalizeTopic(category: QuestionCategory, rawTopic: string): string | null {
+  if (!rawTopic || !category) return null;
+  const allowed = CATEGORY_TOPICS_MAP[category];
+  if (!allowed) return null;
+
+  const cleaned = rawTopic.trim().toLowerCase().replace(/[_-]/g, ' ').replace(/\s+/g, ' ');
+
+  // Direct match
+  const directMatch = allowed.find((t) => t.toLowerCase() === cleaned);
+  if (directMatch) return directMatch;
+
+  // Keyword / symbol variations (e.g., "profit and loss" vs "profit & loss", "time, speed & distance" vs "time speed distance")
+  const stripped = cleaned.replace(/&/g, 'and').replace(/,/g, '').replace(/\s+/g, ' ');
+  for (const t of allowed) {
+    const tCleaned = t.toLowerCase().replace(/&/g, 'and').replace(/,/g, '').replace(/\s+/g, ' ');
+    if (tCleaned === stripped) return t;
+  }
+
+  // Common aliases
+  const ALIASES: Record<string, string> = {
+    'profit and loss': 'Profit & Loss',
+    'profit & loss': 'Profit & Loss',
+    'profit loss': 'Profit & Loss',
+    'time and work': 'Time & Work',
+    'time & work': 'Time & Work',
+    'time speed and distance': 'Time Speed Distance',
+    'time speed distance': 'Time Speed Distance',
+    'ratio and proportion': 'Ratio & Proportion',
+    'ratio & proportion': 'Ratio & Proportion',
+    'permutation and combination': 'Permutation & Combination',
+    'permutation & combination': 'Permutation & Combination',
+    'statement and conclusion': 'Statement & Conclusion',
+    'statement & conclusion': 'Statement & Conclusion',
+    'blood relation': 'Blood Relations',
+    'blood relations': 'Blood Relations',
+    'coding decoding': 'Coding-Decoding',
+    'reading comprehension': 'Reading Comprehension',
+    'data interpretation': 'Data Interpretation',
+    'number system': 'Number System',
+    'data structures': 'Data Structures',
+    'operating system': 'Operating Systems',
+    'operating systems': 'Operating Systems',
+    'computer network': 'Computer Networks',
+    'computer networks': 'Computer Networks',
+  };
+
+  if (ALIASES[cleaned]) {
+    const matched = allowed.find((t) => t.toLowerCase() === ALIASES[cleaned].toLowerCase());
+    if (matched) return matched;
+  }
+
+  return null;
+}
+
+/**
+ * Normalizes difficulty (handles DIFFICULT <-> HARD, EASY, MEDIUM)
+ */
+export function canonicalizeDifficulty(rawDiff: string): QuestionDifficulty {
+  if (!rawDiff) return 'MEDIUM';
+  const upper = rawDiff.trim().toUpperCase();
+  if (upper === 'DIFFICULT' || upper === 'HARD') return 'HARD';
+  if (upper === 'EASY') return 'EASY';
+  return 'MEDIUM';
+}
+
 // =============================================================================
 // DTOs & Interfaces
 // =============================================================================
@@ -96,6 +165,43 @@ export interface CreateQuestionOptionDto {
   optionText: string;
   optionOrder: number;
   isCorrect: boolean;
+}
+
+export interface ConfidenceScores {
+  category: number;
+  topic: number;
+  difficulty: number;
+  questionType: number;
+  overall?: number;
+}
+
+export interface QuestionAiClassificationDto {
+  id: string;
+  questionId: string;
+  suggestedCategory: QuestionCategory;
+  suggestedTopic: string;
+  suggestedDifficulty: QuestionDifficulty;
+  suggestedQuestionType: QuestionType;
+  categoryConfidence: number;
+  topicConfidence: number;
+  difficultyConfidence: number;
+  typeConfidence: number;
+  overallConfidence: number;
+  reasoning?: string | null;
+  status: AiClassificationStatus;
+  rawAiResponse?: string | null;
+  errorMessage?: string | null;
+  modelName?: string | null;
+  isApproved: boolean;
+  approvedAt?: Date | null;
+  approvedById?: string | null;
+  reviewedCategory?: QuestionCategory | null;
+  reviewedTopic?: string | null;
+  reviewedDifficulty?: QuestionDifficulty | null;
+  reviewedQuestionType?: QuestionType | null;
+  notes?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface QuestionDto {
@@ -126,6 +232,7 @@ export interface QuestionDto {
     label: string;
   }>;
   createdBy?: { id: string; email: string } | null;
+  aiClassification?: QuestionAiClassificationDto | null;
   _count?: {
     usages: number;
   };
@@ -146,6 +253,7 @@ export interface CreateQuestionDto {
   explanation?: string;
   status?: QuestionStatus;
   options?: CreateQuestionOptionDto[];
+  autoClassify?: boolean;
 }
 
 export interface UpdateQuestionDto {
@@ -174,8 +282,52 @@ export interface QuestionQueryFilters {
   difficulty?: QuestionDifficulty;
   questionType?: QuestionType;
   status?: QuestionStatus;
+  aiStatus?: AiClassificationStatus;
   sortBy?: 'createdAt' | 'marks' | 'difficulty' | 'questionType' | 'category';
   sortOrder?: 'asc' | 'desc';
+}
+
+export interface AiClassifyQuestionInput {
+  questionId?: string;
+  questionText: string;
+  options?: Array<{ optionText: string; isCorrect?: boolean }>;
+  correctAnswer?: string | null;
+  explanation?: string | null;
+}
+
+export interface AiClassifyResult {
+  category: QuestionCategory;
+  topic: string;
+  difficulty: QuestionDifficulty;
+  questionType: QuestionType;
+  confidence: ConfidenceScores;
+  reasoning: string;
+  status: AiClassificationStatus;
+  rawAiResponse?: string;
+  modelName?: string;
+}
+
+export interface AdminReviewClassificationDto {
+  action: 'APPROVE' | 'ACCEPT_AI' | 'ACCEPT' | 'OVERRIDE' | 'SEND_TO_REVIEW';
+  category?: QuestionCategory;
+  topic?: string;
+  difficulty?: QuestionDifficulty;
+  questionType?: QuestionType;
+  notes?: string;
+}
+
+export interface BatchClassifyResult {
+  totalRequested: number;
+  processed: number;
+  classified: number;
+  needsReview: number;
+  failed: number;
+  results: Array<{
+    questionId: string;
+    status: AiClassificationStatus;
+    classification?: AiClassifyResult;
+    error?: string;
+  }>;
 }
 
 export interface QuestionUsageDto {

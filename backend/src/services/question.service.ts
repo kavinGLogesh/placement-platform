@@ -1,4 +1,5 @@
 import { QuestionRepository, questionRepository } from '../repositories/question.repository.js';
+import { aiClassificationService } from './ai/ai-classification.service.js';
 import {
   QuestionDto,
   CreateQuestionDto,
@@ -8,6 +9,10 @@ import {
   CreateQuestionUsageDto,
   QuestionStatus,
   CATEGORY_TOPICS_MAP,
+  AiClassifyQuestionInput,
+  AiClassifyResult,
+  AdminReviewClassificationDto,
+  BatchClassifyResult,
 } from '../types/question.types.js';
 import { PaginatedResult } from '../types/management.types.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -19,7 +24,16 @@ export class QuestionService {
   async createQuestion(payload: CreateQuestionDto, createdById?: string): Promise<QuestionDto> {
     validateCategoryTopic(payload.category, payload.topic);
     validateQuestionOptions(payload.questionType || 'SINGLE_CHOICE', payload.options, payload.correctAnswer);
-    return this.repository.createQuestion(payload, createdById);
+    const created = await this.repository.createQuestion(payload, createdById);
+
+    // Auto-classify asynchronously if requested, without blocking question creation
+    if (payload.autoClassify) {
+      this.classifyQuestion(created.id).catch(() => {
+        // Safe asynchronous classification
+      });
+    }
+
+    return created;
   }
 
   async getQuestions(filters: QuestionQueryFilters = {}): Promise<PaginatedResult<QuestionDto>> {
@@ -64,9 +78,128 @@ export class QuestionService {
     return this.repository.recordQuestionUsage(payload);
   }
 
+  async bulkCreateQuestions(
+    questions: CreateQuestionDto[],
+    createdById?: string
+  ): Promise<{ created: QuestionDto[]; failed: { index: number; reason: string }[] }> {
+    const created: QuestionDto[] = [];
+    const failed: { index: number; reason: string }[] = [];
+
+    for (let i = 0; i < questions.length; i++) {
+      try {
+        const q = await this.createQuestion(questions[i], createdById);
+        created.push(q);
+      } catch (err: any) {
+        failed.push({ index: i, reason: err.message || 'Validation error' });
+      }
+    }
+
+    return { created, failed };
+  }
+
   getCategoryTopicsMap(): typeof CATEGORY_TOPICS_MAP {
     return CATEGORY_TOPICS_MAP;
+  }
+
+  // ===========================================================================
+  // AI CLASSIFICATION INTELLIGENCE
+  // ===========================================================================
+
+  /**
+   * Triggers AI classification for a single existing question
+   */
+  async classifyQuestion(id: string): Promise<QuestionDto> {
+    const question = await this.getQuestionById(id);
+
+    const classificationResult = await aiClassificationService.classify({
+      questionId: id,
+      questionText: question.questionText,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      explanation: question.explanation,
+    });
+
+    await this.repository.upsertAiClassification(id, classificationResult);
+    return this.getQuestionById(id);
+  }
+
+  /**
+   * Interactive authoring assistant: classifies raw question text & options before saving
+   */
+  async autoDetectClassification(input: AiClassifyQuestionInput): Promise<AiClassifyResult> {
+    if (!input.questionText || !input.questionText.trim()) {
+      throw new AppError('Question text is required for AI classification', 400);
+    }
+    return aiClassificationService.classify(input);
+  }
+
+  /**
+   * Batch classifies multiple questions with concurrency control
+   */
+  async batchClassifyQuestions(questionIds: string[]): Promise<BatchClassifyResult> {
+    if (!Array.isArray(questionIds) || questionIds.length === 0) {
+      throw new AppError('An array of question IDs is required', 400);
+    }
+
+    const inputs: Array<{ questionId: string; input: AiClassifyQuestionInput }> = [];
+
+    for (const id of questionIds) {
+      const q = await this.repository.findQuestionById(id);
+      if (q) {
+        inputs.push({
+          questionId: id,
+          input: {
+            questionId: id,
+            questionText: q.questionText,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+          },
+        });
+      }
+    }
+
+    const batchResult = await aiClassificationService.batchClassify(inputs);
+
+    // Save all successful/needs-review results to repository
+    for (const item of batchResult.results) {
+      if (item.classification) {
+        await this.repository.upsertAiClassification(item.questionId, item.classification);
+      }
+    }
+
+    return batchResult;
+  }
+
+  /**
+   * Admin reviews, accepts, overrides, or approves classification
+   */
+  async reviewClassification(
+    id: string,
+    review: AdminReviewClassificationDto,
+    adminId: string
+  ): Promise<QuestionDto> {
+    if (!review.action || !['APPROVE', 'ACCEPT_AI', 'ACCEPT', 'OVERRIDE', 'SEND_TO_REVIEW'].includes(review.action)) {
+      throw new AppError("Review 'action' is required ('APPROVE', 'ACCEPT_AI', 'ACCEPT', 'OVERRIDE', 'SEND_TO_REVIEW')", 400);
+    }
+
+    if (review.action === 'OVERRIDE') {
+      if (!review.category || !review.topic) {
+        throw new AppError('Category and Topic are required when overriding classification', 400);
+      }
+      validateCategoryTopic(review.category, review.topic);
+    }
+
+    return this.repository.approveAiClassification(id, review, adminId);
+  }
+
+  /**
+   * Returns questions flagged as NEEDS_REVIEW or AI_FAILED
+   */
+  async getQuestionsNeedingReview(page = 1, limit = 10): Promise<PaginatedResult<QuestionDto>> {
+    return this.repository.findQuestionsNeedingReview(page, limit);
   }
 }
 
 export const questionService = new QuestionService();
+
